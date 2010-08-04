@@ -1,18 +1,22 @@
 package ion.core;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.msgpack.Packer;
+import org.msgpack.UnpackException;
+import org.msgpack.UnpackResult;
+import org.msgpack.Unpacker;
 
-import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.Envelope;
-import com.rabbitmq.client.QueueingConsumer;
 
 public class IonMessaging {
 	
@@ -41,6 +45,50 @@ public class IonMessaging {
 		msg.put("conv-seq", 1);
 		msg.put("content", content);
 		return msg;
+	}
+	
+	public static Object decodeMessage(byte[] msgbytes) {
+		ByteArrayInputStream bin = new ByteArrayInputStream(msgbytes);
+		Unpacker unpack = new Unpacker(bin);
+		UnpackResult result = null;
+		try {
+			result = unpack.next();
+		} catch (UnpackException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Object msgData = decodeValue(result.getData());
+		
+        System.out.println("Message obj " + msgData);
+
+		return null;
+	}
+	
+	public static Object decodeValue(Object obj) {
+		if (obj instanceof byte[]) {
+			return new String((byte[]) obj);
+		}
+		else if (obj instanceof List) {
+			List newl = new ArrayList();
+			for (Object v : ((List) obj)) {
+				newl.add(decodeValue(v));
+			}
+			return newl;
+		}
+		else if (obj instanceof Map) {
+			Map newm = new HashMap();
+			for (Object me : ((Map) obj).entrySet()) {
+				String key = (String) decodeValue(((Map.Entry) me).getKey());
+				Object val = decodeValue(((Map.Entry) me).getValue());
+				newm.put(key,val);
+			}
+			return newm;
+
+		}
+		return obj;
 	}
 
 	public static Channel openBrokerChannel(String hostName, int portNumber, String exchange) {
