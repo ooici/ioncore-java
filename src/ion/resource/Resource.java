@@ -1,7 +1,7 @@
 package ion.resource;
 
-import ion.core.DataObject;
-import ion.core.IonMessaging;
+import ion.core.data.DataObject;
+import ion.core.messaging.IonMessaging;
 
 import java.util.HashMap;
 import java.util.Map;

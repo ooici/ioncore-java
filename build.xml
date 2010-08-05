@@ -6,6 +6,7 @@
 	<property name="src" location="src"/>
 	<property name="build" location="build"/>
 	<property name="classes" location="${build}/classes"/>
+	<property name="javadoc" location="${build}/javadoc"/>
 	<property name="dist"  location="dist"/>
 
 	<path id="libs-core">
@@ -43,11 +44,31 @@
 	</target>
 
 	<!-- ================================= 
+          target: javadoc              
+         ================================= -->
+	<target name="javadoc" depends="" description="Generate Javadoc">
+		<javadoc packagenames="ion.*"
+		   sourcepath="${src}"
+			classpathref="libs-example"
+		   defaultexcludes="yes"
+		   destdir="${javadoc}"
+		   author="true"
+		   version="true"
+		   use="true"
+		   windowtitle="ION Core">
+			<doctitle><![CDATA[<h1>ION Core</h1>]]></doctitle>
+			<bottom><![CDATA[<i>Copyright &#169; 2010 UC Regents. All Rights Reserved.</i>]]></bottom>
+			<tag name="todo" scope="all" description="To do:"/>
+		</javadoc>
+	</target>
+	
+	<!-- ================================= 
           target: dist              
          ================================= -->
-	<target name="dist" depends="compile" description="Package Distribution">
+	<target name="dist" depends="clean,compile,javadoc" description="Package Distribution">
 	    <!-- Create the distribution directory -->
 	    <mkdir dir="${dist}/lib"/>
+	    <mkdir dir="${dist}/docs"/>
 
 	    <!-- Create JAR file with library classes, tests and example code -->
 	    <jar jarfile="${dist}/lib/${projname}-full-${version}.jar" basedir="${classes}"/>
@@ -57,7 +78,12 @@
 	    	basedir="${classes}"
 	    	excludes="ion/example/**"
 		/>
-	</target>
+
+	    <!-- Create ZIP file with the javadoc -->
+		<zip destfile="${dist}/docs/${projname}-${version}-javadoc.zip"
+			basedir="${javadoc}"
+		/>		
+</target>
 
 	<!-- ================================= 
           target: clean              

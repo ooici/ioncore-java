@@ -1,6 +1,6 @@
 package ion.example;
 
-import ion.core.IonMessaging;
+import ion.core.messaging.IonMessaging;
 
 import java.io.IOException;
 import java.util.HashMap;
