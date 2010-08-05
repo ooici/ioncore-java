@@ -4,11 +4,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.msgpack.Packer;
 import org.msgpack.UnpackException;
 import org.msgpack.UnpackResult;
@@ -43,6 +46,8 @@ public class IonMessaging {
 		msg.put("op", op);
 		msg.put("conv-id", "#1");
 		msg.put("conv-seq", 1);
+		msg.put("accept-encoding", "application/ion-jsond");
+		msg.put("encoding", "application/ion-jsond");
 		msg.put("content", content);
 		return msg;
 	}
@@ -64,7 +69,7 @@ public class IonMessaging {
 		
         System.out.println("Message obj " + msgData);
 
-		return null;
+		return msgData;
 	}
 	
 	public static Object decodeValue(Object obj) {
@@ -91,6 +96,22 @@ public class IonMessaging {
 		return obj;
 	}
 
+	public static Map decodeDataObject(String dostr) {
+		  JSONParser parser=new JSONParser();
+
+		  System.out.println("=======decode JSON=======");
+		                
+		  Object obj = null;
+		  try {
+			  obj = parser.parse(dostr);
+		  } catch (ParseException e) {
+			  // TODO Auto-generated catch block
+			  e.printStackTrace();
+		  }
+		  System.out.println("decode result: "+obj);
+		  return (Map) obj;
+	}
+	
 	public static Channel openBrokerChannel(String hostName, int portNumber, String exchange) {
         try {
 			ConnectionFactory cfconn = new ConnectionFactory(); 
@@ -100,11 +121,11 @@ public class IonMessaging {
 
 			final Channel channel = conn.createChannel();
 
-			if (exchange == null) {
-			    exchange = "amq.topic";
-			} else {
-			    channel.exchangeDeclare(exchange, "topic");
-			}
+//			if (exchange == null) {
+//			    exchange = "amq.topic";
+//			} else {
+//			    channel.exchangeDeclare(exchange, "topic");
+//			}
 			
 	        System.out.println("Opened channel on host " + hostName + ", port " + portNumber +
 	                " with exchange " + exchange);

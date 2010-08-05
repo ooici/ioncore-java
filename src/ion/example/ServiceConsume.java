@@ -14,10 +14,10 @@ import com.rabbitmq.client.QueueingConsumer;
 
 public class ServiceConsume {
     public static void main(String[] args) {
-        String hostName = "amoeba.ucsd.edu";
+        String hostName = "localhost";
         int portNumber = AMQP.PROTOCOL.PORT;
         String exchange = "magnet.topic";
-        String toName = "mmeisinger.javaint";
+        String toName = "mysys.registry";
         String fromName = "mmeisinger.return";
 
         Channel channel = null;
@@ -25,7 +25,7 @@ public class ServiceConsume {
             channel = IonMessaging.openBrokerChannel(hostName, portNumber, exchange);
             IonMessaging.declareBindQueue(channel, fromName, exchange);
             
-            Map message = IonMessaging.createMessage(fromName, toName, "list_all_instruments", "");
+            Map message = IonMessaging.createMessage(fromName, toName, "get_resource_by_id", "4d60a4ad-0c20-4192-a4ef-cb237bf8d41e");
             byte[] msgbytes = IonMessaging.encodeMessage(message);
                         
             System.out.println("Sending to exchange " + exchange + ", topic " + toName);
@@ -39,13 +39,20 @@ public class ServiceConsume {
     							    null, null);
             channel.basicPublish(exchange, toName, props, msgbytes);
             
-            while (true) {
+            //while (true) {
                 QueueingConsumer.Delivery delivery = consumer.nextDelivery();
                 Envelope envelope = delivery.getEnvelope();
                 Object obj = IonMessaging.decodeMessage(delivery.getBody());
-                System.out.println(envelope.getRoutingKey() + ": " + new String(delivery.getBody()));
+                Map msg = (Map) obj;
+                Map msgcont = (Map) msg.get("content");
+                String dovalue = (String) msgcont.get("value");
+                
+                Map domap = IonMessaging.decodeDataObject(dovalue);
+                printResAttributes((Map) domap.get("fields"));
+                
+//                System.out.println(envelope.getRoutingKey() + ": " + new String(delivery.getBody()));
                 channel.basicAck(envelope.getDeliveryTag(), false);
-            }
+            //}
             
         } catch (Exception ex) {
             System.err.println("Main thread caught exception: " + ex);
@@ -60,6 +67,15 @@ public class ServiceConsume {
         		e.printStackTrace();
         	} 
         }
+    }
+    
+    static void printResAttributes(Map resourceDO) {
+    	for (Object me : resourceDO.entrySet()) {
+    		String key = (String) ((Map.Entry) me).getKey();
+    		Object value = ((Map.Entry) me).getValue();
+    		Object value1 = ((Map) value).get("value");
+    		System.out.println("Attribute "+key+"="+value1);
+    	}
     }
 }
 
