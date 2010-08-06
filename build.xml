@@ -83,8 +83,14 @@
 		<zip destfile="${dist}/docs/${projname}-${version}-javadoc.zip"
 			basedir="${javadoc}"
 		/>		
-</target>
 
+		<!-- Create ZIP file for the entire directory -->
+		<zip destfile="${dist}/${projname}-archive.zip"
+			basedir="."
+			excludes="${dist}/${projname}-archive.zip,${build}/**"
+		/>		
+	</target>
+	
 	<!-- ================================= 
           target: clean              
          ================================= -->
