@@ -18,7 +18,7 @@
 	</path>
 		
 	<path id="libs-example">
-		<pathelement location="./bin"/>
+		<pathelement location="${classes}"/>
 		<path refid="libs-core"/>
 	</path>
 
