@@ -1,6 +1,7 @@
 package ion.core.data;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.json.simple.JSONValue;
@@ -11,13 +12,15 @@ public class DataObject {
 	protected String mDOClass = null;
 	protected String mDOType = null;
 	
-	protected String mRegIdentity = null;
+	public String mRegIdentity = null;
 	protected String mRegBranch = null;
 	protected String mRegCommit = null;
 	
 	protected Map mAttributes = null;
 
 	public DataObject() {
+		mDOType = "DataObject";
+		mAttributes = new HashMap();
 	}
 
 	public DataObject(DataObject dobj) {
@@ -57,8 +60,33 @@ public class DataObject {
 		  return (Map) obj;
 	}
 
+	public void addAttribute(String attrName, DataObject value) {
+		mAttributes.put(attrName, value.encodeDataObject0());
+	}
+
 	public void addAttribute(String attrName, String value) {
 		addAttributeValue(attrName, value, "str", mAttributes);
+	}
+
+	public void addAttribute(String attrName, List value) {
+		Map listmap = new HashMap();
+		if (value != null) {
+			int lidx = 0;
+			for (Object li : value) {
+				listmap.put(""+(lidx++), li);
+			}
+		}
+		addAttributeValue(attrName, listmap, "list", mAttributes);
+	}
+
+	public void addAttribute(String attrName, boolean value) {
+		Object sval = value ? Boolean.TRUE : Boolean.FALSE;
+		addAttributeValue(attrName, sval, "bool", mAttributes);
+	}
+
+	public void addAttribute(String attrName, int value) {
+		String sval = String.valueOf(value);
+		addAttributeValue(attrName, sval, "int", mAttributes);
 	}
 
 	public void addAttributeValue(String attrName, Object value, String valtype, Map valmap) {
@@ -68,7 +96,7 @@ public class DataObject {
 		valmap.put(attrName, attrValMap);
 	}
 
-	public String encodeDataObject() {
+	protected Map encodeDataObject0() {
 		Map domap = new HashMap();
 		domap.put("class", mDOClass);
 		domap.put("type", mDOType);
@@ -77,7 +105,11 @@ public class DataObject {
 		addAttributeValue("RegistryBranch", mRegBranch, "str", fieldsmap);
 		addAttributeValue("RegistryCommit", mRegCommit, "str", fieldsmap);
 		domap.put("fields", fieldsmap);
-		String dovalstr = JSONValue.toJSONString(domap);
+		return domap;
+	}
+
+	public String encodeDataObject() {
+		String dovalstr = JSONValue.toJSONString(encodeDataObject0());
 		return dovalstr;
 	}
 	
@@ -105,15 +137,24 @@ public class DataObject {
     	sb.append("DataObject[");
     	sb.append("class="+mDOClass);
     	sb.append(",type="+mDOType);
-    	sb.append(",id="+mRegIdentity);
-    	sb.append(",branch="+mRegBranch);
-    	sb.append(",commit="+mRegCommit);
+    	if (mRegIdentity != null || mRegBranch != null || mRegCommit != null) {
+	    	sb.append(",id="+mRegIdentity);
+	    	sb.append(",branch="+mRegBranch);
+	    	sb.append(",commit="+mRegCommit);
+    	}
     	sb.append(",fields={");
     	for (Object me : mAttributes.entrySet()) {
     		String key = (String) ((Map.Entry) me).getKey();
     		Object value = ((Map.Entry) me).getValue();
     		Object value1 = ((Map) value).get("value");
     		String vtype = (String) ((Map) value).get("type");
+    		if ("DataObject".equals(vtype)) {
+    			DataObject dob = new DataObject();
+    			dob.mDOClass = (String) ((Map) value).get("class");
+    			dob.mDOType = vtype;
+    			dob.mAttributes = (Map) ((Map) value).get("fields");
+    			value1 = dob.toString();
+    		}
     		sb.append(key);
     		sb.append('<');
     		sb.append(vtype);

@@ -112,6 +112,11 @@ public class MsgBrokerAttachment {
         IonMessage msgin = messageFromDelivery(delivery);
 
         System.out.println("Message received on queue " + queueName + ", msglen " + msgin.getBody().length);
+        
+        Object cont = msgin.getContent();
+        if (cont instanceof Map && "ERROR".equals(((Map) cont).get("status"))) {
+            System.out.println("Received message is an ERROR message: " + ((Map) cont).get("value"));
+        }
 
         return msgin;
 	}
@@ -135,6 +140,7 @@ public class MsgBrokerAttachment {
 
 	public void sendMessage(IonMessage msg) {
 		byte[] msgbytes = msg.getBody();
+		
 		String toName = (String) msg.getIonHeaders().get("receiver");
         BasicProperties props = new BasicProperties("application/msgpack", "binary", null, null,
 			    null, null, null, null,
