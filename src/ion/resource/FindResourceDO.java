@@ -2,7 +2,6 @@ package ion.resource;
 
 import ion.core.data.DataObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class FindResourceDO extends DataObject {

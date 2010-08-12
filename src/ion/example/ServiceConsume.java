@@ -1,78 +1,84 @@
 package ion.example;
 
+import ion.core.BaseProcess;
 import ion.core.data.DataObject;
+import ion.core.data.DataObjectManager;
 import ion.core.messaging.IonMessage;
-import ion.core.messaging.MsgBrokerAttachment;
+import ion.core.messaging.MessagingName;
+import ion.core.messaging.MsgBrokerClient;
 import ion.resource.InstrumentRDO;
 import ion.resource.ListAllQueryDO;
 import ion.resource.ResourceDO;
 
+import java.util.Iterator;
+import java.util.List;
+
 import com.rabbitmq.client.AMQP;
 
-public class ServiceConsume {
-    public static void main(String[] args) {
-        String hostName = "localhost";
-        int portNumber = AMQP.PROTOCOL.PORT;
-        String exchange = "magnet.topic";
-        String toName = "mysys.registry";
-        String fromName = "mysys.return";
-        
-        // Messaging environment
-        MsgBrokerAttachment ionAttach = new MsgBrokerAttachment(hostName, portNumber, exchange);
-        ionAttach.attach();
-        
-        // Create return queue
-        String queue = ionAttach.declareQueue(null);
-        ionAttach.bindQueue(queue, fromName, null);                                
-        ionAttach.attachConsumer(queue);
-     
+public class ServiceConsume extends BaseProcess {
+	
+    public ServiceConsume(MsgBrokerClient brokercl) {
+		super(brokercl);
+	}
+    
+    public void callSequence() {
+        MessagingName ionServiceName = new MessagingName("mysys", "registry");
     	System.out.println("\nSTEP: Register a new resource");
         
         InstrumentRDO res1 = new InstrumentRDO();
-//        res1.addAttribute("name", "thing");
+        res1.create_identity();
+//       res1.addAttribute("serial_num", "abc1236215-33");
         
         // Create and send request message
-        IonMessage msgout1 = ionAttach.createMessage(fromName, toName, "register_resource", res1);
-        ionAttach.sendMessage(msgout1);
-        
-        // Receive response message
-        IonMessage msgin1 = ionAttach.consumeMessage(queue);
-        ionAttach.ackMessage(msgin1);
+        IonMessage msgin1 = this.rpcSend(ionServiceName, "register_resource", res1);
+        this.ackMessage(msgin1);
         
         // Create and send message
     	System.out.println("\nSTEP: Get previously registered resource attributes");
-        IonMessage msgout2 = ionAttach.createMessage(fromName, toName, "get_resource_by_id", res1.getIdentity());
-        ionAttach.sendMessage(msgout2);
-               
-        // Receive response message
-        IonMessage msgin2 = ionAttach.consumeMessage(queue);
+    	IonMessage msgin2 = this.rpcSend(ionServiceName, "get_resource_by_id", res1.getIdentity());
         if (msgin2.hasDataObject()) {
         	DataObject dobj = msgin2.extractDataObject();
-        	ResourceDO res = new ResourceDO(dobj);
-        	System.out.println("Message: "+res);
+        	System.out.println("Message DO: "+dobj);
         }
-        ionAttach.ackMessage(msgin2);
+        this.ackMessage(msgin2);
 
         // Create and send message
     	System.out.println("\nSTEP: Find all resources of a type");
     	InstrumentRDO irdo = new InstrumentRDO();
     	irdo.mRegIdentity = "";
         ListAllQueryDO listall = new ListAllQueryDO(irdo);
-        IonMessage msgout3 = ionAttach.createMessage(fromName, toName, "find_resource", listall);
-        ionAttach.sendMessage(msgout3);
-               
-        // Receive response message
-        IonMessage msgin3 = ionAttach.consumeMessage(queue);
+        IonMessage msgin3 = this.rpcSend(ionServiceName, "find_resource", listall);
         if (msgin3.hasDataObject()) {
         	DataObject dobj = msgin3.extractDataObject();
-        	InstrumentRDO res = new InstrumentRDO(dobj);
-        	System.out.println("Message: "+res);
+        	List reslist = (List) dobj.getAttribute("resources");
+        	for (Iterator it = reslist.iterator(); it.hasNext();) {
+				ResourceDO resobj = (ResourceDO) it.next();
+	        	System.out.println("Resource found: "+resobj);
+			}
         }
-        ionAttach.ackMessage(msgin3);
+        this.ackMessage(msgin3);
+    }
+    
+	public static void main(String[] args) {
+        String hostName = "localhost";
+        int portNumber = AMQP.PROTOCOL.PORT;
+        String exchange = "magnet.topic";
+        
+    	System.out.println("\nSTEP: Process and Message Broker Client Setup");
+
+    	// DataObject handling
+        DataObjectManager.registerDOType(InstrumentRDO.class);
+        
+        // Messaging environment
+        MsgBrokerClient ionClient = new MsgBrokerClient(hostName, portNumber, exchange);
+        ionClient.attach();
+
+        ServiceConsume scex = new ServiceConsume(ionClient);
+        scex.spawn();
+        scex.callSequence(); 
 
         // Close connection
-        ionAttach.detach();
+        ionClient.detach();
     }
-
 }
 

@@ -2,20 +2,21 @@ package ion.core.messaging;
 
 import ion.core.IonException;
 import ion.core.data.DataObject;
+import ion.core.data.DataObjectManager;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.QueueingConsumer;
 import com.rabbitmq.client.ShutdownSignalException;
-import com.rabbitmq.client.AMQP.BasicProperties;
 
-public class MsgBrokerAttachment {
+public class MsgBrokerClient {
 	String mBrokerHost;
 	int mBrokerPort;
 	String mBaseExchange;
@@ -24,7 +25,7 @@ public class MsgBrokerAttachment {
 	Channel mDefaultChannel = null;
 	Map mConsumerMap = null;
 
-	public MsgBrokerAttachment(String hostName, int portNumber, String ionExchange) {
+	public MsgBrokerClient(String hostName, int portNumber, String ionExchange) {
 		mBrokerHost = hostName;
 		mBrokerPort = portNumber;
 		mBaseExchange = ionExchange;
@@ -67,12 +68,12 @@ public class MsgBrokerAttachment {
         return queueName;
 	}
 
-	public void bindQueue(String queueName, String bindingKey, String exchange) {
+	public void bindQueue(String queueName, MessagingName bindingKey, String exchange) {
 		if (exchange == null) {
 			exchange = mBaseExchange;
 		}
 		try {
-			mDefaultChannel.queueBind(queueName, exchange, bindingKey);
+			mDefaultChannel.queueBind(queueName, exchange, bindingKey.getName());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -113,9 +114,8 @@ public class MsgBrokerAttachment {
 
         System.out.println("Message received on queue " + queueName + ", msglen " + msgin.getBody().length);
         
-        Object cont = msgin.getContent();
-        if (cont instanceof Map && "ERROR".equals(((Map) cont).get("status"))) {
-            System.out.println("Received message is an ERROR message: " + ((Map) cont).get("value"));
+        if (msgin.isErrorMessage()) {
+            System.out.println("Received message is an ERROR message: " + ((Map) msgin.getContent()).get("value"));
         }
 
         return msgin;
@@ -130,11 +130,11 @@ public class MsgBrokerAttachment {
         return msg;
 	}
 	
-	public IonMessage createMessage(String from, String to, String op, Object content) {
+	public IonMessage createMessage(MessagingName from, MessagingName to, String op, Object content) {
 		if (content instanceof DataObject) {
-			content = ((DataObject) content).encodeDataObject();
+			content = DataObjectManager.toValueString((DataObject) content);
 		}
-		IonSendMessage newmsg = new IonSendMessage(from, to, op, content);
+		IonSendMessage newmsg = new IonSendMessage(from.getName(), to.getName(), op, content);
 		return newmsg; 
 	}
 
@@ -155,6 +155,11 @@ public class MsgBrokerAttachment {
 		
         System.out.println("Sent message to exchange " + mBaseExchange + " with routing key " + toName + 
         		", msglen "+msgbytes.length);
+	}
+	
+	public void createSendMessage(MessagingName from, MessagingName to, String op, Object content) {
+		IonMessage msg = createMessage(from, to, op, content);
+		sendMessage(msg);
 	}
 	
 	public void ackMessage(IonMessage msg) {

@@ -1,6 +1,7 @@
 package ion.core.messaging;
 
 import ion.core.data.DataObject;
+import ion.core.data.DataObjectManager;
 
 import java.util.Map;
 
@@ -46,14 +47,17 @@ public class IonMessage {
 		return  false;
 	}
 	
+	public boolean isErrorMessage() {
+        return (mContent instanceof Map && "ERROR".equals(((Map) mContent).get("status")));
+	}
+	
 	public DataObject extractDataObject() {
 		if (! hasDataObject()) {
 			return null;
 		}
 
 		String dovalstr = (String) ((Map) mContent).get("value");
-		DataObject dobj = DataObject.fromValueString(dovalstr);
+		DataObject dobj = DataObjectManager.fromValueString(dovalstr);
 	    return dobj;
 	}
-
 }
