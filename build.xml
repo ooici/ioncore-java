@@ -40,6 +40,17 @@
 	<target name="runex" depends="compile" description="Run Example">
 		<java classname="ion.example.ServiceConsume">
 			<classpath refid="libs-example"/>
+			<sysproperty key="ioncore.sysname" value="${user.name}"/>
+		</java>
+	</target>
+
+	<!-- ================================= 
+          target: runex              
+         ================================= -->
+	<target name="runlca" depends="compile" description="Run Example">
+		<java classname="ion.example.LcaDemoProcess">
+			<classpath refid="libs-example"/>
+			<sysproperty key="ioncore.sysname" value="${user.name}"/>
 		</java>
 	</target>
 

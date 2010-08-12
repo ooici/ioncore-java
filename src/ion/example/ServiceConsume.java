@@ -17,12 +17,14 @@ import com.rabbitmq.client.AMQP;
 
 public class ServiceConsume extends BaseProcess {
 	
-    public ServiceConsume(MsgBrokerClient brokercl) {
+	String SYSNAME = System.getProperty("ioncore.sysname","mysys");
+
+	public ServiceConsume(MsgBrokerClient brokercl) {
 		super(brokercl);
 	}
     
     public void callSequence() {
-        MessagingName ionServiceName = new MessagingName("mysys", "registry");
+        MessagingName ionServiceName = new MessagingName(SYSNAME, "registry");
     	System.out.println("\nSTEP: Register a new resource");
         
         InstrumentRDO res1 = new InstrumentRDO();
@@ -44,9 +46,7 @@ public class ServiceConsume extends BaseProcess {
 
         // Create and send message
     	System.out.println("\nSTEP: Find all resources of a type");
-    	InstrumentRDO irdo = new InstrumentRDO();
-    	irdo.mRegIdentity = "";
-        ListAllQueryDO listall = new ListAllQueryDO(irdo);
+        ListAllQueryDO listall = new ListAllQueryDO(new InstrumentRDO());
         IonMessage msgin3 = this.rpcSend(ionServiceName, "find_resource", listall);
         if (msgin3.hasDataObject()) {
         	DataObject dobj = msgin3.extractDataObject();
