@@ -29,12 +29,13 @@ public class ServiceConsume extends BaseProcess {
         
         InstrumentRDO res1 = new InstrumentRDO();
         res1.create_identity();
-//       res1.addAttribute("serial_num", "abc1236215-33");
+        res1.addAttribute("serial_num", "1234");
+        res1.addAttribute("model", "SBE49");
         
         // Create and send request message
         IonMessage msgin1 = this.rpcSend(ionServiceName, "register_resource", res1);
         this.ackMessage(msgin1);
-        
+                
         // Create and send message
     	System.out.println("\nSTEP: Get previously registered resource attributes");
     	IonMessage msgin2 = this.rpcSend(ionServiceName, "get_resource_by_id", res1.getIdentity());
