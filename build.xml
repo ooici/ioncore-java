@@ -15,6 +15,7 @@
 		<pathelement location="./lib/json_simple-1.1.jar"/>
 		<pathelement location="./lib/msgpack-0.3.jar"/>
 		<pathelement location="./lib/rabbitmq-client.jar"/>
+		<pathelement location="./lib/spring-amqp-1.0.0.M1.jar"/>
 	</path>
 		
 	<path id="libs-example">
