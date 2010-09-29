@@ -16,14 +16,22 @@ import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.QueueingConsumer;
 import com.rabbitmq.client.ShutdownSignalException;
 
+/**
+ * MsgBrokerClient
+ *
+ * @author Michael Meisinger
+ * @author Stephen Pasco
+ *
+ */
 public class MsgBrokerClient {
-	String mBrokerHost;
-	int mBrokerPort;
-	String mBaseExchange;
 
-	Connection mBrokerConnection = null;
-	Channel mDefaultChannel = null;
-	Map mConsumerMap = null;
+	private String mBrokerHost;
+	private int mBrokerPort;
+	private String mBaseExchange;
+
+	private Connection mBrokerConnection = null;
+	private Channel mDefaultChannel = null;
+	private Map mConsumerMap = null;
 
 	public MsgBrokerClient(String hostName, int portNumber, String ionExchange) {
 		mBrokerHost = hostName;
