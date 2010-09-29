@@ -4,8 +4,15 @@ import ion.core.messaging.IonMessage;
 import ion.core.messaging.MessagingName;
 import ion.core.messaging.MsgBrokerClient;
 
-
+/**
+ * ioncore-java base process. 
+ *
+ * @author Michael Meisinger
+ * @author Stephen Pasco
+ *
+ */
 public class BaseProcess {
+
 	MessagingName mProcessId;
 	MsgBrokerClient mBrokerClient;
 	String mInQueue;
