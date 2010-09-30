@@ -17,7 +17,7 @@ import com.rabbitmq.client.QueueingConsumer;
 import com.rabbitmq.client.ShutdownSignalException;
 
 /**
- * MsgBrokerClient
+ * MsgBrokerClient serves as the messaging client to a RabbitMQ broker.
  *
  * @author Michael Meisinger
  * @author Stephen Pasco
