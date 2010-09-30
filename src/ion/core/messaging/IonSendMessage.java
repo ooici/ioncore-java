@@ -7,11 +7,31 @@ import java.util.Map;
 
 import org.msgpack.Packer;
 
+/**
+ * The IonSendMessage allows a message's headers to be set. The message headers define
+ * such things as where a message is sent, where the message originates from, the message
+ * operations and more.
+ *
+ * @author Michael Meisinger
+ * @author Stephen Pasco
+ */
 public class IonSendMessage extends IonMessage {
 
+	// Message conversation id counter
 	private static int sConvCnt = 0;
-	
+
+	/**
+	 * Class constructor
+	 * 
+	 * Establishes where a message is from, its destination, its operations and its content.
+	 *
+	 * @param from    Where the message is from
+	 * @param to      The message destination
+	 * @param op      The message operation
+	 * @param content The message content
+	 */
 	public IonSendMessage(String from, String to, String op, Object content) {
+
 		super(false);
 		mHeaders = new HashMap();
 		mHeaders.put("sender", from);
@@ -19,35 +39,52 @@ public class IonSendMessage extends IonMessage {
 		mHeaders.put("reply-to", from);
 		mHeaders.put("op", op);
 		String convid = "#" + (sConvCnt++);
-		mHeaders.put("conv-id", convid);		
+		mHeaders.put("conv-id", convid);
 		mHeaders.put("conv-seq", 1);
 		mHeaders.put("accept-encoding", "application/ion-jsond");
 		mHeaders.put("encoding", "application/ion-jsond");
 		mHeaders.put("content", content);
 		mContent = content;
 	}
-	
+
+	/**
+	 * Returns the content of a message body
+	 *
+	 * @return Returns the byte array of a message body
+	 */
 	public byte[] getBody() {
+
 		if (mBody == null) {
 			Map bodymap = new HashMap(mHeaders);
 			bodymap.put("content", mContent);
 			byte[] bodyenc = encodeMessage(bodymap);
 			mBody = bodyenc;
 		}
+		
 		return mBody;
 	}
 
+	/**
+	 * Encodes a message using MessagePack
+	 *
+	 * @param msg A java.util.Map of messages
+	 * @return Returns a byte array of message pack encoded messages
+	 * @see <a href="http://msgpack.org>Msgpack</a>
+	 */
 	byte[] encodeMessage(Map msg) {
+
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Packer pack = new Packer(out);
+
 		try {
 			pack.pack(msg);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		byte[] res = out.toByteArray();
-		
+
 		return res;
 	}
 }
