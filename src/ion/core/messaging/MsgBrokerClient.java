@@ -49,7 +49,7 @@ public class MsgBrokerClient {
 	}
 
 	/**
-	 * Establish a connection to a RabbitMQ broker and attach a channel to that connection.
+	 * Establish a connection to a RabbitMQ broker and attaches a channel to that connection.
 	 */
 	public void attach() {
 
