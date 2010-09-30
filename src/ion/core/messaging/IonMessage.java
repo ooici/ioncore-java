@@ -8,6 +8,9 @@ import java.util.Map;
 import com.rabbitmq.client.Envelope;
 
 /**
+ * The IonMessage serves as the base class for all Ion messages. It contains the core constructs
+ * for all messages within ION. Such core message features include the message envelope, the message
+ * body, the message content and more. 
  *
  * @author Michael Meisinger
  * @author Stephen Pasco
@@ -100,7 +103,7 @@ public class IonMessage {
 
 	/**
 	 * Extracts and returns the DataObject of a message if it exists within the "value" property
-	 * of the IonMessage
+	 * of the IonMessage.
 	 *
 	 * @return Returns the DataObject contained in the "value" property of the IonMessage.
 	 */
