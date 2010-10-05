@@ -12,7 +12,7 @@ import com.rabbitmq.client.Envelope;
  * for all messages within ION. Such core message features include the message envelope, the message
  * body, the message content and more. 
  *
- * @author Michael Meisinger
+ * @author mmeisinger
  * @author Stephen Pasco
  *
  */

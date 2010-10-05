@@ -3,7 +3,7 @@ package ion.resource;
 import java.util.ArrayList;
 
 /**
- * @author Michael Meisinger
+ * @author mmeisinger
  */
 public class ListAllQueryDO extends FindResourceDO {
 

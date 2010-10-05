@@ -5,7 +5,7 @@ import ion.core.data.DataObject;
 import java.util.List;
 
 /**
- * @author Michael Meisinger
+ * @author mmeisinger
  */
 public class FindResourceDO extends DataObject {
 

@@ -5,7 +5,7 @@ import ion.core.data.DataObject;
 import java.util.UUID;
 
 /**
- * @author Michael Meisinger
+ * @author mmeisinger
  */
 public class ResourceDO extends DataObject {
 

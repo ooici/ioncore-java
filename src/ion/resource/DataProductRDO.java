@@ -2,7 +2,7 @@ package ion.resource;
 
 
 /**
- * @author Michael Meisinger
+ * @author mmeisinger
  */
 public class DataProductRDO extends ResourceDO {
 

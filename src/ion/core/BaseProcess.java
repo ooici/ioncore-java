@@ -7,7 +7,7 @@ import ion.core.messaging.MsgBrokerClient;
 /**
  * ioncore-java base process. 
  *
- * @author Michael Meisinger
+ * @author mmeisinger
  * @author Stephen Pasco
  *
  */

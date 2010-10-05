@@ -1,7 +1,7 @@
 package ion.resource;
 
 /**
- * @author Michael Meisinger
+ * @author mmeisinger
  */
 public class InstrumentRDO extends ResourceDO {
 

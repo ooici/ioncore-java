@@ -19,7 +19,7 @@ import com.rabbitmq.client.ShutdownSignalException;
 /**
  * MsgBrokerClient serves as the messaging client to a RabbitMQ broker.
  *
- * @author Michael Meisinger
+ * @author mmeisinger
  * @author Stephen Pasco
  */
 public class MsgBrokerClient {

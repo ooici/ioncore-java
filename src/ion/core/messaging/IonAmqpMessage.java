@@ -14,7 +14,7 @@ import org.msgpack.Unpacker;
 import com.rabbitmq.client.Envelope;
 
 /**
- * @author Michael Meisinger
+ * @author mmeisinger
  * @author Stephen Pasco
  */
 public class IonAmqpMessage extends IonMessage {

@@ -12,7 +12,7 @@ import org.msgpack.Packer;
  * such things as where a message is sent, where the message originates from, the message
  * operations and more.
  *
- * @author Michael Meisinger
+ * @author mmeisinger
  * @author Stephen Pasco
  */
 public class IonSendMessage extends IonMessage {
