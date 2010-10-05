@@ -5,7 +5,7 @@ ION-CORE - OOI CI Integrated Observatory Network Core Libraries (Java)
 August 2010
 
 This project contains the Java core libraries for the OOI CI Integrated
-Observatory Network (ION). This library provides a the core classes for
+Observatory Network (ION). This library provides the core classes for
 interfacing with the common OOI message Exchange, for interacting with
 OOI services and OOI data objects.
 
