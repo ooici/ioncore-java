@@ -4,9 +4,21 @@ import ion.core.data.DataObject;
 
 import java.util.List;
 
+/**
+ * @author Michael Meisinger
+ */
 public class FindResourceDO extends DataObject {
 
+	/**
+	 * Class Constructor.
+	 *
+	 * @param desc           The ResourceDO
+	 * @param ignoreDefaults Boolean value to ignore defaults
+	 * @param regex          Boolean value to set regex
+	 * @param attNames       List containing attribute names
+	 */
 	public FindResourceDO(ResourceDO desc, boolean ignoreDefaults, boolean regex, List attNames) {
+
 		super();
 		this.mDOClass = "FindResourceContainer";
 		this.addAttribute("description", desc);

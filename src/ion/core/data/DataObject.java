@@ -66,6 +66,7 @@ public class DataObject {
 	}
 
 	public String toString() {
+		
     	StringBuffer sb = new StringBuffer();
     	sb.append("DataObject[");
     	sb.append("*class="+mDOClass);
