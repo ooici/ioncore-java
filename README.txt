@@ -9,6 +9,9 @@ Observatory Network (ION). This library provides the core classes for
 interfacing with the common OOI message Exchange, for interacting with
 OOI services and OOI data objects.
 
+See:
+http://www.oceanobservatories.org/spaces/display/CIDev/IONCore+Java
+
 This library follows the architecture and design defined by the LCAarch project.
 This python based system with its core libraries represents the ION reference
 implementation. For more information, please see:
