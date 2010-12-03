@@ -19,9 +19,11 @@ import com.rabbitmq.client.Envelope;
  */
 public class IonAmqpMessage extends IonMessage {
 
+        private String encoding = "";
+
 	/**
 	 * Class Constructor.
-	 * 
+	 *
 	 * Enables the class establishment of the message envelope and message body.
 	 *
 	 * @param envelope The message envelope
@@ -44,7 +46,7 @@ public class IonAmqpMessage extends IonMessage {
 	 * @return The message decoded
 	 * @see <a href="http://http://msgpack.org/">MessagePack</a>
 	 */
-	public static Object decodeMessage(byte[] msgbytes) {
+	private Object decodeMessage(byte[] msgbytes) {
 
 		ByteArrayInputStream bin = new ByteArrayInputStream(msgbytes);
 		Unpacker unpack = new Unpacker(bin);
@@ -61,12 +63,11 @@ public class IonAmqpMessage extends IonMessage {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		Object msgData = decodeValue(result.getData());
 
 		return msgData;
 	}
-
 	/**
 	 * This is a helper method useful for taking a formerly decoded, MessagePacked, object and
 	 * turning it into something (String, List or Map) that's human readable.
@@ -75,9 +76,9 @@ public class IonAmqpMessage extends IonMessage {
 	 * @return Returns an Object either as a String or a Collection (List or Map). String objects
 	 * should be human readable. Objects of type Collection can be read via toString() functions.
 	 */
-	public static Object decodeValue(Object obj) {
+	private Object decodeValue(Object obj) {
 		if (obj instanceof byte[]) {
-			return new String((byte[]) obj);
+                    return new String((byte[]) obj);
 		}
 		else if (obj instanceof List) {
 			List newl = new ArrayList();
@@ -91,6 +92,15 @@ public class IonAmqpMessage extends IonMessage {
 			for (Object me : ((Map) obj).entrySet()) {
 				String key = (String) decodeValue(((Map.Entry) me).getKey());
 				Object val = decodeValue(((Map.Entry) me).getValue());
+
+                                if(key.equalsIgnoreCase("encoding")) {
+                                    /* Capture the encoding of the message so that the content of ION R1 GPB messages can be left as byte[] objects */
+                                    encoding = val.toString();
+                                    System.out.println("set encoding to: " + encoding);
+                                } else if (encoding.equalsIgnoreCase("ION R1 GPB") && key.equalsIgnoreCase("content")) {
+                                    /* If the encoding indicates that this is a GPB data message, return the raw byte[] object */
+                                    val = ((Map.Entry) me).getValue();
+                                }
 				newm.put(key, val);
 			}
 			return newm;
