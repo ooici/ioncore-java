@@ -20,6 +20,8 @@ import com.rabbitmq.client.Envelope;
 public class IonAmqpMessage extends IonMessage {
 
         private String encoding = "";
+        private String contentKey = "content";
+        private Object content = null;
 
 	/**
 	 * Class Constructor.
@@ -93,13 +95,31 @@ public class IonAmqpMessage extends IonMessage {
 				String key = (String) decodeValue(((Map.Entry) me).getKey());
 				Object val = decodeValue(((Map.Entry) me).getValue());
 
-                                if(key.equalsIgnoreCase("encoding")) {
+                                if(key.equalsIgnoreCase("content")) {
+                                    if(!encoding.isEmpty()) {
+                                        /* If the encoding indicates that this is a GPB data message, return the raw byte[] object */
+                                        if(encoding.equalsIgnoreCase("ION R1 GPB")) {
+                                            val = ((Map.Entry)me).getValue();
+                                        }
+                                    } else {
+                                        /* Stash the content and decode it later */
+                                        contentKey = key;
+                                        content = ((Map.Entry) me).getValue();
+                                        /* Don't add anything to the map! */
+                                        continue;
+                                    }
+                                } else if (key.equalsIgnoreCase("encoding")) {
                                     /* Capture the encoding of the message so that the content of ION R1 GPB messages can be left as byte[] objects */
                                     encoding = val.toString();
                                     System.out.println("set encoding to: " + encoding);
-                                } else if (encoding.equalsIgnoreCase("ION R1 GPB") && key.equalsIgnoreCase("content")) {
-                                    /* If the encoding indicates that this is a GPB data message, return the raw byte[] object */
-                                    val = ((Map.Entry) me).getValue();
+                                    /* Deal with the content now if it has been stashed */
+                                    if(content != null) {
+                                        if(encoding.equalsIgnoreCase("ION R1 GPB")) {
+                                            newm.put(contentKey, content);
+                                        } else {
+                                            newm.put(contentKey, decodeValue(content));
+                                        }
+                                    }
                                 }
 				newm.put(key, val);
 			}
