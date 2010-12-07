@@ -58,6 +58,12 @@ public class BaseProcess {
         return msgin;
     }
 
+    public IonMessage rpcSend(IonMessage msg) {
+        mBrokerClient.sendMessage(msg);
+        IonMessage msgin = mBrokerClient.consumeMessage(mInQueue);
+        return msgin;
+    }
+
     public IonMessage receive() {
         IonMessage msgin = mBrokerClient.consumeMessage(mInQueue);
         return msgin;
