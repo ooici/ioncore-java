@@ -21,10 +21,10 @@ public class IonBootstrap {
 	private static final String MESSAGE_TYPE_ID_ENUM_ID = "_ID";
 
 	// Map that will contain the collection of enum value ==> Class mappings
-	private HashMap<Integer, Class> intToClassMap;
+	private static HashMap<Integer, Class> intToClassMap;
 	
 	// Backward map from Class to enum value
-	private HashMap<Class, Integer> classToIntMap;
+	private static HashMap<Class, Integer> classToIntMap;
 
 	private IonBootstrap() throws Exception {
 		intToClassMap = new HashMap<Integer, Class>();
@@ -33,15 +33,18 @@ public class IonBootstrap {
 		createProtoMap();
 	}
 
-	public static void bootstrap() {
+	public static void bootstrap() throws Exception {
+        intToClassMap = new HashMap<Integer, Class>();
+		classToIntMap = new HashMap<Class, Integer>();
 
+		createProtoMap();
 	}
 
 	/**
 	 * Method which traverses the list of GeneratedMessage classes listed in
 	 * the net.Init class and adds them to the enum value => Class hash map.
 	 */
-	private void createProtoMap() throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+	private static void createProtoMap() throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 
 		// net.Init class has public static String[] containing all the known
 		// proto buffer class names
@@ -97,19 +100,19 @@ public class IonBootstrap {
 		}
 	}
 
-	public Class getMappedClassForKeyValue(int key) {
+	public static Class getMappedClassForKeyValue(int key) {
 		return intToClassMap.get(key);
 	}
 	
-	public int getKeyValueForMappedClass(Class key) {
+	public static int getKeyValueForMappedClass(Class key) {
 		return classToIntMap.get(key);
 	}
 
-	public Set<Integer> getKeySet() {
+	public static Set<Integer> getKeySet() {
 		return intToClassMap.keySet();
 	}
 
-	public Collection<Class> getValueSet() {
+	public static Collection<Class> getValueSet() {
 		return intToClassMap.values();
 	}
 
