@@ -7,6 +7,7 @@
 	<property name="build" location="build"/>
 	<property name="classes" location="${build}/classes"/>
 	<property name="javadoc" location="${build}/javadoc"/>
+	<property name="ion-obj-def" location="../ion-object-definitions"/>
 	<property name="dist"  location="dist"/>
 
 	<path id="libs-core">
@@ -23,6 +24,9 @@
 		<pathelement location="./lib/org.springframework.core-3.0.4.RELEASE.jar"/>
 		<pathelement location="./lib/org.springframework.context.support-3.0.4.RELEASE.jar"/>
 		<pathelement location="./lib/org.springframework.aop-3.0.4.RELEASE.jar"/>
+		<!-- ion-object-definitions dependencies -->
+		<pathelement location="${ion-obj-def}/protobuf-java-2.3.0.jar"/>
+		<pathelement location="${ion-obj-def}/java/dist/ion_proto_0.1.jar"/>
 	</path>
 		
 	<path id="libs-example">
