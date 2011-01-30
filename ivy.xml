@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0">
+    <info module="ioncore-java" organisation="net.ooici" revision="0.1.0"/>
+    <configurations>
+        <conf name="compile"/>
+    </configurations>
+    <dependencies>
+        <!-- Public dependencies -->
+        <dependency org="org.slf4j" name="slf4j-api" rev="1.6.1" conf="" />
+        <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.1" conf="" />
+        <dependency org="org.msgpack" name="msgpack" rev="0.3" conf=""/>
+        <dependency org="com.rabbitmq" name="amqp-client" rev="1.8.1" conf="" />
+        <dependency org="com.googlecode.json-simple" name="json-simple" rev="1.1" conf="" />
+        <dependency org="com.google.protobuf" name="protobuf-java" rev="2.3.0"/>
+        <!-- Spring framework libs -->
+        <dependency org="org.springframework" name="spring-aop" rev="3.0.4.RELEASE" conf="" transitive="false" />
+        <dependency org="org.springframework" name="spring-context-support" rev="3.0.4.RELEASE" conf="" transitive="false" />
+        <dependency org="org.springframework" name="spring-core" rev="3.0.4.RELEASE" conf="" transitive="false" />
+        <dependency org="org.springframework" name="spring-oxm" rev="3.0.4.RELEASE" conf="" transitive="false" />
+        <dependency org="org.springframework" name="spring-test" rev="3.0.4.RELEASE" conf="" transitive="false" />
+        <!-- Couldn't find these out there anywhere...coming from local 'ion-libs' directory for now -->
+        <dependency name="ion_proto" rev="0.3.0" conf="" />
+        <dependency name="spring-amqp" rev="1.0.0.M1" conf="" />
+        <dependency name="spring-rabbit" rev="1.0.0.M1" conf="" />
+        <dependency name="spring-rabbit" rev="1.0.0.M1" conf="" />
+        
+    </dependencies>
+</ivy-module>
