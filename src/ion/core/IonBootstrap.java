@@ -19,6 +19,12 @@ public class IonBootstrap {
 	private static final String GET_DESCRIPTOR_METHOD_NAME = "getDescriptor";
 	private static final String MESSAGE_TYPE_ID_ENUM_NAME = "_MessageTypeIdentifier";
 	private static final String MESSAGE_TYPE_ID_ENUM_ID = "_ID";
+	
+	private static IonBootstrap instance = null;
+	
+	static {
+		instance = new IonBootstrap();
+	}
 
 	// Map that will contain the collection of enum value ==> Class mappings
 	private static HashMap<Integer, Class> intToClassMap;
@@ -26,18 +32,30 @@ public class IonBootstrap {
 	// Backward map from Class to enum value
 	private static HashMap<Class, Integer> classToIntMap;
 
-	private IonBootstrap() throws Exception {
-		intToClassMap = new HashMap<Integer, Class>();
-		classToIntMap = new HashMap<Class, Integer>();
-
-		createProtoMap();
-	}
-
-	public static void bootstrap() throws Exception {
+	private IonBootstrap() {
         intToClassMap = new HashMap<Integer, Class>();
 		classToIntMap = new HashMap<Class, Integer>();
 
-		createProtoMap();
+		try {
+			createProtoMap();
+		}
+		catch (Exception e) {
+			// TODO log exception
+			// Exit with non-zero code to indicate error
+			System.exit(1);
+		}
+	}
+	
+	private static void checkInitialized() {
+		if (instance == null) {
+			// TODO log exception
+			// Exit with non-zero code to indate error
+			System.exit(1);
+		}
+	}
+
+	public static void bootstrap() {
+		checkInitialized();
 	}
 
 	/**
@@ -101,30 +119,29 @@ public class IonBootstrap {
 	}
 
 	public static Class getMappedClassForKeyValue(int key) {
+		checkInitialized();
 		return intToClassMap.get(key);
 	}
 	
 	public static int getKeyValueForMappedClass(Class key) {
+		checkInitialized();
 		return classToIntMap.get(key);
 	}
 
 	public static Set<Integer> getKeySet() {
+		checkInitialized();
 		return intToClassMap.keySet();
 	}
 
 	public static Collection<Class> getValueSet() {
+		checkInitialized();
 		return intToClassMap.values();
 	}
 
 	// Simple main routine to exercise the mapping logic
 	public static void main(String[] args) {
-		try {
-			IonBootstrap bootstrap = new IonBootstrap();
-			System.out.println("Keys: " + bootstrap.getKeySet());
-			System.out.println("Keys: " + bootstrap.getValueSet());
-		} catch (Exception e) {
-			System.out.println("Exception: " + e);
-		}
-
+			IonBootstrap.bootstrap();
+			System.out.println("Keys: " + IonBootstrap.getKeySet());
+			System.out.println("Keys: " + IonBootstrap.getValueSet());
 	}
 }
