@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
-    <info module="ioncore-java" organisation="net.ooici" revision="0.1.0"/>
+    <info module="ioncore-java" organisation="net.ooici" revision="0.2.0"/>
     <configurations>
         <conf name="compile"/>
     </configurations>
@@ -18,11 +18,13 @@
         <dependency org="org.springframework" name="spring-core" rev="3.0.4.RELEASE" conf="*->*,!sources,!javadoc" transitive="false" />
         <dependency org="org.springframework" name="spring-oxm" rev="3.0.4.RELEASE" conf="*->*,!sources,!javadoc" transitive="false" />
         <dependency org="org.springframework" name="spring-test" rev="3.0.4.RELEASE" conf="*->*,!sources,!javadoc" transitive="false" />
-        <!-- Couldn't find these out there anywhere...coming from local 'ion-libs' directory for now -->
+        <!-- More Spring framework libs - from different repository -->
+        <dependency org="org.springframework.amqp" name="spring-amqp" rev="1.0.0.M1" conf="*->*,!sources,!javadoc"  transitive="false" />
+        <dependency org="org.springframework.amqp" name="spring-rabbit" rev="1.0.0.M1" conf="*->*,!sources,!javadoc"  transitive="false" />
+        <dependency org="org.springframework.amqp" name="spring-rabbit-admin" rev="1.0.0.M1" conf="*->*,!sources,!javadoc"  transitive="false" />
+        
+        <!-- OOICI Package Server -->
         <dependency name="ion_proto" rev="0.3.1" conf="*->*,!sources,!javadoc" />
-        <dependency name="spring-amqp" rev="1.0.0.M1" conf="*->*,!sources,!javadoc" />
-        <dependency name="spring-rabbit" rev="1.0.0.M1" conf="*->*,!sources,!javadoc" />
-        <dependency name="spring-rabbit" rev="1.0.0.M1" conf="*->*,!sources,!javadoc" />
         
     </dependencies>
 </ivy-module>
