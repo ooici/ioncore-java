@@ -1,7 +1,0 @@
-1.) start rabbitmq-server if not already running
-2.) from lcaarch directory:
-	2a.) workon lcaarch
-	2b.) twistd -n magnet -h localhost -a sysname=cmueller res/scripts/javalca.py
-3.) from ioncore-java directory:
-	3a.) ant runex
-	3b.) ant runlca
