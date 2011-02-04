@@ -1,5 +1,23 @@
-build/
-dist/
-target/
+######################
+# Compilation directories
+######################
+lib
+build
+docs
+dist
+ivy-report
+output
+
+######################
+# OS generated files 
+######################
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
+
+######################
+# Others
+######################
 .classpath
 *.iml

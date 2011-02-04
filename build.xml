@@ -1,33 +1,14 @@
-<!--
-   Licensed to the Apache Software Foundation (ASF) under one
-   or more contributor license agreements.  See the NOTICE file
-   distributed with this work for additional information
-   regarding copyright ownership.  The ASF licenses this file
-   to you under the Apache License, Version 2.0 (the
-   "License"); you may not use this file except in compliance
-   with the License.  You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing,
-   software distributed under the License is distributed on an
-   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-   KIND, either express or implied.  See the License for the
-   specific language governing permissions and limitations
-   under the License.    
--->
-<project name="ioncore-java" default="run" xmlns:ivy="antlib:org.apache.ivy.ant" basedir=".">
-    <!-- some variables used -->
-    <property name="lib.dir" value="lib" />
-    <property name="build.dir" value="build" />
-    <property name="src.dir" value="src" />
+<project name="ioncore-java" default="dist" xmlns:ivy="antlib:org.apache.ivy.ant" basedir=".">
+    <!-- import properties -->
+    <property file="build.properties" />
+    
     
     <!-- paths used for compilation and run  -->
     <path id="lib.path.id">
         <fileset dir="${lib.dir}" />
 	</path>
-    <path id="run.path.id">
-        <path refid="lib.path.id" />
+    <path id="runtime.classpath">
+    	<path refid="lib.path.id" />
         <path location="${build.dir}/" />
     </path>
     
@@ -36,23 +17,25 @@
           NOTE: may want this to depends="clean" because when a dependency is removed,
           the jar(s) are not removed from the 'lib' directory after re-running 'ant resolve'
          ================================= -->
-    <target name="resolve" description="--> retreive dependencies with ivy">
+    <target name="resolve" description="--> Retreive dependencies with ivy">
         <ivy:retrieve/>
     </target>    
     
     <!-- ================================= 
           target: report-deps              
          ================================= -->
-    <target name="report-deps" depends="resolve" description="--> generates a report of dependencies">
-        <ivy:report todir="${build.dir}"/>
+    <target name="report-deps" depends="resolve" description="--> Generates a report of dependencies">
+        <ivy:report todir="${ivy-report.dir}"/>
     </target>
 
     <!-- ================================= 
           target: compile
          ================================= -->
-    <target name="compile" depends="resolve" description="--> compile the project">
+    <target name="compile" depends="resolve" description="--> Compile the project">
         <mkdir dir="${build.dir}" />
-        <javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="lib.path.id" />
+        <javac srcdir="${src.dir}" destdir="${build.dir}" >
+        	<classpath refid="lib.path.id" />
+        </javac>
         <!-- copy the log4j.properties file -->
         <copy file="${src.dir}/log4j.properties" todir="${build.dir}" />
     </target>
@@ -62,7 +45,7 @@
          ================================= -->
 	<target name="runex" depends="resolve,compile" description="Run Example">
 		<java classname="ion.example.ServiceConsume">
-			<classpath refid="run.path.id"/>
+			<classpath refid="runtime.classpath"/>
 			<sysproperty key="ioncore.sysname" value="${user.name}"/>
 		</java>
 	</target>
@@ -70,16 +53,101 @@
     <!-- ================================= 
           target: clean              
          ================================= -->
-    <target name="clean" description="--> clean the project">
-    	<delete dir="build"/>
-    	<delete dir="lib"/>
-    	<delete dir="dist"/>
+    <target name="clean" description="--> Clean the project">
+    	<delete dir="${build.dir}" />
+    	<delete dir="${lib.dir}" />
+    	<delete dir="${dist.dir}" />
+    	<delete dir="${docs.dir}" />
+    	<delete dir="${ivy-report.dir}" />
     </target>
 	
     <!-- ================================= 
           target: clean-ivy-cache              
          ================================= -->
-	<target name="clean-ivy-cache" description="--> clean the ivy cache">
+	<target name="clean-ivy-cache" description="--> Clean the ivy cache">
 		<ivy:cleancache />
+	</target>
+	
+	<!-- ================================= 
+          target: deep-clean
+         ================================= -->
+    <target name="deep-clean" description="--> Cleans both this directory and the ivy cache">
+    	<antcall target="clean" />
+    	<antcall target="clean-ivy-cache" />
+	</target>
+	
+	<!-- ================================= 
+          target: javadoc              
+         ================================= -->
+	<target name="javadoc" depends="" description="--> Generate Javadoc">
+		<javadoc packagenames="ion.*"
+		   sourcepath="${src.dir}"
+			classpathref="runtime.classpath"
+		   defaultexcludes="yes"
+		   destdir="${docs.dir}"
+		   author="true"
+		   version="true"
+		   use="true"
+		   windowtitle="ION Core">
+			<doctitle><![CDATA[<h1>ION Core</h1>]]></doctitle>
+			<bottom><![CDATA[<i>Copyright &#169; 2010 UC Regents. All Rights Reserved.</i>]]></bottom>
+			<tag name="todo" scope="all" description="To do:"/>
+		</javadoc>
+	</target>
+	
+	<!-- ================================= 
+          target: dist              
+         ================================= -->
+	<target name="dist" depends="clean,compile,javadoc" description="--> Package Distribution">
+	    <!-- Create the distribution directory -->
+	    <mkdir dir="${dist.dir}" />
+	    <mkdir dir="${dist.dir}/lib"/>
+	    <mkdir dir="${dist.dir}/docs"/>
+
+		<!-- Convert project class path to string property -->
+  		<pathconvert property="manifest.classpath" pathsep=" ">
+		<path refid="runtime.classpath"/>
+			<mapper>
+   				<chainedmapper>
+     				<flattenmapper/>
+     				<globmapper from="*.jar" to="lib/*.jar"/>
+  				</chainedmapper>
+  			</mapper>
+		</pathconvert>
+
+		<tstamp/><!-- needed for TODAY -->
+		<!-- Create the manifest.mf file -->
+		<manifest file="MANIFEST.MF">
+			<!--
+			<attribute name="Built-By" value="${manifest.built.by}"/>
+			<attribute name="Created-By" value="${manifest.created.by}"/>
+			-->
+			<attribute name="Main-Class" value="${runtime.main.class}"/>
+			<attribute name="Implementation-Version" value="${version}"/>   
+			<attribute name="Built-Date" value="${TODAY}"/>
+			<attribute name="Class-Path" value="${manifest.classpath}" />
+		</manifest>
+
+	    <!-- Create JAR file with library classes, tests and example code -->
+	    <jar jarfile="${dist.dir}/lib/${projname}-full-${version}.jar"
+	    	basedir="${build.dir}"
+	    	manifest="MANIFEST.MF" />
+
+	    <!-- Create JAR file with all library classes -->
+		<jar jarfile="${dist.dir}/lib/${projname}-${version}.jar" 
+	    	basedir="${build.dir}"
+	    	excludes="ion/example/**" 
+	    	manifest="MANIFEST.MF" />
+
+	    <!-- Create ZIP file with the javadoc -->
+		<zip destfile="${dist.dir}/docs/${projname}-${version}-javadoc.zip"
+			basedir="${docs.dir}"
+		/>		
+
+		<!-- Create ZIP file for the entire directory -->
+		<zip destfile="${dist.dir}/${projname}-archive.zip"
+			basedir="."
+			excludes="${dist.dir}/${projname}-archive.zip,${build}/**,.git/**"
+		/>		
 	</target>
 </project>
