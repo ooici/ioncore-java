@@ -43,7 +43,7 @@
 	<!-- ================================= 
           target: runex              
          ================================= -->
-	<target name="runex" depends="resolve,compile" description="Run Example">
+	<target name="runex" depends="resolve,compile" description="--> Run Example">
 		<java classname="ion.example.ServiceConsume">
 			<classpath refid="runtime.classpath"/>
 			<sysproperty key="ioncore.sysname" value="${user.name}"/>

@@ -17,41 +17,82 @@ This python based system with its core libraries represents the ION reference
 implementation. For more information, please see:
 http://www.oceanobservatories.org/spaces/display/CIDev/LCAARCH+Development+Project
 
-Setting Up Required Dependencies
-================================
-ION Java has two dependencies.
+Source
+======
+Obtain the eoi-agents project by running:
+::
+	git clone git@github.com:ooici/ioncore-java
 
-- It depends on the Google Protocol Buffer Jar file, which must be included
-in this project's CLASSPATH.
-- It depends on the net.Init class from the ion-object-definitions repo and
-hence the ion_proto_x.y.jar file found in the java/dist directory of that
-repo.
+NOTE: Unless otherwise noted - all commands should be run from the "eoi-agents" directory
+::
+	cd ioncore-java
 
-> If you haven't done so already, pull the ion-object-definitions proto, follow
-the README.txt to build the Java classes for the .proto files.
-> As part of the step above, you will have pulled down the Google Protocol Buffers
-zip and built the protobuf-java-x.y.z.jar file.  Via your IDE, include this jar
-file in the ION Java project's CLASSPATH dependencies.
-> Via your IDE, include the distribution jar file ion-object-definitions/java/dist
-jar file (ion_proto_x.y.jar) as a CLASSPATH dependency.   
 
-Building
+Dependencies
+============
+Dependencies are managed using Apache Ivy.  If you haven't installed Ivy, please refer to the "Installing Ivy" section below.
+
+To resolve (process and download) dependencies run:
+::
+	ant resolve
+
+
+Compiling
+=========
+Compile the project by running:
+::
+	ant compile
+
+
+Build.xml
 ========
+All tasks are performed with ant, and are run with:
+::
+	ant <target>
 
-Run
-> ant clean
-> ant dist
+Tasks can be viewed with the following command:
+::
+	ant -p
+
+Main targets:
+
+ clean            --> Clean the project
+ clean-ivy-cache  --> Clean the ivy cache
+ compile          --> Compile the project
+ deep-clean       --> Cleans both this directory and the ivy cache
+ dist             --> Package Distribution
+ javadoc          --> Generate Javadoc
+ report-deps      --> Generates a report of dependencies
+ resolve          --> Retreive dependencies with ivy
+ test-all         --> Runs all tests
+ test-ncagent     --> Runs a canned netcdf test
+ test-sos         --> Runs a canned sos test
+ test-usgs        --> Runs a canned usgs test
+Default target: dist
 
 
-Examples
-========
+IDE Setup
+=========
+1. Run: ant resolve
+2. Make a "existing source" (or similar) project in your IDE of choice and select the src directory of the project.
+3. Put all of the jar files in the "lib" directory on the project classpath in your IDE.
+** Note - when you "ant clean" the lib directory is wiped out.  If you discover your project not compiling, make sure
+there's a lib directory!
 
-Make sure LCAarch services are running.
-Run
-> ant runex
 
+**********************************
+**********************************
 
-Usage
-=====
+Ivy Installation*
+================
+1. Download Apache Ivy (OOICI hosted) from: http://ooici.net/packages/ivy.jar
 
-Add the ioncore-<version>.jar library to the classpath. See the examples
+2. Copy/move the ivy.jar to the "lib" directory of your ant installation:
+	Mac OSX: usually - /usr/share/ant/lib/
+	Linux/Windows: wherever you have ant installed (check "%ANT_HOME%" if you're not sure)
+
+3. To verify the installation run (from eoi-agents directory):
+::
+	ant resolve
+
+* Full install instructions: http://ant.apache.org/ivy/history/2.2.0-rc1/install.html
