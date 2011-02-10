@@ -19,6 +19,7 @@ public class IonBootstrap {
 	private static final String GET_DESCRIPTOR_METHOD_NAME = "getDescriptor";
 	private static final String MESSAGE_TYPE_ID_ENUM_NAME = "_MessageTypeIdentifier";
 	private static final String MESSAGE_TYPE_ID_ENUM_ID = "_ID";
+	private static final String MESSAGE_TYPE_VERSION_ENUM_ID = "_VERSION";
 	
 	private static IonBootstrap instance = null;
 	
@@ -26,15 +27,19 @@ public class IonBootstrap {
 		instance = new IonBootstrap();
 	}
 
-	// Map that will contain the collection of enum value ==> Class mappings
+	// Map that contains the collection of enum value ==> Class mappings
 	private static HashMap<Integer, Class> intToClassMap;
 	
 	// Backward map from Class to enum value
 	private static HashMap<Class, Integer> classToIntMap;
+	
+	// Map from enum value to version value
+	private static HashMap<Integer, Integer> intToVersionMap;
 
 	private IonBootstrap() {
         intToClassMap = new HashMap<Integer, Class>();
 		classToIntMap = new HashMap<Class, Integer>();
+        intToVersionMap = new HashMap<Integer, Integer>();
 
 		try {
 			createProtoMap();
@@ -97,19 +102,35 @@ public class IonBootstrap {
 						
 						// Make sure something odd didn't happen
 						assert(enumDesc.getValues().size() == 2);
+						int id = -1;
 						for (EnumValueDescriptor enumValueDesc : enumDesc.getValues()) {
 							
 							// Get the _ID EnumValueDescriptor which will contain the value after
 							// the = sign from the proto file
 							if (enumValueDesc.getName().equals(MESSAGE_TYPE_ID_ENUM_ID)) {
 								
-								int number = enumValueDesc.getNumber();
+								id = enumValueDesc.getNumber();
 								// Make sure there isn't another class mapped to this value
-								assert(!intToClassMap.containsKey(number));
+								assert(!intToClassMap.containsKey(id));
 
 								// Map the class
-								intToClassMap.put(number, messageClazz);
-								classToIntMap.put(messageClazz, number);
+								intToClassMap.put(id, messageClazz);
+								classToIntMap.put(messageClazz, id);
+							}
+						}
+
+						assert(id != -1);
+						for (EnumValueDescriptor enumValueDesc : enumDesc.getValues()) {
+							// Get the _VERSION EnumValueDescriptor which will contain the value after
+							// the = sign from the proto file
+							if (enumValueDesc.getName().equals(MESSAGE_TYPE_VERSION_ENUM_ID)) {
+								
+								int version = enumValueDesc.getNumber();
+								// Make sure there isn't another class mapped to this value
+								assert(!intToVersionMap.containsKey(id));
+
+								// Map the class
+								intToVersionMap.put(id, version);
 							}
 						}
 					}
@@ -126,6 +147,11 @@ public class IonBootstrap {
 	public static int getKeyValueForMappedClass(Class key) {
 		checkInitialized();
 		return classToIntMap.get(key);
+	}
+
+	public static int getMappedClassVersion(int key) {
+		checkInitialized();
+		return intToVersionMap.get(key);
 	}
 
 	public static Set<Integer> getKeySet() {
