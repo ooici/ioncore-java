@@ -122,7 +122,7 @@ public class GPBWrapper<V> {
    * This method was taken from com.google.protobuf.TextFormat.java - it could
    * not be called directly because it is package-private
    */
-  private static String escapeBytes(final ByteString input) {
+  static String escapeBytes(final ByteString input) {
     final StringBuilder builder = new StringBuilder(input.size());
     for (int i = 0; i < input.size(); i++) {
       final byte b = input.byteAt(i);
@@ -239,7 +239,6 @@ public class GPBWrapper<V> {
         V ret = null;
         try {
             java.lang.reflect.Method parseFromMethod = getTypeClass().getDeclaredMethod("parseFrom", ByteString.class);
-//			System.out.println(">>> Found Method: " + buildMethod);
             ret = (V) parseFromMethod.invoke(null, value);
         } catch (NoSuchMethodException ex) {
             ex.printStackTrace(System.out);
@@ -270,7 +269,7 @@ public class GPBWrapper<V> {
                 .toString();
     }
 
-
+    /* Attempt at returning a builder for the object */
 ////    public B b;
 ////    public <B extends Message.Builder> B getBuilderObject() {
 ////        return (b == null) ? b = (B) _getBuilderObject() : b;

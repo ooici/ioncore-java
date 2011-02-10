@@ -29,7 +29,7 @@
 		<pathelement location="./lib/log4j-1.2.15.jar"/>
 		<!-- ion-object-definitions dependencies -->
 		<pathelement location="${ion-obj-def}/protobuf-java-2.3.0.jar"/>
-		<pathelement location="${ion-obj-def}/java/dist/ion_proto_0.3.1.jar"/>
+		<pathelement location="${ion-obj-def}/java/dist/ion_proto_0.3.5.jar"/>
 	</path>
 		
 	<path id="libs-example">
