@@ -317,7 +317,7 @@ public class ProtoUtils {
         System.out.println(msg);
 
         System.out.println(">>> Get the item referenced by that head");
-        GPBWrapper<DatasetEntryMessage> demWrap = sm.getObjectWrapper(msg.getMessageObject().getKey());
+        GPBWrapper<DatasetEntryMessage> demWrap = sm.getObjectWrapper(msg.getMessageObject());
         DatasetEntryMessage dem = demWrap.getObjectValue();
         System.out.println(dem);
     }
