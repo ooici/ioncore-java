@@ -77,8 +77,7 @@
           target: javadoc              
          ================================= -->
 	<target name="javadoc" depends="" description="--> Generate Javadoc">
-		<javadoc packagenames="net.*"
-		   sourcepath="${src.dir}"
+		<javadoc sourcepath="${src.dir}"
 			classpathref="runtime.classpath"
 		   defaultexcludes="yes"
 		   destdir="${docs.dir}"
