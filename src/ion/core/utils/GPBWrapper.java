@@ -122,11 +122,7 @@ public class GPBWrapper<V> {
    * This method was taken from com.google.protobuf.TextFormat.java - it could
    * not be called directly because it is package-private
    */
-<<<<<<< HEAD
   static String escapeBytes(final ByteString input) {
-=======
-  private static String escapeBytes(final ByteString input) {
->>>>>>> ooici-eoi/develop
     final StringBuilder builder = new StringBuilder(input.size());
     for (int i = 0; i < input.size(); i++) {
       final byte b = input.byteAt(i);
@@ -187,15 +183,10 @@ public class GPBWrapper<V> {
      */
     private static Type.GPBType _getGPBType(Object protoBuffObj) {
         Type.GPBType.Builder gpbType = Type.GPBType.newBuilder();
-<<<<<<< HEAD
         gpbType.setObjectId(IonBootstrap.getKeyValueForMappedClass(protoBuffObj.getClass()));
-        /* TODO: Need to get this from IonBootstrap */
-        gpbType.setVersion(1);
-=======
         int key = IonBootstrap.getKeyValueForMappedClass(protoBuffObj.getClass());
         gpbType.setObjectId(key);
         gpbType.setVersion(IonBootstrap.getMappedClassVersion(key));
->>>>>>> ooici-eoi/develop
         return gpbType.build();
     }
 
@@ -249,10 +240,6 @@ public class GPBWrapper<V> {
         V ret = null;
         try {
             java.lang.reflect.Method parseFromMethod = getTypeClass().getDeclaredMethod("parseFrom", ByteString.class);
-<<<<<<< HEAD
-=======
-//			System.out.println(">>> Found Method: " + buildMethod);
->>>>>>> ooici-eoi/develop
             ret = (V) parseFromMethod.invoke(null, value);
         } catch (NoSuchMethodException ex) {
             ex.printStackTrace(System.out);
@@ -283,11 +270,7 @@ public class GPBWrapper<V> {
                 .toString();
     }
 
-<<<<<<< HEAD
     /* Attempt at returning a builder for the object */
-=======
-
->>>>>>> ooici-eoi/develop
 ////    public B b;
 ////    public <B extends Message.Builder> B getBuilderObject() {
 ////        return (b == null) ? b = (B) _getBuilderObject() : b;
