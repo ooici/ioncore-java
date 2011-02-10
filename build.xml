@@ -14,6 +14,7 @@
 		<pathelement location="./lib/commons-cli-1.1.jar"/>
 		<pathelement location="./lib/commons-io-1.2.jar"/>
 		<pathelement location="./lib/json_simple-1.1.jar"/>
+		<pathelement location="./lib/junit-4.8.2.jar"/>
 		<pathelement location="./lib/msgpack-0.3.jar"/>
 		<pathelement location="./lib/rabbitmq-client.jar"/>
 		<pathelement location="./lib/spring-amqp-1.0.0.M1.jar"/>
@@ -29,7 +30,11 @@
 		<pathelement location="./lib/log4j-1.2.15.jar"/>
 		<!-- ion-object-definitions dependencies -->
 		<pathelement location="${ion-obj-def}/protobuf-java-2.3.0.jar"/>
+<<<<<<< HEAD
 		<pathelement location="${ion-obj-def}/java/dist/ion_proto_0.3.5.jar"/>
+=======
+		<pathelement location="${ion-obj-def}/java/dist/ion_proto_0.3.3.jar"/>
+>>>>>>> ooici-eoi/develop
 	</path>
 		
 	<path id="libs-example">
