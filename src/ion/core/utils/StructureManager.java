@@ -6,10 +6,15 @@
 package ion.core.utils;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import ion.core.messaging.IonMessage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.ooici.core.container.Container.*;
+import net.ooici.core.link.Link.CASRef;
 
 /**
  * Management class for packing, unpacking, and accessing members of {@link Container.Structure} objects
@@ -26,6 +31,14 @@ public class StructureManager {
         _headIds = new ArrayList<String>();
         _itemIds = new ArrayList<String>();
         addStructure(structure);
+    }
+
+    public static StructureManager Factory(IonMessage msg) {
+        try {
+            return new StructureManager(Structure.parseFrom((byte[]) msg.getContent()));
+        } catch (InvalidProtocolBufferException ex) {
+            return null;
+        }
     }
 
     public static StructureManager Factory(Structure structure) {
@@ -74,11 +87,15 @@ public class StructureManager {
         return _headIds;
     }
 
-    public GPBWrapper getObjectByKey(ByteString key) {
-        return getObjectByKey(GPBWrapper.escapeBytes(key));
+    public GPBWrapper getObjectWrapper(CASRef key) {
+        return getObjectWrapper(key.getKey());
     }
 
-    public GPBWrapper getObjectByKey(String key) {
+    public GPBWrapper getObjectWrapper(ByteString key) {
+        return getObjectWrapper(GPBWrapper.escapeBytes(key));
+    }
+
+    public GPBWrapper getObjectWrapper(String key) {
         return _map.get(key);
     }
 
