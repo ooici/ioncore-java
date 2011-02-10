@@ -1,5 +1,6 @@
 package ion.core;
 
+import net.ooici.core.container.Container;
 import ion.core.messaging.IonMessage;
 import ion.core.messaging.MessagingName;
 import ion.core.messaging.MsgBrokerClient;
@@ -60,6 +61,26 @@ public class BaseProcess {
 
     public IonMessage rpcSend(IonMessage msg) {
         mBrokerClient.sendMessage(msg);
+        IonMessage msgin = mBrokerClient.consumeMessage(mInQueue);
+        return msgin;
+    }
+
+    /**
+     * Method that performs message send and consume message on behalf of the caller.
+     * Content is a Protocol Buffer Container.Structure object.
+     * 
+     * @param to target service
+     * @param op target service's operation
+     * @param structure message payload
+     * @return response message
+     */
+    public IonMessage rpcSendContainerContent(MessagingName to, String op, Container.Structure structure) {
+    	
+        IonMessage msgout = mBrokerClient.createMessage(mProcessId, to, op, structure.toByteArray());
+
+        // Adjust the message headers and send
+        msgout.getIonHeaders().put("encoding", "ION R1 GPB");
+        mBrokerClient.sendMessage(msgout);
         IonMessage msgin = mBrokerClient.consumeMessage(mInQueue);
         return msgin;
     }
