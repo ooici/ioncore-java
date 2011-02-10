@@ -24,7 +24,7 @@
         <dependency org="org.springframework.amqp" name="spring-rabbit-admin" rev="1.0.0.M1" conf="*->*,!sources,!javadoc"  transitive="false" />
         
         <!-- OOICI Package Server -->
-        <dependency name="ion_proto" rev="0.3.1" conf="*->*,!sources,!javadoc" />
+        <dependency name="ion_proto" rev="0.3.5" conf="*->*,!sources,!javadoc" />
         
     </dependencies>
 </ivy-module>
