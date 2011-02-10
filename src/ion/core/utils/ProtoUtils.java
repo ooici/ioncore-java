@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 
 import net.ooici.core.container.Container;
 import net.ooici.core.link.Link.CASRef;
-import net.ooici.core.link.Link.IDRef;
 import net.ooici.core.message.IonMessage.IonMsg;
 import net.ooici.core.type.Type;
 import net.ooici.core.type.Type.GPBType;
@@ -185,15 +184,15 @@ public class ProtoUtils {
             struct = Container.Structure.newBuilder();
         }
 
-        // TODO, change this to an 'add' after David updates Structure proto buff to have multiple head elements
         if (isHead) {
-            struct.setHead(element);
+            struct.addHeads(element);
         } else {
             struct.addItems(element);
         }
 
         return struct;
     }
+
     public static HashMap<String, GPBWrapper> unpackStructure(byte[] structure) {
         return unpackStructure(ByteString.copyFrom(structure));
     }
@@ -207,7 +206,6 @@ public class ProtoUtils {
         return null;
     }
 
-
     /**
      * Method that extracts n-layer nested proto buff content hanging off Structure into hash map.
      * 
@@ -218,12 +216,12 @@ public class ProtoUtils {
         HashMap<String, GPBWrapper> map = new HashMap<String, GPBWrapper>();
 
         // Traverse the head elements
-        System.out.println("hasHead: " + structure.hasHead());
-        if (structure.hasHead()) {
-            // TODO, change this to an 'iterator' after David updates Structure proto buff to have multiple head elements
-            Container.StructureElement element = structure.getHead();
-            GPBWrapper head = GPBWrapper.Factory(element);
-            map.put(head.getKeyString(), head);
+        System.out.println("hasHead: " + (structure.getHeadsCount() >= 1));
+        if (structure.getHeadsCount() >= 1) {
+            for (Container.StructureElement element : structure.getHeadsList()) {
+                GPBWrapper head = GPBWrapper.Factory(element);
+                map.put(head.getKeyString(), head);
+            }
 //    		map.putAll(parseStructureElement(map, element));
         }
 
@@ -257,39 +255,51 @@ public class ProtoUtils {
 //        }
 //    }
     public static void main(String[] args) {
-        // Sample code showing the workings of the new methods
-        // We will create a simple message with a head object and an item object payload
+//        testSendReceive();
+        testStructureManager();
+    }
 
-        // Header object is an IDRef
-        IDRef.Builder idRefBuilder = IDRef.newBuilder();
-        idRefBuilder.setKey("MyKey");
-        IDRef idRef = idRefBuilder.build();
+    private static void testStructureManager() {
+        System.out.println("\n>>>>>>>>>>>>>>>>>Test StructureManager<<<<<<<<<<<<<<<<<");
+        
+        System.out.println("\n******Make struct1******");
+        Container.Structure struct1 = makeStruct1();
+        System.out.println("*******************************\n\n");
 
-        // Construct GPBType object for IDRef
-        Type.GPBType idRefGPBType = getGPBType(idRef, 1);
+        System.out.println(">>> Add struct1 to StructureManager");
+        StructureManager sm = StructureManager.Factory(struct1);
+        System.out.println(sm);
 
-        // Item object is a DatasetEntryMessage
-        DatasetEntryMessage.Builder dataResourceBuilder = DatasetEntryMessage.newBuilder();
-        dataResourceBuilder.setProvider("provider1").setDataType("cool_type").setFormat("json").setTitle("great title");
-        DatasetEntryMessage dataResource = dataResourceBuilder.build();
+        System.out.println("\n******Make struct2******");
+        Container.Structure struct2 = makeStruct2();
+        System.out.println("*******************************\n\n");
 
-        // Construct GPBType object for IDRef
-        Type.GPBType dataResourceGPBType = getGPBType(dataResource, 1);
+        System.out.println(">>> Add struct2 to StructureManager");
+        sm.addStructure(struct2);
+        System.out.println(sm);
 
-        /* GPBWrapper Factory Example */
-        System.out.println("****** Generate message_objects******");
-        GPBWrapper<DatasetEntryMessage> demWrap = GPBWrapper.Factory(dataResource);
-        System.out.println("DatasetEntryMessage:\n" + demWrap);
-        IonMsg.Builder ionMsgBldr = IonMsg.newBuilder().setName("Test Message").setIdentity("1");
-        ionMsgBldr.setType(demWrap.getObjectType());
-        /* This object references the dem object via a CASRef */
-        ionMsgBldr.setMessageObject(demWrap.getCASRef());
-        GPBWrapper msgWrap = GPBWrapper.Factory(ionMsgBldr.build());
-        System.out.println("IonMsg:\n" + msgWrap);
+        System.out.println(">>> Remove the struct1 from StructureManager");
+        sm.removeStructure(struct1);
+        System.out.println(sm);
 
-        /* Add the elements to the Container.Structure.Builder */
-        Container.Structure.Builder structBldr = ProtoUtils.addStructureElementToStructureBuilder(null, msgWrap.getStructureElement(), true);
-        ProtoUtils.addStructureElementToStructureBuilder(structBldr, demWrap.getStructureElement(), false);
+        System.out.println(">>> Get the first head");
+        GPBWrapper<IonMsg> msgWrap = sm.getObjectByKey(sm.getHeadIds().get(0));
+        IonMsg msg = msgWrap.getObjectValue();
+        System.out.println(msg);
+
+        System.out.println(">>> Get the item referenced by that head");
+        GPBWrapper<DatasetEntryMessage> demWrap = sm.getObjectByKey(msg.getMessageObject().getKey());
+        DatasetEntryMessage dem = demWrap.getObjectValue();
+        System.out.println(dem);
+    }
+
+    private static void testSendReceive() {
+        System.out.println("\n>>>>>>>>>>>>>>>>>Test Send/Receive<<<<<<<<<<<<<<<<<");
+        
+        System.out.println("\n******Make Test Structure******");
+        /* Generate the test struct1 */
+        Container.Structure structure = makeStruct1();
+        System.out.println("\n*******************************\n\n");
 
         System.out.println("\n******Prepare MsgBrokerClient******");
         /* Send the message to the simple_responder service which just replys with the content of the sent message */
@@ -301,7 +311,7 @@ public class ProtoUtils {
 
         System.out.println("\n******RPC Send******");
         MessagingName simpleResponder = new MessagingName("testing", "responder");
-        IonMessage reply = baseProcess.rpcSendContainerContent(simpleResponder, "respond", structBldr.build(), null);
+        IonMessage reply = baseProcess.rpcSendContainerContent(simpleResponder, "respond", structure, null);
 
         System.out.println("\n******Unpack Message******");
         HashMap<String, GPBWrapper> replyMap = ProtoUtils.unpackStructure((byte[]) reply.getContent());
@@ -321,79 +331,57 @@ public class ProtoUtils {
         }
 
         baseProcess.dispose();
+    }
+    private static Container.Structure makeStruct1() {
+        /* GPBWrapper Factory Example */
 
-//        System.exit(0);
-//
-//        /* TODO: Seems to me we could move the packing of StructureElements inside the "addToStructureBuilder" method...*/
-//        // Add IDRef to StructureElement
-//        Container.StructureElement headElement = ProtoUtils.packStructureElement(idRef, idRefGPBType, true);
-//
-//        // Add DatasetEntryMessage to StructureElement
-//        Container.StructureElement itemElement = ProtoUtils.packStructureElement(dataResource, dataResourceGPBType, true);
-//
-//        // Put these into the container
-//        // Note, don't pass in Structure on the first call
-//        Container.Structure.Builder contBldr = ProtoUtils.addStructureElementToStructureBuilder(null, headElement, true);
-//        ProtoUtils.addStructureElementToStructureBuilder(contBldr, itemElement, false);
-//        Container.Structure container = contBldr.build();
-//
-//        System.out.println("\n***Container Before Send***");
-//        /* Unpack the container */
-//        HashMap<String, GPBWrapper> containerMap = ProtoUtils.unpackStructure(container);
-//        Iterator<Entry<String, GPBWrapper>> iter = containerMap.entrySet().iterator();
-//        System.out.println(">>> Map Contents:");
-//        while (iter.hasNext()) {
-//            Entry<String, GPBWrapper> entry = iter.next();
-//            if (entry.getValue().getTypeClass().isAssignableFrom(IDRef.class)) {
-//                GPBWrapper<IDRef> wrap = entry.getValue();
-//                System.out.println(wrap);
-//                IDRef ref = wrap.getObjectValue();
-//                System.out.println("============== Object ==============");
-//                System.out.println(ref);
-//            } else if (entry.getValue().getTypeClass().isAssignableFrom(DatasetEntryMessage.class)) {
-//                GPBWrapper<DatasetEntryMessage> wrap = entry.getValue();
-//                System.out.println(wrap);
-//                DatasetEntryMessage dem = wrap.getObjectValue();
-//                System.out.println("============== Object ==============");
-//                System.out.println(dem);
-//            }
-//        }
-//
-//
-//        System.out.println("\n***Prepare MsgBrokerClient***");
-//        /* Send the message to the simple_responder service which just replys with the content of the sent message */
-//        MsgBrokerClient ionClient = new MsgBrokerClient("localhost", com.rabbitmq.client.AMQP.PROTOCOL.PORT, "magnet.topic");
-//        ionClient.attach();
-//
-//        BaseProcess baseProcess = new BaseProcess(ionClient);
-//        baseProcess.spawn();
-////
-//        MessagingName simpleResponder = new MessagingName("testing", "responder");
-//        System.out.println("\n***RPC Send***");
-//        IonMessage reply = baseProcess.rpcSendContainerContent(simpleResponder, "respond", container, null);
-//
-//        System.out.println("\n***Unpack Message***");
-//        /* Unpack the container */
-//        HashMap<String, GPBWrapper> replyMap = ProtoUtils.unpackStructure((byte[]) reply.getContent());
-//        Iterator<Entry<String, GPBWrapper>> replyIter = replyMap.entrySet().iterator();
-//        System.out.println(">>> Map Contents:");
-//        while (replyIter.hasNext()) {
-//            Entry<String, GPBWrapper> entry = replyIter.next();
-//            if (entry.getValue().getTypeClass().isAssignableFrom(IDRef.class)) {
-//                GPBWrapper<IDRef> wrap = entry.getValue();
-//                System.out.println(wrap);
-//                IDRef ref = wrap.getObjectValue();
-//                System.out.println("============== Object ==============");
-//                System.out.println(ref);
-//            } else if (entry.getValue().getTypeClass().isAssignableFrom(DatasetEntryMessage.class)) {
-//                GPBWrapper<DatasetEntryMessage> wrap = entry.getValue();
-//                System.out.println(wrap);
-//                DatasetEntryMessage dem = wrap.getObjectValue();
-//                System.out.println("============== Object ==============");
-//                System.out.println(dem);
-//            }
-//        }
-//
-//        baseProcess.dispose();
+        // Item object is a DatasetEntryMessage
+        DatasetEntryMessage.Builder dataResourceBuilder = DatasetEntryMessage.newBuilder();
+        dataResourceBuilder.setProvider("provider1").setDataType("cool_type").setFormat("json").setTitle("great title");
+        DatasetEntryMessage dataResource = dataResourceBuilder.build();
+
+        System.out.println("****** Generate message_objects******");
+        GPBWrapper<DatasetEntryMessage> demWrap = GPBWrapper.Factory(dataResource);
+        System.out.println("DatasetEntryMessage:\n" + demWrap);
+
+        // Head is an IonMsg
+        IonMsg.Builder ionMsgBldr = IonMsg.newBuilder().setName("Test Message").setIdentity("1");
+        ionMsgBldr.setType(demWrap.getObjectType());
+        /* This object references the dem object via a CASRef */
+        ionMsgBldr.setMessageObject(demWrap.getCASRef());
+        GPBWrapper msgWrap = GPBWrapper.Factory(ionMsgBldr.build());
+        System.out.println("IonMsg:\n" + msgWrap);
+
+        /* Add the elements to the Container.Structure.Builder */
+        Container.Structure.Builder structBldr = ProtoUtils.addStructureElementToStructureBuilder(null, msgWrap.getStructureElement(), true);
+        ProtoUtils.addStructureElementToStructureBuilder(structBldr, demWrap.getStructureElement(), false);
+
+        return structBldr.build();
+    }
+    private static Container.Structure makeStruct2() {
+        /* GPBWrapper Factory Example */
+
+        // Item object is a DatasetEntryMessage
+        DatasetEntryMessage.Builder dataResourceBuilder = DatasetEntryMessage.newBuilder();
+        dataResourceBuilder.setProvider("provider2").setDataType("awesome_type").setFormat("json").setTitle("Best Title Ever");
+        DatasetEntryMessage dataResource = dataResourceBuilder.build();
+
+        System.out.println("****** Generate message_objects******");
+        GPBWrapper<DatasetEntryMessage> demWrap = GPBWrapper.Factory(dataResource);
+        System.out.println("DatasetEntryMessage:\n" + demWrap);
+
+        // Head is an IonMsg
+        IonMsg.Builder ionMsgBldr = IonMsg.newBuilder().setName("Another Test Message").setIdentity("22");
+        ionMsgBldr.setType(demWrap.getObjectType());
+        /* This object references the dem object via a CASRef */
+        ionMsgBldr.setMessageObject(demWrap.getCASRef());
+        GPBWrapper msgWrap = GPBWrapper.Factory(ionMsgBldr.build());
+        System.out.println("IonMsg:\n" + msgWrap);
+
+        /* Add the elements to the Container.Structure.Builder */
+        Container.Structure.Builder structBldr = ProtoUtils.addStructureElementToStructureBuilder(null, msgWrap.getStructureElement(), true);
+        ProtoUtils.addStructureElementToStructureBuilder(structBldr, demWrap.getStructureElement(), false);
+
+        return structBldr.build();
     }
 }

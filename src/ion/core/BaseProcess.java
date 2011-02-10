@@ -3,15 +3,8 @@ package ion.core;
 import ion.core.messaging.IonMessage;
 import ion.core.messaging.MessagingName;
 import ion.core.messaging.MsgBrokerClient;
-import ion.core.utils.ProtoUtils;
-import ion.core.utils.SHA1;
 import net.ooici.core.container.Container;
-import net.ooici.core.message.ResourceRequest;
-import net.ooici.core.message.ResourceRequest.ResourceConfigurationRequest.LifeCycleOperation;
-import net.ooici.core.type.Type;
-import net.ooici.services.dm.DatasetRegistry.DatasetEntryMessage;
 
-import com.google.protobuf.ByteString;
 
 /**
  * ioncore-java base process. 
