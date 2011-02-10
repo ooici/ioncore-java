@@ -22,7 +22,8 @@
         <dependency org="org.springframework.amqp" name="spring-amqp" rev="1.0.0.M1" conf="*->*,!sources,!javadoc"  transitive="false" />
         <dependency org="org.springframework.amqp" name="spring-rabbit" rev="1.0.0.M1" conf="*->*,!sources,!javadoc"  transitive="false" />
         <dependency org="org.springframework.amqp" name="spring-rabbit-admin" rev="1.0.0.M1" conf="*->*,!sources,!javadoc"  transitive="false" />
-        
+        <!-- JUnit -->
+        <dependency org="junit" name="junit" rev="4.8.2"/>
         <!-- OOICI Package Server -->
         <dependency name="ion_proto" rev="0.3.5" conf="*->*,!sources,!javadoc" />
         
