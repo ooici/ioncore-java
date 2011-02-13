@@ -21,7 +21,7 @@
     http://ant.apache.org/ivy/history/trunk/settings.html -->
     
     <!-- import ivysettings.properties -->
-    <properties file="${settings.dir}/ivysettings.properties" />
+    <properties file="ivysettings.properties" />
     
     <!-- Set the defaultCacheDir - The cache location is local to the project so that "ant deep-clean" will not
     wipe out the libraries for all projects on the machine, just the one where "ant deep-clean" was run -->
@@ -50,11 +50,6 @@
             <!-- Supplemental springframework repository -->    
             <ibiblio name="spring_fw_repo" m2compatible="true" root="http://maven.springframework.org/milestone/"
             	pattern="[organisation]/[artifact]/[revision]/[artifact]-[revision].[ext]"/>
-            	
-            <!-- NOTE: Uncomment the following 3 lines if you want to use local libraries.  make a folder "ion-libs" and put the jar files in that directory -->
-        	<!-- <filesystem name="ion-libs">
-        		<artifact pattern="${basedir}/ion-libs/[artifact]-[revision].[ext]"/>
-        	</filesystem> -->
         	
         	
             <!--
