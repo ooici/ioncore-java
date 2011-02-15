@@ -173,28 +173,41 @@ public class ProtoUtils {
     }
 
     /**
-     * Method to encapsulate the effort to put a StructureElement into a Structure.  The structure parameter can be passes a null.
+     * Method to encapsulate the effort to put a StructureElement into a Structure.  The structBldr parameter can be passes a null.
      * This results in the method constructing a new Structure.Builder, which is returned from the method.  This Structure.Builder
      * should be passed in on subsequent calls to this method.
      *
-     * @param structure Structure.Builder into which the StructureElement should be placed.
+     * @param structBldr Structure.Builder into which the StructureElement should be placed.  Will be initialized if == null
      * @param element built StructureElement to be added to the StructureBuilder
      * @param isHead indicates if this should be added to the head list or the items list
-     * @return StructureBuilder in which the StructureElement was added
+     * @return Structure.Builder for convenience, returns the {@code structBldr} that was passed in
      */
-    public static Container.Structure.Builder addStructureElementToStructureBuilder(Container.Structure.Builder structure, Container.StructureElement element, boolean isHead) {
-        Container.Structure.Builder struct = structure;
-        if (struct == null) {
-            struct = Container.Structure.newBuilder();
+    public static Container.Structure.Builder addStructureElementToStructureBuilder(Container.Structure.Builder structBldr, Container.StructureElement element, boolean isHead) {
+//        Container.Structure.Builder struct = structBldr;
+        if (structBldr == null) {
+            structBldr = Container.Structure.newBuilder();
         }
 
         if (isHead) {
-            struct.addHeads(element);
+            structBldr.addHeads(element);
         } else {
-            struct.addItems(element);
+            structBldr.addItems(element);
         }
 
-        return struct;
+        return structBldr;
+    }
+
+    /**
+     * Overload method for {@link ProtoUtils.addStructureElementToStructureBuilder(Container.Structure.Builder structBldr, Container.StructureElement element, boolean isHead) }
+     * that sets the {@code isHead } parameter to false.
+     * </p>
+     * Use this method when adding "items" to the Structure.Builder
+     * @param structBldr Structure.Builder into which the StructureElement should be placed.  Will be initialized if == null
+     * @param element built StructureElement to be added to the StructureBuilder
+     * @return Structure.Builder for convenience, returns the {@code structBldr} that was passed in
+     */
+    public static Container.Structure.Builder addStructureElementToStructureBuilder(Container.Structure.Builder structBldr, Container.StructureElement element) {
+        return addStructureElementToStructureBuilder(structBldr, element, false);
     }
 
     /**
