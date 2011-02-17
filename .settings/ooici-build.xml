@@ -156,4 +156,17 @@
 		<!-- Remove the MANIFEST.MF file -->
 		<delete file="MANIFEST.MF" />
 	</target>
+	
+	<target name="test-all" description="--> Runs JUnit tests for all classes ending in 'Test.java')">
+		<mkdir dir="test-report" />
+		<junit printsummary="yes" haltonfailure="no">
+			<classpath refid="runtime.classpath" />
+		
+  			<batchtest fork="yes">
+    			<fileset dir="${src.dir}">
+      				<include name="**/*Test.java"/>
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
 </project>

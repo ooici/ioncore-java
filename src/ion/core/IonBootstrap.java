@@ -13,6 +13,7 @@ import com.google.protobuf.Descriptors.EnumDescriptor;
 import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.Descriptors.FileDescriptor;
 import com.google.protobuf.GeneratedMessage;
+import java.util.Iterator;
 
 public class IonBootstrap {
 
@@ -22,7 +23,7 @@ public class IonBootstrap {
 	private static final String MESSAGE_TYPE_VERSION_ENUM_ID = "_VERSION";
 	
 	private static IonBootstrap instance = null;
-	
+
 	static {
 		instance = new IonBootstrap();
 	}
@@ -72,12 +73,14 @@ public class IonBootstrap {
 		// net.Init class has public static String[] containing all the known
 		// proto buffer class names
 		for (String containerClass : Init.protos) {
+            /* class names from Init.protos are separated with '/' - replace with '.' */
+            containerClass = containerClass.replace("/", ".");
 			// Can't instantiate class because default constructor is private.
 			// But can call static method to get the Descriptor directly using reflection.
 			Class containerClazz = Class.forName(containerClass);
 
-			Method getDescriptorMethod = containerClazz.getMethod(GET_DESCRIPTOR_METHOD_NAME, null);
-			Object fileDescriptorRetObject = getDescriptorMethod.invoke(null, null);
+			Method getDescriptorMethod = containerClazz.getMethod(GET_DESCRIPTOR_METHOD_NAME);
+			Object fileDescriptorRetObject = getDescriptorMethod.invoke(null);
 
 			// Cast return to correct Descriptor type
 			FileDescriptor fileDescriptor = (FileDescriptor)fileDescriptorRetObject;
@@ -167,7 +170,12 @@ public class IonBootstrap {
 	// Simple main routine to exercise the mapping logic
 	public static void main(String[] args) {
 			IonBootstrap.bootstrap();
-			System.out.println("Keys: " + IonBootstrap.getKeySet());
-			System.out.println("Keys: " + IonBootstrap.getValueSet());
+            StringBuilder sb = new StringBuilder("Key = Value").append("\n");
+            Integer[] ints = IonBootstrap.getKeySet().toArray(new Integer[0]);
+            java.util.Arrays.sort(ints);
+            for(Integer i : ints){
+                sb.append(i).append(" = ").append(IonBootstrap.getMappedClassForKeyValue(i).getName()).append("\n");
+            }
+            System.out.println(sb.toString());
 	}
 }
