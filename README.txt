@@ -56,18 +56,22 @@ Tasks can be viewed with the following command:
 
 Main targets:
 
- clean            --> Clean the project
- clean-ivy-cache  --> Clean the ivy cache
- compile          --> Compile the project
- deep-clean       --> Cleans both this directory and the ivy cache
- dist             --> Package Distribution
- javadoc          --> Generate Javadoc
- report-deps      --> Generates a report of dependencies
- resolve          --> Retreive dependencies with ivy
- test-all         --> Runs all tests
- test-ncagent     --> Runs a canned netcdf test
- test-sos         --> Runs a canned sos test
- test-usgs        --> Runs a canned usgs test
+ clean                    --> Clean the project
+ clean-ivy-cache          --> Clean the ivy cache
+ clean-more               --> Called at the end of 'clean' - empty by default, override in build.xml to use
+ clean-ooici-cache        --> Clean the ivy cache of the ooici dependencies only
+ compile                  --> Compile the project
+ deep-clean               --> Cleans both this directory and the ivy cache
+ dist                     --> Package Distribution
+ javadoc                  --> Generate Javadoc
+ ooici_base.post-compile  --> Called after javac compilation - empty by default, override in build.xml to use
+ post-dist                --> Called after all actions in the dist target - empty by default, override in build.xml to use
+ pre-compile              --> Called before javac compilation - empty by default, override in build.xml to use
+ pre-dist                 --> Called before all actions in the dist target - empty by default, override in build.xml to use
+ report-deps              --> Generates a report of dependencies
+ resolve                  --> Retreive dependencies with ivy
+ runex                    --> Run Example
+ test-all                 --> Runs JUnit tests for all classes ending in 'Test.java')
 Default target: dist
 
 
