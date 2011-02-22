@@ -23,7 +23,7 @@ Obtain the eoi-agents project by running:
 ::
 	git clone git@github.com:ooici/ioncore-java
 
-NOTE: Unless otherwise noted - all commands should be run from the "eoi-agents" directory
+NOTE: Unless otherwise noted - all commands should be run from the "ioncore-java" directory
 ::
 	cd ioncore-java
 
