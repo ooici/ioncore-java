@@ -228,7 +228,7 @@ public class ProtoUtils {
 
     	// Construct IonMsg to be put in heads list
     	IonMsg.Builder ionMsgBldr = IonMsg.newBuilder().setName(name).setIdentity(identity);
-        ionMsgBldr.setType(contentWrapper.getObjectType());
+//        ionMsgBldr.setType(contentWrapper.getObjectType());
         // Reference the content object via a CASRef
         ionMsgBldr.setMessageObject(contentWrapper.getCASRef());
         // Construct wrapper for IonMsg
@@ -388,7 +388,7 @@ public class ProtoUtils {
 
         // Head is an IonMsg
         IonMsg.Builder ionMsgBldr = IonMsg.newBuilder().setName("Test Message").setIdentity("1");
-        ionMsgBldr.setType(demWrap.getObjectType());
+//        ionMsgBldr.setType(demWrap.getObjectType());
         /* This object references the dem object via a CASRef */
         ionMsgBldr.setMessageObject(demWrap.getCASRef());
         GPBWrapper msgWrap = GPBWrapper.Factory(ionMsgBldr.build());
@@ -414,7 +414,7 @@ public class ProtoUtils {
 
         // Head is an IonMsg
         IonMsg.Builder ionMsgBldr = IonMsg.newBuilder().setName("Another Test Message").setIdentity("22");
-        ionMsgBldr.setType(demWrap.getObjectType());
+//        ionMsgBldr.setType(demWrap.getObjectType());
         /* This object references the dem object via a CASRef */
         ionMsgBldr.setMessageObject(demWrap.getCASRef());
         GPBWrapper msgWrap = GPBWrapper.Factory(ionMsgBldr.build());
