@@ -297,8 +297,8 @@ public class ProtoUtils {
 //    }
     public static void main(String[] args) {
 //        testSendReceive();
-        testStructureManager();
-//        test();
+//        testStructureManager();
+        test();
     }
 
     private static void testStructureManager() {
@@ -353,7 +353,7 @@ public class ProtoUtils {
 
         System.out.println("\n******RPC Send******");
         MessagingName simpleResponder = new MessagingName("testing", "responder");
-        IonMessage reply = baseProcess.rpcSendContainerContent(simpleResponder, "respond", structure, null);
+        IonMessage reply = baseProcess.rpcSendContainerContent(simpleResponder, "respond", structure);
 
         System.out.println("\n******Unpack Message******");
         StructureManager sm = StructureManager.Factory(reply);
@@ -467,7 +467,7 @@ public class ProtoUtils {
 
 		MessagingName r1intSvc = new MessagingName("Tom", "r1integration");
 
-        IonMessage msgin = baseProcess.rpcSendContainerContent(r1intSvc, "createDataResource", structureBuilder.build());
+        IonMessage msgin = baseProcess.rpcSendContainerContent(r1intSvc, "createDataResource", structureBuilder.build(), "83e08e23-1666-47c2-9e8a-f5dfcbde6690", "1234");
 
         System.out.println("UUID: " + msgin.getContent());
     }
