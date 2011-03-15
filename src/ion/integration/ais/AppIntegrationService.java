@@ -129,7 +129,7 @@ public class AppIntegrationService {
         	assert(clazz != null);
 
     		// Get builder instance by invoking static newBuilder() via reflection
-    		Method method = clazz.getMethod("newBuilder", null);
+    		Method method = clazz.getMethod("newBuilder", (Class[])null);
     		Message.Builder builder = (Message.Builder)method.invoke(null, (Object[])null);
 
     		// Copy Json into GPB
