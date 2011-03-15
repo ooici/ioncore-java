@@ -12,6 +12,7 @@
         <dependency org="com.rabbitmq" name="amqp-client" rev="1.8.1" conf="*->*,!sources,!javadoc" />
         <dependency org="com.googlecode.json-simple" name="json-simple" rev="1.1" conf="*->*,!sources,!javadoc" />
         <dependency org="com.google.protobuf" name="protobuf-java" rev="2.3.0"/>
+        <dependency org="protobuf-format-java.googlecode.com" name="protobuf-format-java" rev="1.1.1"/>
         <!-- Spring framework libs -->
         <dependency org="org.springframework" name="spring-aop" rev="3.0.4.RELEASE" conf="*->*,!sources,!javadoc" transitive="false" />
         <dependency org="org.springframework" name="spring-context-support" rev="3.0.4.RELEASE" conf="*->*,!sources,!javadoc" transitive="false" />
@@ -25,7 +26,7 @@
         <!-- JUnit -->
         <dependency org="junit" name="junit" rev="4.8.2" conf="*->*,!sources,!javadoc"/>
         <!-- OOICI Package Server -->
-        <dependency name="ionproto" rev="0.3.12" conf="*->*,!sources,!javadoc" />
+        <dependency name="ionproto" rev="0.3.13" conf="*->*,!sources,!javadoc" />
         
     </dependencies>
 </ivy-module>
