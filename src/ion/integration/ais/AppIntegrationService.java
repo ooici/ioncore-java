@@ -33,8 +33,11 @@ public class AppIntegrationService {
     private BaseProcess baseProcess;
 
     // TODO fill out enum
+    // Enum used by UI to indicate to this library what operation is
+    // associated with the passed Json data.
     public enum RequestType {
     	CREATE_DOWNLOAD_URL, FIND_DATA_RESOURCES, GET_DATA_RESOURCE_DETAIL,
+    	CREATE_DATA_RESOURCE, UPDATE_DATA_RESOURCE, DELETE_DATA_RESOURCE,
     	REGISTER_USER, UPDATE_USER_EMAIL, UPDATE_USER_DISPATCHER_QUEUE
     }
 
@@ -47,50 +50,79 @@ public class AppIntegrationService {
     // Map enum values to int GPB type ids
     // TODO define all mappings.  Currently using echo service to validate functionality.
     static {
-    	// Register user
     	typeEnumToTypeIntMap.put(RequestType.CREATE_DOWNLOAD_URL, -1);
     	typeEnumToServiceOpMap.put(RequestType.CREATE_DOWNLOAD_URL, "createDownloadURL");
-    	// Register user
+    	
     	typeEnumToTypeIntMap.put(RequestType.FIND_DATA_RESOURCES, 9031);
     	typeEnumToServiceOpMap.put(RequestType.FIND_DATA_RESOURCES, "findDataResources");
-    	// Register user
+    	
     	typeEnumToTypeIntMap.put(RequestType.GET_DATA_RESOURCE_DETAIL, -1);
     	typeEnumToServiceOpMap.put(RequestType.GET_DATA_RESOURCE_DETAIL, "getDataResourceDetail");
-    	// Register user
+    	
+    	typeEnumToTypeIntMap.put(RequestType.CREATE_DATA_RESOURCE, 9211);
+    	typeEnumToServiceOpMap.put(RequestType.CREATE_DATA_RESOURCE, "createDataResource");
+    	
+    	typeEnumToTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE, 9211);
+    	typeEnumToServiceOpMap.put(RequestType.UPDATE_DATA_RESOURCE, "updateDataResource");
+    	
+    	typeEnumToTypeIntMap.put(RequestType.DELETE_DATA_RESOURCE, 9213);
+    	typeEnumToServiceOpMap.put(RequestType.DELETE_DATA_RESOURCE, "deleteDataResource");
+    	
     	typeEnumToTypeIntMap.put(RequestType.REGISTER_USER, 9101);
     	typeEnumToServiceOpMap.put(RequestType.REGISTER_USER, "registerUser");
-    	// Register user
+    	
     	typeEnumToTypeIntMap.put(RequestType.UPDATE_USER_EMAIL, -1);
     	typeEnumToServiceOpMap.put(RequestType.UPDATE_USER_EMAIL, "updateUserEmail");
-    	// Register user
+    	
     	typeEnumToTypeIntMap.put(RequestType.UPDATE_USER_DISPATCHER_QUEUE, -1);
     	typeEnumToServiceOpMap.put(RequestType.UPDATE_USER_DISPATCHER_QUEUE, "updateUserDispatcherQueue");
     }
 
     // TODO utilize sysName
+    /**
+     * Constructor taking the full set of parameters required to target
+     * requests to the Application Integration Service running in a specific
+     * capability container with topic being hosted on a specific node.
+     * 
+     * @param sysName system name under which the ION Core Python capability container is
+     * running
+     * @param hostName machine hosting the broker
+     * @param portNumber port number of the broker
+     * @param exchange name of the exchange being hosted by the broker
+     */
 	public AppIntegrationService(String sysName, String hostName, int portNumber, String exchange) {
 		msgBrokerClient = new MsgBrokerClient(hostName, portNumber, exchange);
 		msgBrokerClient.attach();
 		baseProcess = new BaseProcess(msgBrokerClient);
 		baseProcess.spawn();
-		applicationIntegrationSvc = new MessagingName(sysName, AIS_SERVICE_NAME);
+		createMessagingName(sysName);
 	}
-    
+
 	public AppIntegrationService(String sysName, MsgBrokerClient brokerClient) {
 		baseProcess = new BaseProcess(brokerClient);
 		baseProcess.spawn();
-		applicationIntegrationSvc = new MessagingName(sysName, AIS_SERVICE_NAME);
+		createMessagingName(sysName);
+	}
+
+	public AppIntegrationService(String sysName, BaseProcess baseProcess) {
+		this.baseProcess = baseProcess;
+		createMessagingName(sysName);
 	}
 
 	public void dispose() {
 		baseProcess.dispose();
 	}
 
+	private void createMessagingName(String sysName) {
+		applicationIntegrationSvc = new MessagingName(sysName, AIS_SERVICE_NAME);
+	}
+
 	/**
-	 * Method to be called from UI to send requests to ION Core Application Integration Service.  Input
-	 * is in Json string format.  Results is returned in Json string format.
+	 * Method to be called from UI to send requests to ION Core Application Integration
+	 * Service.  Input is in Json string format.  Results is returned to UI in Json
+	 * string format.
 	 * 
-	 * @param jsonRequest input to be send in GPB to AIS
+	 * @param jsonRequest input to be send in GPB to Application Integration Service
 	 * @param reqType enum value indicating specific operation being requested
 	 * @param userId for enforcing policy.  OOID or 'ANONYMOUS'
 	 * @param expiry for enforcing policy.  Expiry of certificate represented (time since epoc in seconds) as a string or '0'
@@ -279,9 +311,5 @@ public class AppIntegrationService {
         
         ais.dispose();
     }
-	
-	
-	
-	
 	
 }
