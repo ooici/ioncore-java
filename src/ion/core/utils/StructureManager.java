@@ -88,6 +88,9 @@ public class StructureManager {
     }
 
     public GPBWrapper getObjectWrapper(CASRef key) {
+        if(key == null) {
+            return null;
+        }
         return getObjectWrapper(key.getKey());
     }
 
