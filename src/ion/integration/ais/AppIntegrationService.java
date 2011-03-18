@@ -18,6 +18,7 @@ import net.ooici.core.message.IonMessage.IonMsg;
 import net.ooici.integration.ais.AisRequestResponse.ApplicationIntegrationServiceError;
 import net.ooici.integration.ais.AisRequestResponse.ApplicationIntegrationServiceRequestMsg;
 import net.ooici.integration.ais.AisRequestResponse.ApplicationIntegrationServiceResponseMsg;
+import net.ooici.integration.ais.findDataResources.FindDataResources.FindDataResourcesRspMsg;
 
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.JsonFormat;
@@ -31,6 +32,8 @@ public class AppIntegrationService {
 
     private MsgBrokerClient msgBrokerClient;
     private BaseProcess baseProcess;
+    
+    private String errorMessage = "";
 
     // TODO fill out enum
     // Enum used by UI to indicate to this library what operation is
@@ -78,7 +81,6 @@ public class AppIntegrationService {
     	typeEnumToServiceOpMap.put(RequestType.UPDATE_USER_DISPATCHER_QUEUE, "updateUserDispatcherQueue");
     }
 
-    // TODO utilize sysName
     /**
      * Constructor taking the full set of parameters required to target
      * requests to the Application Integration Service running in a specific
@@ -139,11 +141,19 @@ public class AppIntegrationService {
     	return sendReceive(jsonRequest, gpbId, serviceOperation, userId, expiry);
 	}
 
+	public String sendReceiveUIRequestCanned() {
+		String requestJsonString = "{\"user_ooi_id\": \"3f27a744-2c3e-4d2a-a98c-050b246334a3\",\"minLatitude\": 32.87521,\"maxLatitude\": 32.97521,\"minLongitude\": -117.274609,\"maxLongitude\": -117.174609,\"minDepth\": 5.5,\"maxDepth\": 6.6,\"minTime\": 7.7,\"maxTime\": 8.8,\"identity\": \"ad0adf8b-4a7e-43e1-8cc0-371fb9057664\"}";
+        String replyJsonString = sendReceiveUIRequest(requestJsonString, RequestType.FIND_DATA_RESOURCES, "3f27a744-2c3e-4d2a-a98c-050b246334a3", "0");
+        return replyJsonString;
+	}
+
 	public String sendReceive(String jsonRequest, int gpbId, String serviceOperation, String userId, String expiry) {
 
 		// Convert Json "payload" data to appropriate GPB format
 		GeneratedMessage payload = convertJsonToGPB(jsonRequest, gpbId);
-		assert(payload != null);
+		if (payload == null) {
+			return errorMessage;
+		}
 
 		Structure requestMessage = packageRequestMessage(payload, gpbId);
 		
@@ -169,7 +179,7 @@ public class AppIntegrationService {
     		
     		return (GeneratedMessage)builder.build();
     	} catch(Exception e) {
-    		System.out.println("Exception: " + e);
+    		errorMessage = "Exception encoding JSON to GPB: " + e;
     	}
 
     	return null;
@@ -232,22 +242,32 @@ public class AppIntegrationService {
         
         // Now get payload
         assert(sm.getItemIds().size() > 1);
+        boolean createList = sm.getItemIds().size() > 2 ? true : false;
+        String payloadInfo = createList ? "[" : "";
+        boolean firstTime = true;
         for (String itemKey : sm.getItemIds()) {
             msgWrapper = sm.getObjectWrapper(itemKey);
 
             // If error response, convert info and return
             if (msgWrapper.getObjectValue() instanceof ApplicationIntegrationServiceResponseMsg
-            	|| msgWrapper.getObjectValue() instanceof ApplicationIntegrationServiceError) {
+            	|| msgWrapper.getObjectValue() instanceof ApplicationIntegrationServiceError
+            	|| msgWrapper.getObjectValue() instanceof FindDataResourcesRspMsg) {
             	continue;
             }
             GPBWrapper payloadWrapper = sm.getObjectWrapper(itemKey);
             GeneratedMessage payloadMessage = (GeneratedMessage)payloadWrapper.getObjectValue();
-            String payloadInfo = JsonFormat.printToString(payloadMessage);
-            return payloadInfo;
+        	if (createList && !firstTime) {
+        		payloadInfo += ", ";
+        	}
+            payloadInfo += JsonFormat.printToString(payloadMessage);
+            if (firstTime) {
+            	firstTime = false;
+            }
         }
-
-        // TODO how to return error condition here?
-        return null;
+        if (createList) {
+        	payloadInfo += "]";
+        }
+        return payloadInfo;
     }
 
 	public static void main(String[] args) {
