@@ -159,6 +159,10 @@ public class AppIntegrationService {
 		
 		IonMessage replyMessage = baseProcess.rpcSendContainerContent(applicationIntegrationSvc, serviceOperation, requestMessage);
 		
+		if (replyMessage == null) {
+    		return "Request timeout";
+		}
+		
 		return unpackageResponseMessage(replyMessage);
 	}
 
