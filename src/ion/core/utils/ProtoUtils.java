@@ -189,7 +189,7 @@ public class ProtoUtils {
         }
 
         if (isHead) {
-            structBldr.addHeads(element);
+            structBldr.setHead(element);
         } else {
             structBldr.addItems(element);
         }
@@ -261,12 +261,11 @@ public class ProtoUtils {
         HashMap<String, GPBWrapper> map = new HashMap<String, GPBWrapper>();
 
         // Traverse the head elements
-        System.out.println("# Heads: " + structure.getHeadsCount());
-        if (structure.getHeadsCount() > 0) {
-        	for (Container.StructureElement element : structure.getHeadsList()) {
-        		GPBWrapper head = GPBWrapper.Factory(element);
-        		map.put(head.getKeyString(), head);
-        	}
+        System.out.println("Head " + (structure.getHead() != null ? "exists" : "not defined"));
+        if (structure.getHead() != null) {
+        	Container.StructureElement element = structure.getHead();
+        	GPBWrapper head = GPBWrapper.Factory(element);
+       		map.put(head.getKeyString(), head);
         }
 
         // Iterate through items list.
@@ -297,8 +296,8 @@ public class ProtoUtils {
 //    }
     public static void main(String[] args) {
 //        testSendReceive();
-//        testStructureManager();
-        test();
+        testStructureManager();
+//        test();
     }
 
     private static void testStructureManager() {
