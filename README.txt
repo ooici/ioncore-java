@@ -23,7 +23,7 @@ Obtain the eoi-agents project by running:
 ::
 	git clone git@github.com:ooici/ioncore-java
 
-NOTE: Unless otherwise noted - all commands should be run from the "eoi-agents" directory
+NOTE: Unless otherwise noted - all commands should be run from the "ioncore-java" directory
 ::
 	cd ioncore-java
 
@@ -32,16 +32,36 @@ Dependencies
 ============
 Dependencies are managed using Apache Ivy.  If you haven't installed Ivy, please refer to the "Installing Ivy" section below.
 
+
+Ivy Installation*
+================
+1. Download Apache Ivy (OOICI hosted) from: http://ooici.net/packages/ivy.jar
+
+2. Copy/move the ivy.jar to the "lib" directory of your ant installation:
+        ac OSX: you can place the .jar in your user ant configuration -->  ~/.ant/lib/
+                or in the root ant installation, usually --> /usr/share/ant/lib/
+        Linux/Windows: wherever you have ant installed (check "%ANT_HOME%" if you're not sure)
+
+3. To verify the installation run (from eoi-agents directory):
+::
+        ant resolve
+
+* Full install instructions: http://ant.apache.org/ivy/history/2.2.0-rc1/install.html
+
+
+**********************************
+**********************************
+
+Compiling
+=========
 To resolve (process and download) dependencies run:
 ::
 	ant resolve
 
-
-Compiling
-=========
 Compile the project by running:
 ::
 	ant compile
+
 
 
 Build.xml
@@ -84,20 +104,3 @@ IDE Setup
 there's a lib directory!
 
 
-**********************************
-**********************************
-
-Ivy Installation*
-================
-1. Download Apache Ivy (OOICI hosted) from: http://ooici.net/packages/ivy.jar
-
-2. Copy/move the ivy.jar to the "lib" directory of your ant installation:
-	ac OSX: you can place the .jar in your user ant configuration -->  ~/.ant/lib/
-		or in the root ant installation, usually --> /usr/share/ant/lib/
-	Linux/Windows: wherever you have ant installed (check "%ANT_HOME%" if you're not sure)
-
-3. To verify the installation run (from eoi-agents directory):
-::
-	ant resolve
-
-* Full install instructions: http://ant.apache.org/ivy/history/2.2.0-rc1/install.html

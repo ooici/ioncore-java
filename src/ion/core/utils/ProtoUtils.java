@@ -189,7 +189,7 @@ public class ProtoUtils {
         }
 
         if (isHead) {
-            structBldr.addHeads(element);
+            structBldr.setHead(element);
         } else {
             structBldr.addItems(element);
         }
@@ -228,7 +228,7 @@ public class ProtoUtils {
 
     	// Construct IonMsg to be put in heads list
     	IonMsg.Builder ionMsgBldr = IonMsg.newBuilder().setName(name).setIdentity(identity);
-        ionMsgBldr.setType(contentWrapper.getObjectType());
+//        ionMsgBldr.setType(contentWrapper.getObjectType());
         // Reference the content object via a CASRef
         ionMsgBldr.setMessageObject(contentWrapper.getCASRef());
         // Construct wrapper for IonMsg
@@ -261,12 +261,11 @@ public class ProtoUtils {
         HashMap<String, GPBWrapper> map = new HashMap<String, GPBWrapper>();
 
         // Traverse the head elements
-        System.out.println("# Heads: " + structure.getHeadsCount());
-        if (structure.getHeadsCount() > 0) {
-        	for (Container.StructureElement element : structure.getHeadsList()) {
-        		GPBWrapper head = GPBWrapper.Factory(element);
-        		map.put(head.getKeyString(), head);
-        	}
+        System.out.println("Head " + (structure.getHead() != null ? "exists" : "not defined"));
+        if (structure.getHead() != null) {
+        	Container.StructureElement element = structure.getHead();
+        	GPBWrapper head = GPBWrapper.Factory(element);
+       		map.put(head.getKeyString(), head);
         }
 
         // Iterate through items list.
@@ -353,7 +352,7 @@ public class ProtoUtils {
 
         System.out.println("\n******RPC Send******");
         MessagingName simpleResponder = new MessagingName("testing", "responder");
-        IonMessage reply = baseProcess.rpcSendContainerContent(simpleResponder, "respond", structure, null);
+        IonMessage reply = baseProcess.rpcSendContainerContent(simpleResponder, "respond", structure);
 
         System.out.println("\n******Unpack Message******");
         StructureManager sm = StructureManager.Factory(reply);
@@ -388,7 +387,7 @@ public class ProtoUtils {
 
         // Head is an IonMsg
         IonMsg.Builder ionMsgBldr = IonMsg.newBuilder().setName("Test Message").setIdentity("1");
-        ionMsgBldr.setType(demWrap.getObjectType());
+//        ionMsgBldr.setType(demWrap.getObjectType());
         /* This object references the dem object via a CASRef */
         ionMsgBldr.setMessageObject(demWrap.getCASRef());
         GPBWrapper msgWrap = GPBWrapper.Factory(ionMsgBldr.build());
@@ -414,7 +413,7 @@ public class ProtoUtils {
 
         // Head is an IonMsg
         IonMsg.Builder ionMsgBldr = IonMsg.newBuilder().setName("Another Test Message").setIdentity("22");
-        ionMsgBldr.setType(demWrap.getObjectType());
+//        ionMsgBldr.setType(demWrap.getObjectType());
         /* This object references the dem object via a CASRef */
         ionMsgBldr.setMessageObject(demWrap.getCASRef());
         GPBWrapper msgWrap = GPBWrapper.Factory(ionMsgBldr.build());
@@ -467,7 +466,7 @@ public class ProtoUtils {
 
 		MessagingName r1intSvc = new MessagingName("Tom", "r1integration");
 
-        IonMessage msgin = baseProcess.rpcSendContainerContent(r1intSvc, "createDataResource", structureBuilder.build());
+        IonMessage msgin = baseProcess.rpcSendContainerContent(r1intSvc, "createDataResource", structureBuilder.build(), "83e08e23-1666-47c2-9e8a-f5dfcbde6690", "1234");
 
         System.out.println("UUID: " + msgin.getContent());
     }

@@ -24,6 +24,8 @@ import com.rabbitmq.client.ShutdownSignalException;
  * @author Chris Mueller
  */
 public class MsgBrokerClient {
+	
+	private static final int DEFAULT_TIMEOUT_MS = 30000;
 
     private String mBrokerHost;
     private int mBrokerPort;
@@ -149,7 +151,7 @@ public class MsgBrokerClient {
     }
 
     public IonMessage consumeMessage(String queueName) {
-        return consumeMessage(queueName, -1);
+        return consumeMessage(queueName, DEFAULT_TIMEOUT_MS);
     }
 
     /**

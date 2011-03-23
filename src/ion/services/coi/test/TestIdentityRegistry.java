@@ -20,7 +20,7 @@ import com.rabbitmq.client.AMQP;
  * Before running this class, ensure the identity registry is running.
  * 
  */
-public class IdentityRegistryTest extends TestCase {
+public class TestIdentityRegistry extends TestCase {
 
 	// Alter these values as necessary for your system configuration
 	private String SYSNAME = System.getProperty("ioncore.sysname","Tom");
@@ -77,7 +77,7 @@ public class IdentityRegistryTest extends TestCase {
 		"c2bPOQRAYZyD2o+/MHBDsz7RWZJoZiI+SJJuE4wphGUsEbI2Ger1QW9135jKp6BsY2qZ\n" +
 		"-----END RSA PRIVATE KEY-----";
 
-	public IdentityRegistryTest(String name) {
+	public TestIdentityRegistry(String name) {
 		super(name);
 	}
 	
@@ -94,7 +94,7 @@ public class IdentityRegistryTest extends TestCase {
 		baseProcess = null;
 	}
 
-    public void testIdentRegistry() throws Exception {
+    public void testUserRegistration() throws Exception {
         System.out.println("\nSTEP: Register credentials");
 
         Map<String, Object> content = new HashMap<String, Object>();
