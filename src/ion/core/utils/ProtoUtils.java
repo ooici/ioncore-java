@@ -26,7 +26,7 @@ import net.ooici.core.link.Link.CASRef;
 import net.ooici.core.message.IonMessage.IonMsg;
 import net.ooici.core.type.Type;
 import net.ooici.core.type.Type.GPBType;
-import net.ooici.services.dm.DatasetRegistry.DatasetEntryMessage;
+//import net.ooici.services.dm.DatasetRegistry.DatasetEntryMessage;
 
 /**
  *
@@ -294,180 +294,180 @@ public class ProtoUtils {
 //            recurseStructureElement(map, element);
 //        }
 //    }
-    public static void main(String[] args) {
-//        testSendReceive();
-        testStructureManager();
-//        test();
-    }
-
-    private static void testStructureManager() {
-        System.out.println("\n>>>>>>>>>>>>>>>>>Test StructureManager<<<<<<<<<<<<<<<<<");
-        
-        System.out.println("\n******Make struct1******");
-        Container.Structure struct1 = makeStruct1();
-        System.out.println("*******************************\n\n");
-
-        System.out.println(">>> Add struct1 to StructureManager");
-        StructureManager sm = StructureManager.Factory(struct1);
-        System.out.println(sm);
-
-        System.out.println("\n******Make struct2******");
-        Container.Structure struct2 = makeStruct2();
-        System.out.println("*******************************\n\n");
-
-        System.out.println(">>> Add struct2 to StructureManager");
-        sm.addStructure(struct2);
-        System.out.println(sm);
-
-        System.out.println(">>> Remove the struct1 from StructureManager");
-        sm.removeStructure(struct1);
-        System.out.println(sm);
-
-        System.out.println(">>> Get the first head");
-        GPBWrapper<IonMsg> msgWrap = sm.getObjectWrapper(sm.getHeadIds().get(0));
-        IonMsg msg = msgWrap.getObjectValue();
-        System.out.println(msg);
-
-        System.out.println(">>> Get the item referenced by that head");
-        GPBWrapper<DatasetEntryMessage> demWrap = sm.getObjectWrapper(msg.getMessageObject());
-        DatasetEntryMessage dem = demWrap.getObjectValue();
-        System.out.println(dem);
-    }
-
-    private static void testSendReceive() {
-        System.out.println("\n>>>>>>>>>>>>>>>>>Test Send/Receive<<<<<<<<<<<<<<<<<");
-        
-        System.out.println("\n******Make Test Structure******");
-        /* Generate the test struct1 */
-        Container.Structure structure = makeStruct1();
-        System.out.println("\n*******************************\n\n");
-
-        System.out.println("\n******Prepare MsgBrokerClient******");
-        /* Send the message to the simple_responder service which just replys with the content of the sent message */
-        MsgBrokerClient ionClient = new MsgBrokerClient("localhost", com.rabbitmq.client.AMQP.PROTOCOL.PORT, "magnet.topic");
-        ionClient.attach();
-        BaseProcess baseProcess = new BaseProcess(ionClient);
-        baseProcess.spawn();
-
-
-        System.out.println("\n******RPC Send******");
-        MessagingName simpleResponder = new MessagingName("testing", "responder");
-        IonMessage reply = baseProcess.rpcSendContainerContent(simpleResponder, "respond", structure);
-
-        System.out.println("\n******Unpack Message******");
-        StructureManager sm = StructureManager.Factory(reply);
-        System.out.println(">>>> Heads:");
-        for(String key : sm.getHeadIds()) {
-            System.out.println(key);
-            GPBWrapper<IonMsg> msgWrap = sm.getObjectWrapper(key);
-            System.out.println(msgWrap);
-            IonMsg msg = msgWrap.getObjectValue();
-        }
-        System.out.println("\n>>>> Items:");
-        for(String key : sm.getItemIds()) {
-            System.out.println(key);
-            GPBWrapper<DatasetEntryMessage> demWrap = sm.getObjectWrapper(key);
-            System.out.println(demWrap);
-            DatasetEntryMessage dem = demWrap.getObjectValue();
-        }
-
-        baseProcess.dispose();
-    }
-    private static Container.Structure makeStruct1() {
-        /* GPBWrapper Factory Example */
-
-        // Item object is a DatasetEntryMessage
-        DatasetEntryMessage.Builder dataResourceBuilder = DatasetEntryMessage.newBuilder();
-        dataResourceBuilder.setProvider("provider1").setDataType("cool_type").setFormat("json").setTitle("great title");
-        DatasetEntryMessage dataResource = dataResourceBuilder.build();
-
-        System.out.println("****** Generate message_objects******");
-        GPBWrapper<DatasetEntryMessage> demWrap = GPBWrapper.Factory(dataResource);
-        System.out.println("DatasetEntryMessage:\n" + demWrap);
-
-        // Head is an IonMsg
-        IonMsg.Builder ionMsgBldr = IonMsg.newBuilder().setName("Test Message").setIdentity("1");
-//        ionMsgBldr.setType(demWrap.getObjectType());
-        /* This object references the dem object via a CASRef */
-        ionMsgBldr.setMessageObject(demWrap.getCASRef());
-        GPBWrapper msgWrap = GPBWrapper.Factory(ionMsgBldr.build());
-        System.out.println("IonMsg:\n" + msgWrap);
-
-        /* Add the elements to the Container.Structure.Builder */
-        Container.Structure.Builder structBldr = ProtoUtils.addStructureElementToStructureBuilder(null, msgWrap.getStructureElement(), true);
-        ProtoUtils.addStructureElementToStructureBuilder(structBldr, demWrap.getStructureElement(), false);
-
-        return structBldr.build();
-    }
-    private static Container.Structure makeStruct2() {
-        /* GPBWrapper Factory Example */
-
-        // Item object is a DatasetEntryMessage
-        DatasetEntryMessage.Builder dataResourceBuilder = DatasetEntryMessage.newBuilder();
-        dataResourceBuilder.setProvider("provider2").setDataType("awesome_type").setFormat("json").setTitle("Best Title Ever");
-        DatasetEntryMessage dataResource = dataResourceBuilder.build();
-
-        System.out.println("****** Generate message_objects******");
-        GPBWrapper<DatasetEntryMessage> demWrap = GPBWrapper.Factory(dataResource);
-        System.out.println("DatasetEntryMessage:\n" + demWrap);
-
-        // Head is an IonMsg
-        IonMsg.Builder ionMsgBldr = IonMsg.newBuilder().setName("Another Test Message").setIdentity("22");
-//        ionMsgBldr.setType(demWrap.getObjectType());
-        /* This object references the dem object via a CASRef */
-        ionMsgBldr.setMessageObject(demWrap.getCASRef());
-        GPBWrapper msgWrap = GPBWrapper.Factory(ionMsgBldr.build());
-        System.out.println("IonMsg:\n" + msgWrap);
-
-        /* Add the elements to the Container.Structure.Builder */
-        Container.Structure.Builder structBldr = ProtoUtils.addStructureElementToStructureBuilder(null, msgWrap.getStructureElement(), true);
-        ProtoUtils.addStructureElementToStructureBuilder(structBldr, demWrap.getStructureElement(), false);
-
-        return structBldr.build();
-    }
-
-    private static void test() {
-        String hostName = "localhost";
-        int portNumber = AMQP.PROTOCOL.PORT;
-        String exchange = "magnet.topic";
-
-    	// Messaging environment
-        MsgBrokerClient ionClient = new MsgBrokerClient(hostName, portNumber, exchange);
-        ionClient.attach();
-
-        BaseProcess baseProcess = new BaseProcess(ionClient);
-    	baseProcess.spawn();
-
-		DatasetEntryMessage.Builder dataResource = DatasetEntryMessage.newBuilder();
-
-		dataResource.setProvider("provider1");
-		dataResource.setFormat("format1");
-		dataResource.setProtocol("protocol1");
-		dataResource.setType("type1");
-		dataResource.setTitle("title1");
-		dataResource.setDataType("data_type1");
-		dataResource.setNamingAuthority("naming_authority1");
-
-		DatasetEntryMessage.Person.Builder publisher = DatasetEntryMessage.Person.newBuilder();
-		publisher.setName("publisher_name1");
-		publisher.setEmail("publisher_email1");
-		publisher.setWebsite("publisher_website1");
-		publisher.setInstitution("publisher_institution1");
-		dataResource.setPublisher(publisher);
-
-		DatasetEntryMessage.Person.Builder creator = DatasetEntryMessage.Person.newBuilder();
-		creator.setName("creator_name1");
-		creator.setEmail("creator_email1");
-		creator.setWebsite("creator_website1");
-		creator.setInstitution("creator_institution1");
-		dataResource.setCreator(creator);
-
-		Container.Structure.Builder structureBuilder = ProtoUtils.addIonMessageContent(null, "CreateDataResource", "Identity", dataResource.build());
-
-		MessagingName r1intSvc = new MessagingName("Tom", "r1integration");
-
-        IonMessage msgin = baseProcess.rpcSendContainerContent(r1intSvc, "createDataResource", structureBuilder.build(), "83e08e23-1666-47c2-9e8a-f5dfcbde6690", "1234");
-
-        System.out.println("UUID: " + msgin.getContent());
-    }
+//    public static void main(String[] args) {
+////        testSendReceive();
+//        testStructureManager();
+////        test();
+//    }
+//
+//    private static void testStructureManager() {
+//        System.out.println("\n>>>>>>>>>>>>>>>>>Test StructureManager<<<<<<<<<<<<<<<<<");
+//
+//        System.out.println("\n******Make struct1******");
+//        Container.Structure struct1 = makeStruct1();
+//        System.out.println("*******************************\n\n");
+//
+//        System.out.println(">>> Add struct1 to StructureManager");
+//        StructureManager sm = StructureManager.Factory(struct1);
+//        System.out.println(sm);
+//
+//        System.out.println("\n******Make struct2******");
+//        Container.Structure struct2 = makeStruct2();
+//        System.out.println("*******************************\n\n");
+//
+//        System.out.println(">>> Add struct2 to StructureManager");
+//        sm.addStructure(struct2);
+//        System.out.println(sm);
+//
+//        System.out.println(">>> Remove the struct1 from StructureManager");
+//        sm.removeStructure(struct1);
+//        System.out.println(sm);
+//
+//        System.out.println(">>> Get the first head");
+//        GPBWrapper<IonMsg> msgWrap = sm.getObjectWrapper(sm.getHeadIds().get(0));
+//        IonMsg msg = msgWrap.getObjectValue();
+//        System.out.println(msg);
+//
+//        System.out.println(">>> Get the item referenced by that head");
+//        GPBWrapper<DatasetEntryMessage> demWrap = sm.getObjectWrapper(msg.getMessageObject());
+//        DatasetEntryMessage dem = demWrap.getObjectValue();
+//        System.out.println(dem);
+//    }
+//
+//    private static void testSendReceive() {
+//        System.out.println("\n>>>>>>>>>>>>>>>>>Test Send/Receive<<<<<<<<<<<<<<<<<");
+//
+//        System.out.println("\n******Make Test Structure******");
+//        /* Generate the test struct1 */
+//        Container.Structure structure = makeStruct1();
+//        System.out.println("\n*******************************\n\n");
+//
+//        System.out.println("\n******Prepare MsgBrokerClient******");
+//        /* Send the message to the simple_responder service which just replys with the content of the sent message */
+//        MsgBrokerClient ionClient = new MsgBrokerClient("localhost", com.rabbitmq.client.AMQP.PROTOCOL.PORT, "magnet.topic");
+//        ionClient.attach();
+//        BaseProcess baseProcess = new BaseProcess(ionClient);
+//        baseProcess.spawn();
+//
+//
+//        System.out.println("\n******RPC Send******");
+//        MessagingName simpleResponder = new MessagingName("testing", "responder");
+//        IonMessage reply = baseProcess.rpcSendContainerContent(simpleResponder, "respond", structure);
+//
+//        System.out.println("\n******Unpack Message******");
+//        StructureManager sm = StructureManager.Factory(reply);
+//        System.out.println(">>>> Heads:");
+//        for(String key : sm.getHeadIds()) {
+//            System.out.println(key);
+//            GPBWrapper<IonMsg> msgWrap = sm.getObjectWrapper(key);
+//            System.out.println(msgWrap);
+//            IonMsg msg = msgWrap.getObjectValue();
+//        }
+//        System.out.println("\n>>>> Items:");
+//        for(String key : sm.getItemIds()) {
+//            System.out.println(key);
+//            GPBWrapper<DatasetEntryMessage> demWrap = sm.getObjectWrapper(key);
+//            System.out.println(demWrap);
+//            DatasetEntryMessage dem = demWrap.getObjectValue();
+//        }
+//
+//        baseProcess.dispose();
+//    }
+//    private static Container.Structure makeStruct1() {
+//        /* GPBWrapper Factory Example */
+//
+//        // Item object is a DatasetEntryMessage
+//        DatasetEntryMessage.Builder dataResourceBuilder = DatasetEntryMessage.newBuilder();
+//        dataResourceBuilder.setProvider("provider1").setDataType("cool_type").setFormat("json").setTitle("great title");
+//        DatasetEntryMessage dataResource = dataResourceBuilder.build();
+//
+//        System.out.println("****** Generate message_objects******");
+//        GPBWrapper<DatasetEntryMessage> demWrap = GPBWrapper.Factory(dataResource);
+//        System.out.println("DatasetEntryMessage:\n" + demWrap);
+//
+//        // Head is an IonMsg
+//        IonMsg.Builder ionMsgBldr = IonMsg.newBuilder().setName("Test Message").setIdentity("1");
+////        ionMsgBldr.setType(demWrap.getObjectType());
+//        /* This object references the dem object via a CASRef */
+//        ionMsgBldr.setMessageObject(demWrap.getCASRef());
+//        GPBWrapper msgWrap = GPBWrapper.Factory(ionMsgBldr.build());
+//        System.out.println("IonMsg:\n" + msgWrap);
+//
+//        /* Add the elements to the Container.Structure.Builder */
+//        Container.Structure.Builder structBldr = ProtoUtils.addStructureElementToStructureBuilder(null, msgWrap.getStructureElement(), true);
+//        ProtoUtils.addStructureElementToStructureBuilder(structBldr, demWrap.getStructureElement(), false);
+//
+//        return structBldr.build();
+//    }
+//    private static Container.Structure makeStruct2() {
+//        /* GPBWrapper Factory Example */
+//
+//        // Item object is a DatasetEntryMessage
+//        DatasetEntryMessage.Builder dataResourceBuilder = DatasetEntryMessage.newBuilder();
+//        dataResourceBuilder.setProvider("provider2").setDataType("awesome_type").setFormat("json").setTitle("Best Title Ever");
+//        DatasetEntryMessage dataResource = dataResourceBuilder.build();
+//
+//        System.out.println("****** Generate message_objects******");
+//        GPBWrapper<DatasetEntryMessage> demWrap = GPBWrapper.Factory(dataResource);
+//        System.out.println("DatasetEntryMessage:\n" + demWrap);
+//
+//        // Head is an IonMsg
+//        IonMsg.Builder ionMsgBldr = IonMsg.newBuilder().setName("Another Test Message").setIdentity("22");
+////        ionMsgBldr.setType(demWrap.getObjectType());
+//        /* This object references the dem object via a CASRef */
+//        ionMsgBldr.setMessageObject(demWrap.getCASRef());
+//        GPBWrapper msgWrap = GPBWrapper.Factory(ionMsgBldr.build());
+//        System.out.println("IonMsg:\n" + msgWrap);
+//
+//        /* Add the elements to the Container.Structure.Builder */
+//        Container.Structure.Builder structBldr = ProtoUtils.addStructureElementToStructureBuilder(null, msgWrap.getStructureElement(), true);
+//        ProtoUtils.addStructureElementToStructureBuilder(structBldr, demWrap.getStructureElement(), false);
+//
+//        return structBldr.build();
+//    }
+//
+//    private static void test() {
+//        String hostName = "localhost";
+//        int portNumber = AMQP.PROTOCOL.PORT;
+//        String exchange = "magnet.topic";
+//
+//    	// Messaging environment
+//        MsgBrokerClient ionClient = new MsgBrokerClient(hostName, portNumber, exchange);
+//        ionClient.attach();
+//
+//        BaseProcess baseProcess = new BaseProcess(ionClient);
+//    	baseProcess.spawn();
+//
+//		DatasetEntryMessage.Builder dataResource = DatasetEntryMessage.newBuilder();
+//
+//		dataResource.setProvider("provider1");
+//		dataResource.setFormat("format1");
+//		dataResource.setProtocol("protocol1");
+//		dataResource.setType("type1");
+//		dataResource.setTitle("title1");
+//		dataResource.setDataType("data_type1");
+//		dataResource.setNamingAuthority("naming_authority1");
+//
+//		DatasetEntryMessage.Person.Builder publisher = DatasetEntryMessage.Person.newBuilder();
+//		publisher.setName("publisher_name1");
+//		publisher.setEmail("publisher_email1");
+//		publisher.setWebsite("publisher_website1");
+//		publisher.setInstitution("publisher_institution1");
+//		dataResource.setPublisher(publisher);
+//
+//		DatasetEntryMessage.Person.Builder creator = DatasetEntryMessage.Person.newBuilder();
+//		creator.setName("creator_name1");
+//		creator.setEmail("creator_email1");
+//		creator.setWebsite("creator_website1");
+//		creator.setInstitution("creator_institution1");
+//		dataResource.setCreator(creator);
+//
+//		Container.Structure.Builder structureBuilder = ProtoUtils.addIonMessageContent(null, "CreateDataResource", "Identity", dataResource.build());
+//
+//		MessagingName r1intSvc = new MessagingName("Tom", "r1integration");
+//
+//        IonMessage msgin = baseProcess.rpcSendContainerContent(r1intSvc, "createDataResource", structureBuilder.build(), "83e08e23-1666-47c2-9e8a-f5dfcbde6690", "1234");
+//
+//        System.out.println("UUID: " + msgin.getContent());
+//    }
 }
