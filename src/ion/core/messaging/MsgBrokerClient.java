@@ -246,35 +246,25 @@ public class MsgBrokerClient {
      */
     public void sendMessage(IonMessage msg) {
 
-        byte[] msgbytes = msg.getBody();
+    	byte[] msgbytes = msg.getBody();
 
-        String toName = (String) msg.getIonHeaders().get("receiver");
-        BasicProperties props = new BasicProperties("application/msgpack", "binary", null, null,
-                null, null, null, null,
-                null, null, null, null,
-                null, null);
-        try {
-            mDefaultChannel.basicPublish(mBaseExchange, toName, props, msgbytes);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    	assert(msg.getIonHeaders().get("user-id") != null);
+    	assert(msg.getIonHeaders().get("expiry") != null);
 
-        System.out.println("Sent message to exchange " + mBaseExchange + " with routing key " + toName
-                + ", msglen " + msgbytes.length);
-    }
+    	String toName = (String) msg.getIonHeaders().get("receiver");
+    	BasicProperties props = new BasicProperties("application/msgpack", "binary", null, null,
+    			null, null, null, null,
+    			null, null, null, null,
+    			null, null);
+    	try {
+    		mDefaultChannel.basicPublish(mBaseExchange, toName, props, msgbytes);
+    	} catch (IOException e) {
+    		// TODO Auto-generated catch block
+    		e.printStackTrace();
+    	}
 
-    /**
-     * Creates and sends an IonMessage
-     *
-     * @param from      Message source
-     * @param to        Message destination
-     * @param op        Message operation
-     * @param content   Message content
-     */
-    public void createSendMessage(MessagingName from, MessagingName to, String op, Object content) {
-        IonMessage msg = createMessage(from, to, op, content);
-        sendMessage(msg);
+    	System.out.println("Sent message to exchange " + mBaseExchange + " with routing key " + toName
+    			+ ", msglen " + msgbytes.length);
     }
 
     /**
