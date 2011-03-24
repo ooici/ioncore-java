@@ -51,7 +51,16 @@ public class BaseProcess {
     }
 
     public void send(MessagingName to, String op, Object content) {
-        mBrokerClient.createSendMessage(mProcessId, to, op, content);
+    	send(to, op, content, "ANONYMOUS", "0");
+    }
+
+    public void send(MessagingName to, String op, Object content, String userId, String expiry) {
+        IonMessage msgout = mBrokerClient.createMessage(mProcessId, to, op, content);
+
+        // Adjust the message headers and send
+        msgout.getIonHeaders().put("user-id", userId);
+        msgout.getIonHeaders().put("expiry", expiry);
+        mBrokerClient.sendMessage(msgout);
     }
 
     public IonMessage rpcSend(MessagingName to, String op, Object content) {
@@ -70,6 +79,12 @@ public class BaseProcess {
     }
 
     public IonMessage rpcSend(IonMessage msg) {
+    	return rpcSend(msg, "ANONYMOUS", "0");
+    }
+
+    public IonMessage rpcSend(IonMessage msg, String userId, String expiry) {
+    	msg.getIonHeaders().put("user-id", userId);
+    	msg.getIonHeaders().put("expiry", expiry);
         mBrokerClient.sendMessage(msg);
         IonMessage msgin = mBrokerClient.consumeMessage(mInQueue);
         return msgin;
