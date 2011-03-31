@@ -18,6 +18,7 @@ import net.ooici.core.message.IonMessage.IonMsg;
 import net.ooici.integration.ais.AisRequestResponse.ApplicationIntegrationServiceError;
 import net.ooici.integration.ais.AisRequestResponse.ApplicationIntegrationServiceRequestMsg;
 import net.ooici.integration.ais.AisRequestResponse.ApplicationIntegrationServiceResponseMsg;
+import net.ooici.integration.ais.findDataResources.FindDataResources.FindDataResourcesRspMsg;
 
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.JsonFormat;
@@ -31,10 +32,15 @@ public class AppIntegrationService {
 
     private MsgBrokerClient msgBrokerClient;
     private BaseProcess baseProcess;
+    
+    private String errorMessage = "";
 
     // TODO fill out enum
+    // Enum used by UI to indicate to this library what operation is
+    // associated with the passed Json data.
     public enum RequestType {
     	CREATE_DOWNLOAD_URL, FIND_DATA_RESOURCES, GET_DATA_RESOURCE_DETAIL,
+    	CREATE_DATA_RESOURCE, UPDATE_DATA_RESOURCE, DELETE_DATA_RESOURCE,
     	REGISTER_USER, UPDATE_USER_EMAIL, UPDATE_USER_DISPATCHER_QUEUE
     }
 
@@ -47,50 +53,78 @@ public class AppIntegrationService {
     // Map enum values to int GPB type ids
     // TODO define all mappings.  Currently using echo service to validate functionality.
     static {
-    	// Register user
     	typeEnumToTypeIntMap.put(RequestType.CREATE_DOWNLOAD_URL, -1);
     	typeEnumToServiceOpMap.put(RequestType.CREATE_DOWNLOAD_URL, "createDownloadURL");
-    	// Register user
+    	
     	typeEnumToTypeIntMap.put(RequestType.FIND_DATA_RESOURCES, 9031);
     	typeEnumToServiceOpMap.put(RequestType.FIND_DATA_RESOURCES, "findDataResources");
-    	// Register user
+    	
     	typeEnumToTypeIntMap.put(RequestType.GET_DATA_RESOURCE_DETAIL, -1);
     	typeEnumToServiceOpMap.put(RequestType.GET_DATA_RESOURCE_DETAIL, "getDataResourceDetail");
-    	// Register user
+    	
+    	typeEnumToTypeIntMap.put(RequestType.CREATE_DATA_RESOURCE, 9211);
+    	typeEnumToServiceOpMap.put(RequestType.CREATE_DATA_RESOURCE, "createDataResource");
+    	
+    	typeEnumToTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE, 9211);
+    	typeEnumToServiceOpMap.put(RequestType.UPDATE_DATA_RESOURCE, "updateDataResource");
+    	
+    	typeEnumToTypeIntMap.put(RequestType.DELETE_DATA_RESOURCE, 9213);
+    	typeEnumToServiceOpMap.put(RequestType.DELETE_DATA_RESOURCE, "deleteDataResource");
+    	
     	typeEnumToTypeIntMap.put(RequestType.REGISTER_USER, 9101);
     	typeEnumToServiceOpMap.put(RequestType.REGISTER_USER, "registerUser");
-    	// Register user
+    	
     	typeEnumToTypeIntMap.put(RequestType.UPDATE_USER_EMAIL, -1);
     	typeEnumToServiceOpMap.put(RequestType.UPDATE_USER_EMAIL, "updateUserEmail");
-    	// Register user
+    	
     	typeEnumToTypeIntMap.put(RequestType.UPDATE_USER_DISPATCHER_QUEUE, -1);
     	typeEnumToServiceOpMap.put(RequestType.UPDATE_USER_DISPATCHER_QUEUE, "updateUserDispatcherQueue");
     }
 
-    // TODO utilize sysName
+    /**
+     * Constructor taking the full set of parameters required to target
+     * requests to the Application Integration Service running in a specific
+     * capability container with topic being hosted on a specific node.
+     * 
+     * @param sysName system name under which the ION Core Python capability container is
+     * running
+     * @param hostName machine hosting the broker
+     * @param portNumber port number of the broker
+     * @param exchange name of the exchange being hosted by the broker
+     */
 	public AppIntegrationService(String sysName, String hostName, int portNumber, String exchange) {
 		msgBrokerClient = new MsgBrokerClient(hostName, portNumber, exchange);
 		msgBrokerClient.attach();
 		baseProcess = new BaseProcess(msgBrokerClient);
 		baseProcess.spawn();
-		applicationIntegrationSvc = new MessagingName(sysName, AIS_SERVICE_NAME);
+		createMessagingName(sysName);
 	}
-    
+
 	public AppIntegrationService(String sysName, MsgBrokerClient brokerClient) {
 		baseProcess = new BaseProcess(brokerClient);
 		baseProcess.spawn();
-		applicationIntegrationSvc = new MessagingName(sysName, AIS_SERVICE_NAME);
+		createMessagingName(sysName);
+	}
+
+	public AppIntegrationService(String sysName, BaseProcess baseProcess) {
+		this.baseProcess = baseProcess;
+		createMessagingName(sysName);
 	}
 
 	public void dispose() {
 		baseProcess.dispose();
 	}
 
+	private void createMessagingName(String sysName) {
+		applicationIntegrationSvc = new MessagingName(sysName, AIS_SERVICE_NAME);
+	}
+
 	/**
-	 * Method to be called from UI to send requests to ION Core Application Integration Service.  Input
-	 * is in Json string format.  Results is returned in Json string format.
+	 * Method to be called from UI to send requests to ION Core Application Integration
+	 * Service.  Input is in Json string format.  Results is returned to UI in Json
+	 * string format.
 	 * 
-	 * @param jsonRequest input to be send in GPB to AIS
+	 * @param jsonRequest input to be send in GPB to Application Integration Service
 	 * @param reqType enum value indicating specific operation being requested
 	 * @param userId for enforcing policy.  OOID or 'ANONYMOUS'
 	 * @param expiry for enforcing policy.  Expiry of certificate represented (time since epoc in seconds) as a string or '0'
@@ -107,15 +141,27 @@ public class AppIntegrationService {
     	return sendReceive(jsonRequest, gpbId, serviceOperation, userId, expiry);
 	}
 
+	public String sendReceiveUIRequestCanned() {
+		String requestJsonString = "{\"user_ooi_id\": \"3f27a744-2c3e-4d2a-a98c-050b246334a3\",\"minLatitude\": 32.87521,\"maxLatitude\": 32.97521,\"minLongitude\": -117.274609,\"maxLongitude\": -117.174609,\"minDepth\": 5.5,\"maxDepth\": 6.6,\"minTime\": 7.7,\"maxTime\": 8.8,\"identity\": \"ad0adf8b-4a7e-43e1-8cc0-371fb9057664\"}";
+        String replyJsonString = sendReceiveUIRequest(requestJsonString, RequestType.FIND_DATA_RESOURCES, "3f27a744-2c3e-4d2a-a98c-050b246334a3", "0");
+        return replyJsonString;
+	}
+
 	public String sendReceive(String jsonRequest, int gpbId, String serviceOperation, String userId, String expiry) {
 
 		// Convert Json "payload" data to appropriate GPB format
 		GeneratedMessage payload = convertJsonToGPB(jsonRequest, gpbId);
-		assert(payload != null);
+		if (payload == null) {
+			return errorMessage;
+		}
 
 		Structure requestMessage = packageRequestMessage(payload, gpbId);
 		
 		IonMessage replyMessage = baseProcess.rpcSendContainerContent(applicationIntegrationSvc, serviceOperation, requestMessage);
+		
+		if (replyMessage == null) {
+    		return "Request timeout";
+		}
 		
 		return unpackageResponseMessage(replyMessage);
 	}
@@ -137,7 +183,7 @@ public class AppIntegrationService {
     		
     		return (GeneratedMessage)builder.build();
     	} catch(Exception e) {
-    		System.out.println("Exception: " + e);
+    		errorMessage = "Exception encoding JSON to GPB: " + e;
     	}
 
     	return null;
@@ -200,22 +246,32 @@ public class AppIntegrationService {
         
         // Now get payload
         assert(sm.getItemIds().size() > 1);
+        boolean createList = sm.getItemIds().size() > 2 ? true : false;
+        String payloadInfo = createList ? "[" : "";
+        boolean firstTime = true;
         for (String itemKey : sm.getItemIds()) {
             msgWrapper = sm.getObjectWrapper(itemKey);
 
             // If error response, convert info and return
             if (msgWrapper.getObjectValue() instanceof ApplicationIntegrationServiceResponseMsg
-            	|| msgWrapper.getObjectValue() instanceof ApplicationIntegrationServiceError) {
+            	|| msgWrapper.getObjectValue() instanceof ApplicationIntegrationServiceError
+            	|| msgWrapper.getObjectValue() instanceof FindDataResourcesRspMsg) {
             	continue;
             }
             GPBWrapper payloadWrapper = sm.getObjectWrapper(itemKey);
             GeneratedMessage payloadMessage = (GeneratedMessage)payloadWrapper.getObjectValue();
-            String payloadInfo = JsonFormat.printToString(payloadMessage);
-            return payloadInfo;
+        	if (createList && !firstTime) {
+        		payloadInfo += ", ";
+        	}
+            payloadInfo += JsonFormat.printToString(payloadMessage);
+            if (firstTime) {
+            	firstTime = false;
+            }
         }
-
-        // TODO how to return error condition here?
-        return null;
+        if (createList) {
+        	payloadInfo += "]";
+        }
+        return payloadInfo;
     }
 
 	public static void main(String[] args) {
@@ -279,9 +335,5 @@ public class AppIntegrationService {
         
         ais.dispose();
     }
-	
-	
-	
-	
 	
 }

@@ -43,6 +43,8 @@ public class IonSendMessage extends IonMessage {
 		mHeaders.put("conv-seq", 1);
 		mHeaders.put("accept-encoding", "application/ion-jsond");
 		mHeaders.put("encoding", "application/ion-jsond");
+		mHeaders.put("user-id", "ANONYMOUS");
+		mHeaders.put("expiry", "0");
 		mHeaders.put("content", content);
 		mContent = content;
 	}

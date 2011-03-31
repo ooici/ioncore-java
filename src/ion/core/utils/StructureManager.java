@@ -46,13 +46,12 @@ public class StructureManager {
     }
 
     public List<String> addStructure(Structure structure) {
-        if(structure.getHeadsCount() >= 1) {
-            for(StructureElement se : structure.getHeadsList()) {
-                GPBWrapper head = GPBWrapper.Factory(se);
-                String key = head.getKeyString();
-                _map.put(key, head);
-                _headIds.add(key);
-            }
+        if(structure.getHead() != null) {
+        	StructureElement se = structure.getHead();
+        	GPBWrapper head = GPBWrapper.Factory(se);
+        	String key = head.getKeyString();
+        	_map.put(key, head);
+        	_headIds.add(key);
         }
         if(structure.getItemsCount() >= 1) {
             for(StructureElement se : structure.getItemsList()) {
@@ -67,13 +66,12 @@ public class StructureManager {
     }
 
     public List<String> removeStructure(Structure structure) {
-        if(structure.getHeadsCount() >= 1) {
-            for(StructureElement se : structure.getHeadsList()) {
-                GPBWrapper head = GPBWrapper.Factory(se);
-                String key = head.getKeyString();
-                _map.remove(key);
-                _headIds.remove(key);
-            }
+        if(structure.getHead() != null) {
+        	StructureElement se = structure.getHead();
+        	GPBWrapper head = GPBWrapper.Factory(se);
+        	String key = head.getKeyString();
+        	_map.remove(key);
+        	_headIds.remove(key);
         }
         if(structure.getItemsCount() >= 1) {
             for(StructureElement se : structure.getItemsList()) {
