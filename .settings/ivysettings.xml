@@ -77,7 +77,8 @@
 
 <!-- furthermore, instead of ooici.net it should be net.ooici or org.ooici -->
 
-                        <artifact pattern="${user.home}/repo/[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]"/>
+                        <!-- <artifact pattern="${user.home}/repo/[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]"/> -->
+                        <artifact pattern="/var/www/releases/maven/repo/[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]"/>
                 </filesystem>
                 <chain name="default">
                         <resolver ref="maven-local"/>
