@@ -41,6 +41,8 @@ public class IonSendMessage extends IonMessage {
 		String convid = "#" + (sConvCnt++);
 		mHeaders.put("conv-id", convid);
 		mHeaders.put("conv-seq", 1);
+		mHeaders.put("performative", "request");
+		mHeaders.put("protocol", "rpc");
 		mHeaders.put("accept-encoding", "application/ion-jsond");
 		mHeaders.put("encoding", "application/ion-jsond");
 		mHeaders.put("user-id", "ANONYMOUS");
