@@ -65,7 +65,7 @@
 		</ivy:makepom>
 	</target>
 
-	<target name="ivy-publish-local" depends="dist,ivy-init,gen-pom" description="publish jar/source to maven repo mounted at ~/.m2/repository">
+	<target name="ivy-publish-local" depends="ivy-init,gen-pom, dist" description="publish jar/source to maven repo mounted at ~/.m2/repository">
 		<!-- snapshots only exist locally, so kick the cache. -->
 		<delete>
 			<fileset dir="${ivy.cache.dir}/${ivy.organisation}/${ivy.module}" includes="**/*SNAPSHOT*"/>
