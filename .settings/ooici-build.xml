@@ -33,7 +33,7 @@
     <target name="compile" depends="resolve" description="--> Compile the project">
     	<antcall target="pre-compile" />
         <mkdir dir="${build.dir}" />
-        <javac srcdir="${src.dir}" destdir="${build.dir}" >
+        <javac srcdir="${src.dir}" destdir="${build.dir}" debug="on" debuglevel="lines,vars,source">
         	<classpath refid="lib.path.id" />
         </javac>
         <antcall target="post-compile" />
@@ -179,6 +179,19 @@
     			<fileset dir="${src.dir}">
       				<include name="**/*Test.java"/>
       				<include name="**/Test*.java"/>
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+	<target name="test-this" description="--> Runs JUnit tests for all classes named '*Test.java' or 'Test*.java'">
+		<mkdir dir="${test-report.dir}" />
+		<junit printsummary="yes" haltonfailure="no">
+			<classpath refid="runtime.classpath" />
+			<formatter type="plain"/>
+			<assertions><enable/></assertions>
+  			<batchtest fork="yes" todir="${test-report.dir}">
+    			<fileset dir="${src.dir}">
+      				<include name="${include}"/>
 				</fileset>
 			</batchtest>
 		</junit>
