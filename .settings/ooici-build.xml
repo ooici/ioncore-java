@@ -165,7 +165,7 @@
     
 	<target name="post-dist" description="--> Called after all actions in the dist target - empty by default, override in build.xml to use" />
 	
-	<target name="test-all" description="--> Runs JUnit tests for all classes ending in 'Test.java')">
+	<target name="test-all" description="--> Runs JUnit tests for all classes named '*Test.java' or 'Test*.java'">
 		<mkdir dir="test-report" />
 		<junit printsummary="yes" haltonfailure="no">
 			<classpath refid="runtime.classpath" />
