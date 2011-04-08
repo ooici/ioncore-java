@@ -52,6 +52,9 @@
     	<delete dir="${dist.dir}" />
     	<delete dir="${docs.dir}" />
     	<delete dir="${ivy.report.dir}" />
+      <delete dir="${bin.dir}" />
+      <delete dir="${ivy-publish.dir}" />
+      <delete dir="${ivy.report.dir}" />
     	<delete dir="${testreport.dir}" />
     	<delete file="MANIFEST.MF" />
     	<antcall target="clean-more" />
