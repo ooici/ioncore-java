@@ -36,6 +36,15 @@
 		</java>
 	</target>
     
+	<!-- ================================= 
+          target: ionbootstrap              
+         ================================= -->
+	<target name="ionbootstrap" depends="resolve,compile" description="--> Run basic IonBootstrap test">
+		<java classname="ion.core.IonBootstrap" fork="true">
+			<classpath refid="runtime.classpath"/>
+			<assertions><enable/></assertions>
+		</java>
+	</target>
     
     <property name="pub.resolver" value="default" />
 

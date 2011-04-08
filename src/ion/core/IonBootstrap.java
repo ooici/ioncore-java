@@ -95,7 +95,7 @@ public class IonBootstrap {
 				Class messageClazz = Class.forName(msgClassName);
 				
 				// Make sure the class is of the appropriate type
-				assert (messageClazz.isInstance(GeneratedMessage.class));
+				assert (GeneratedMessage.class.isAssignableFrom(messageClazz));
 
 				// Search the EnumDescriptors within the message type Descriptor
 				for (EnumDescriptor enumDesc : msgTypeDesc.getEnumTypes()) {
