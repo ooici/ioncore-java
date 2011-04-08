@@ -183,7 +183,7 @@
 			</batchtest>
 		</junit>
 	</target>
-	<target name="test-this" description="--> Runs JUnit tests for all classes named '*Test.java' or 'Test*.java'">
+	<target name="test-this" description="--> Runs JUnit tests for class(es) indicated with 'include' property">
 		<mkdir dir="${test-report.dir}" />
 		<junit printsummary="yes" haltonfailure="no">
 			<classpath refid="runtime.classpath" />
