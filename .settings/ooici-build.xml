@@ -55,7 +55,7 @@
       <delete dir="${bin.dir}" />
       <delete dir="${ivy-publish.dir}" />
       <delete dir="${ivy.report.dir}" />
-    	<delete dir="${testreport.dir}" />
+    	<delete dir="${test-report.dir}" />
     	<delete file="MANIFEST.MF" />
     	<antcall target="clean-more" />
     </target>
@@ -170,12 +170,12 @@
 	<target name="post-dist" description="--> Called after all actions in the dist target - empty by default, override in build.xml to use" />
 	
 	<target name="test-all" description="--> Runs JUnit tests for all classes named '*Test.java' or 'Test*.java'">
-		<mkdir dir="${testreport.dir}" />
+		<mkdir dir="${test-report.dir}" />
 		<junit printsummary="yes" haltonfailure="no">
 			<classpath refid="runtime.classpath" />
 			<formatter type="plain"/>
 			<assertions><enable/></assertions>
-  			<batchtest fork="yes" todir="${testreport.dir}">
+  			<batchtest fork="yes" todir="${test-report.dir}">
     			<fileset dir="${src.dir}">
       				<include name="**/*Test.java"/>
       				<include name="**/Test*.java"/>
