@@ -6,6 +6,7 @@ build
 docs
 dist
 ivy-report
+test-report
 output
 MANIFEST.MF
 
