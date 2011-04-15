@@ -9,6 +9,7 @@ ivy-report
 test-report
 output
 MANIFEST.MF
+bin
 
 ######################################
 # Transient settings sub-directories #
