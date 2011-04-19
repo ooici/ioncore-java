@@ -31,7 +31,7 @@ public class MsgBrokerClient {
     private int mBrokerPort;
     private String mBaseExchange;
     private Connection mBrokerConnection = null;
-    private Channel mDefaultChannel = null;
+    protected Channel mDefaultChannel = null;
     private Map mConsumerMap = null;
 
     /**
