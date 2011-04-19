@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -24,6 +27,8 @@ import com.rabbitmq.client.ShutdownSignalException;
  * @author Chris Mueller
  */
 public class MsgBrokerClient {
+    
+    private static final Logger log = LoggerFactory.getLogger(MsgBrokerClient.class);
 	
 	private static final int DEFAULT_TIMEOUT_MS = 30000;
 
@@ -267,6 +272,56 @@ public class MsgBrokerClient {
     			+ ", msglen " + msgbytes.length);
     }
 
+
+    /**
+     * Sends a IonMessage to the "receiver" specified in the header of the message.
+     * 
+     * For the mandatory and immediate flags, see 
+     * <a href="http://www.rabbitmq.com/releases/rabbitmq-java-client/v2.4.1/rabbitmq-java-client-javadoc-2.4.1/com/rabbitmq/client/Channel.html#basicPublish%28java.lang.String,%20java.lang.String,%20boolean,%20boolean,%20com.rabbitmq.client.AMQP.BasicProperties,%20byte[]%29"
+     * >here</a>
+     * 
+     * <p>NOTE: This method was added in the context of the SIAM-CI integration 
+     * prototype where the "mandatory"/"immediate" flags are
+     * being used for enabling functionality related with detecting
+     * undelivered/unroutable messages. All of this may change as ioncore-java
+     * is further developed as a whole.
+     *
+     * @param msg 
+     *                    The IonMessage being sent
+     * @param mandatory true 
+     *                    if requesting a mandatory publish
+     * @param immediate true 
+     *                    if requesting an immediate publish
+     *                    
+     * @throws IOException if the message cannot be published
+     */
+    public void sendMessage(IonMessage msg, boolean mandatory, boolean immediate) 
+    throws IOException {
+        
+        // NOTE: Adapted from sendMessage(IonMessage msg) with the following changes:
+        //  - of course, use the new parameters for the corresponding basicPublish call
+        //  - expose the possible IOException (instead of hiding it within the method)
+        //  - use a logger (instead of writing to stdout)
+
+        byte[] msgbytes = msg.getBody();
+
+        assert(msg.getIonHeaders().get("user-id") != null);
+        assert(msg.getIonHeaders().get("expiry") != null);
+
+        String toName = (String) msg.getIonHeaders().get("receiver");
+        BasicProperties props = new BasicProperties("application/msgpack", "binary", null, null,
+                null, null, null, null,
+                null, null, null, null,
+                null, null);
+        
+        mDefaultChannel.basicPublish(mBaseExchange, toName, mandatory, immediate, props, msgbytes);
+
+        if ( log.isDebugEnabled() ) {
+            log.debug("Sent message to exchange " + mBaseExchange + " with routing key " + toName
+                + ", msglen " + msgbytes.length + ", mandatory=" +mandatory+ " immediate=" +immediate);
+        }
+    }
+    
     /**
      * Acknowledges receipt of a delivered message
      *
