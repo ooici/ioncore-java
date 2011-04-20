@@ -72,10 +72,12 @@ public class MsgBrokerClient {
             mDefaultChannel = mBrokerConnection.createChannel();
             mDefaultChannel.exchangeDeclare(mBaseExchange, "topic", false, true, null);
 
-            System.out.println("Opened channel on host " + mBrokerHost + ", port " + mBrokerPort);
+            if (log.isDebugEnabled()) {
+                log.debug("Opened channel on host " + mBrokerHost + ", port " + mBrokerPort);
+            }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            // TODO This exception should be handled by the caller
+            log.error("some error thrown in attach() call", e);
             System.exit(1);
         }
     }
@@ -95,11 +97,13 @@ public class MsgBrokerClient {
                 mDefaultChannel.queueDeclare(queueName, false, false, false, null);
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            // TODO This exception should be handled by the caller
+            log.error("Error calling queueDeclare", e);
         }
 
-        System.out.println("Declared queue " + queueName);
+        if (log.isDebugEnabled()) {
+            log.debug("Declared queue " + queueName);
+        }
 
         return queueName;
     }
@@ -118,11 +122,13 @@ public class MsgBrokerClient {
         }
         try {
             mDefaultChannel.queueBind(queueName, exchange, bindingKey.getName());
-            System.out.println("Bound queue " + queueName + " to exchange " + exchange
+            if (log.isDebugEnabled()) {
+                log.debug("Bound queue " + queueName + " to exchange " + exchange
                     + " with binding key " + bindingKey);
+            }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            // TODO This exception should be handled by the caller
+            log.error("Error calling queueBind", e);
         }
 
     }
@@ -138,8 +144,8 @@ public class MsgBrokerClient {
         try {
             mDefaultChannel.basicConsume(queueName, consumer);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            // TODO This exception should be handled by the caller
+            log.error("Error calling basicConsume", e);
         }
 
         mConsumerMap.put(queueName, consumer);
@@ -178,14 +184,20 @@ public class MsgBrokerClient {
                 delivery = consumer.nextDelivery(timeout);
             }
             if(delivery == null) {
-                System.out.println(consumer.getConsumerTag());
+                if (log.isDebugEnabled()) {
+                    log.debug(consumer.getConsumerTag());
+                }
                 return null;
             }
             msgin = messageFromDelivery(delivery);
-            System.out.println("Message received on queue " + queueName + ", msglen " + msgin.getBody().length);
+            if (log.isDebugEnabled()) {
+                log.debug("Message received on queue " + queueName + ", msglen " + msgin.getBody().length);
+            }
 
             if (msgin.isErrorMessage()) {
-                System.out.println("Received message is an ERROR message: " + ((Map) msgin.getContent()).get("value"));
+                if (log.isDebugEnabled()) {
+                    log.debug("Received message is an ERROR message: " + ((Map) msgin.getContent()).get("value"));
+                }
             }
         } catch (ShutdownSignalException e) {
             // TODO Auto-generated catch block
@@ -197,8 +209,7 @@ public class MsgBrokerClient {
 //            e.printStackTrace(new java.io.PrintStream(baos));
 //            msgin = new IonAmqpMessage(null, baos.toByteArray());
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("interrupted", e);
 
             /* Attempt at replying with an error of some sort */
 //            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
@@ -263,13 +274,15 @@ public class MsgBrokerClient {
     			null, null);
     	try {
     		mDefaultChannel.basicPublish(mBaseExchange, toName, props, msgbytes);
+    		if (log.isDebugEnabled()) {
+    		    log.debug("Sent message to exchange " + mBaseExchange + " with routing key " + toName
+    		            + ", msglen " + msgbytes.length);
+    		}
     	} catch (IOException e) {
-    		// TODO Auto-generated catch block
-    		e.printStackTrace();
+            // TODO This exception should be handled by the caller
+            log.error("Error calling basicPublish", e);
     	}
 
-    	System.out.println("Sent message to exchange " + mBaseExchange + " with routing key " + toName
-    			+ ", msglen " + msgbytes.length);
     }
 
 
@@ -331,8 +344,8 @@ public class MsgBrokerClient {
         try {
             mDefaultChannel.basicAck(msg.getEnvelope().getDeliveryTag(), false);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            // TODO This exception should probably be handled by the caller
+            log.error("Error calling basicAck", e);
         }
     }
 
@@ -344,8 +357,8 @@ public class MsgBrokerClient {
             mDefaultChannel.close();
             mBrokerConnection.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            // TODO This exception should probably be handled by the caller
+            log.error("Error closing channel or connection", e);
         }
         mDefaultChannel = null;
         mBrokerConnection = null;
