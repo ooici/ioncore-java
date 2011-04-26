@@ -3,9 +3,11 @@
     <property name="src" value="./src" />
     <property name="lib" value="./lib" />
     <property name="classes" value="./build" />
+    <property name="reports" value="./reports" />
      
 
     <target name="test">
+	<mkdir dir="${reports}"/>
       <junit printsummary="yes" haltonfailure="no">
         <classpath>
           <pathelement location="${classes}" />
@@ -15,13 +17,10 @@
           </fileset>
         </classpath>
     
-        <formatter type="plain"/>
-    
-        <test name="ioncore-java.tests" haltonfailure="no" outfile="build/result">
+        <formatter type="xml"/>
+
+        <batchtest fork="yes" todir="${reports}">
           <formatter type="xml"/>
-        </test>
-    
-        <batchtest fork="yes" todir="./reports">
           <fileset dir="${src}">
             <include name="**/Test*.java"/>
             <exclude name="**/foo.java"/>
