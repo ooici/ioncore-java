@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.msgpack.Packer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The IonSendMessage allows a message's headers to be set. The message headers define
@@ -16,6 +18,8 @@ import org.msgpack.Packer;
  * @author Stephen Pasco
  */
 public class IonSendMessage extends IonMessage {
+    
+    private static final Logger log = LoggerFactory.getLogger(IonSendMessage.class);
 
 	// Message conversation id counter
 	private static int sConvCnt = 0;
@@ -84,8 +88,8 @@ public class IonSendMessage extends IonMessage {
 			pack.pack(msg);
 		}
 		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// TODO the exception should propbably be handled by the caller
+		    log.error("Error in pack.pack call", e);
 		}
 		byte[] res = out.toByteArray();
 

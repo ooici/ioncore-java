@@ -4,12 +4,17 @@
  */
 package ion.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  *
  * @author cmueller
  */
 public abstract class PollingProcess extends ion.core.BaseProcess implements java.awt.event.ActionListener {
+    
+    private static final Logger log = LoggerFactory.getLogger(PollingProcess.class);
 
     private javax.swing.Timer timer;
 
@@ -26,38 +31,50 @@ public abstract class PollingProcess extends ion.core.BaseProcess implements jav
 
     @Override
     public void spawn() {
-        System.out.println("PollingProcess:: Spawn");
+        if (log.isDebugEnabled()) {
+            log.debug("PollingProcess:: Spawn");
+        }
         super.spawn();
         startPolling();
     }
 
     public void startPolling() {
         if (timer != null) {
-            System.out.println("PollingProcess:: Start Polling");
+            if (log.isDebugEnabled()) {
+                log.debug("PollingProcess:: Start Polling");
+            }
             timer.start();
         }
     }
 
     public void stopPolling() {
         if (timer != null) {
-            System.out.println("PollingProcess:: Stop Polling");
+            if (log.isDebugEnabled()) {
+                log.debug("PollingProcess:: Stop Polling");
+            }
             timer.stop();
         }
     }
 
     public void actionPerformed(java.awt.event.ActionEvent e) {
         try {
-            System.out.println("PollingProcess:: Checking messages...");
+            if (log.isDebugEnabled()) {
+                log.debug("PollingProcess:: Checking messages...");
+            }
             /* Stop polling the queue */
             stopPolling();
             ion.core.messaging.IonMessage message = this.receive();//this blocks if there are not any messages...
             if (message != null) {
-                System.out.println("PollingProcess:: there's a message!");
+                if (log.isDebugEnabled()) {
+                    log.debug("PollingProcess:: there's a message!");
+                }
                 /* There's a message - send it to the messageReceived method */
                 messageReceived(message);
             } else {
                 /* This may only happen when a ShutdownSignalException is encountered within the BaseProcess.receive method... */
-                System.out.println("PollingProcess:: no message");
+                if (log.isDebugEnabled()) {
+                    log.debug("PollingProcess:: no message");
+                }
             }
         } finally {
             /* Resume polling */
@@ -69,7 +86,9 @@ public abstract class PollingProcess extends ion.core.BaseProcess implements jav
 
     @Override
     public void dispose() {
-        System.out.println("PollingProcess:: Dispose PollingProcess");
+        if (log.isDebugEnabled()) {
+            log.debug("PollingProcess:: Dispose PollingProcess");
+        }
         stopPolling();
         timer = null;
 
