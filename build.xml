@@ -17,7 +17,7 @@
     
         <formatter type="plain"/>
     
-        <test name="ioncore-java.tests" haltonfailure="no" outfile="result">
+        <test name="ioncore-java.tests" haltonfailure="no" outfile="build/result">
           <formatter type="xml"/>
         </test>
     
