@@ -102,7 +102,3 @@ IDE Setup
 3. Put all of the jar files in the "lib" directory on the project classpath in your IDE.
 ** Note - when you "ant clean" the lib directory is wiped out.  If you discover your project not compiling, make sure
 there's a lib directory!
-
-
-
-
