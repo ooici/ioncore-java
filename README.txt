@@ -103,4 +103,3 @@ IDE Setup
 ** Note - when you "ant clean" the lib directory is wiped out.  If you discover your project not compiling, make sure
 there's a lib directory!
 
-
