@@ -50,10 +50,10 @@ public class AppIntegrationService {
     public enum RequestType {
     	CREATE_DOWNLOAD_URL,
     	FIND_USER_CONFIG, UPDATE_USER_CONFIG,
-    	CREATE_SUBSCRIPTION, FIND_SUBSCRIPTION, DELETE_SUBSCRIPTION,
+    	CREATE_DATA_RESOURCE_SUBSCRIPTION, UPDATE_DATA_RESOURCE_SUBSCRIPTION, DELETE_DATA_RESOURCE_SUBSCRIPTION,
     	FIND_DATA_RESOURCES, FIND_DATA_RESOURCES_BY_USER, GET_DATA_RESOURCE_DETAIL,
     	CREATE_DATA_RESOURCE, UPDATE_DATA_RESOURCE, DELETE_DATA_RESOURCE,
-    	REGISTER_USER, UPDATE_USER_EMAIL, UPDATE_USER_DISPATCHER_QUEUE,
+    	REGISTER_USER, UPDATE_USER_PROFILE,
     	GET_RESOURCE_TYPES, GET_RESOURCES_OF_TYPE, GET_RESOURCE
     }
 
@@ -95,22 +95,22 @@ public class AppIntegrationService {
     	typeEnumToResponseTypeMap.put(RequestType.UPDATE_USER_CONFIG, ResponseType.SINGLE_OBJECT);
 
 // TODO
-    	typeEnumToRequestTypeIntMap.put(RequestType.CREATE_SUBSCRIPTION, -1);
-    	typeEnumToResponseTypeIntMap.put(RequestType.CREATE_SUBSCRIPTION, -1);
-    	typeEnumToServiceOpMap.put(RequestType.CREATE_SUBSCRIPTION, "createSubscription");
-    	typeEnumToResponseTypeMap.put(RequestType.CREATE_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
+    	typeEnumToRequestTypeIntMap.put(RequestType.CREATE_DATA_RESOURCE_SUBSCRIPTION, 9203);
+    	typeEnumToResponseTypeIntMap.put(RequestType.CREATE_DATA_RESOURCE_SUBSCRIPTION, 9204);
+    	typeEnumToServiceOpMap.put(RequestType.CREATE_DATA_RESOURCE_SUBSCRIPTION, "createDataResourceSubscription");
+    	typeEnumToResponseTypeMap.put(RequestType.CREATE_DATA_RESOURCE_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
 
 // TODO
-    	typeEnumToRequestTypeIntMap.put(RequestType.FIND_SUBSCRIPTION, -1);
-    	typeEnumToResponseTypeIntMap.put(RequestType.FIND_SUBSCRIPTION, -1);
-    	typeEnumToServiceOpMap.put(RequestType.FIND_SUBSCRIPTION, "findSubscription");
-    	typeEnumToResponseTypeMap.put(RequestType.FIND_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
+    	typeEnumToRequestTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, 9203);
+    	typeEnumToResponseTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, 9204);
+    	typeEnumToServiceOpMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, "updateDataResourceSubscription");
+    	typeEnumToResponseTypeMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
 
 // TODO
-    	typeEnumToRequestTypeIntMap.put(RequestType.DELETE_SUBSCRIPTION, -1);
-    	typeEnumToResponseTypeIntMap.put(RequestType.DELETE_SUBSCRIPTION, -1);
-    	typeEnumToServiceOpMap.put(RequestType.DELETE_SUBSCRIPTION, "deleteSubscription");
-    	typeEnumToResponseTypeMap.put(RequestType.DELETE_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
+    	typeEnumToRequestTypeIntMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, 9203);
+    	typeEnumToResponseTypeIntMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, 9204);
+    	typeEnumToServiceOpMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, "deleteDataResourceSubscription");
+    	typeEnumToResponseTypeMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
     	
     	typeEnumToRequestTypeIntMap.put(RequestType.FIND_DATA_RESOURCES, 9031);
     	typeEnumToResponseTypeIntMap.put(RequestType.FIND_DATA_RESOURCES, 9032);
@@ -143,33 +143,25 @@ public class AppIntegrationService {
     	typeEnumToResponseTypeMap.put(RequestType.DELETE_DATA_RESOURCE, ResponseType.STATUS_ONLY);
     	
     	typeEnumToRequestTypeIntMap.put(RequestType.REGISTER_USER, 9101);
-    	typeEnumToResponseTypeIntMap.put(RequestType.REGISTER_USER, 9104);
+    	typeEnumToResponseTypeIntMap.put(RequestType.REGISTER_USER, 9103);
     	typeEnumToServiceOpMap.put(RequestType.REGISTER_USER, "registerUser");
     	typeEnumToResponseTypeMap.put(RequestType.REGISTER_USER, ResponseType.SINGLE_OBJECT);
     	
-    	typeEnumToRequestTypeIntMap.put(RequestType.UPDATE_USER_EMAIL, 9102);
-    	typeEnumToResponseTypeIntMap.put(RequestType.UPDATE_USER_EMAIL, 9002);
-    	typeEnumToServiceOpMap.put(RequestType.UPDATE_USER_EMAIL, "updateUserEmail");
-    	typeEnumToResponseTypeMap.put(RequestType.UPDATE_USER_EMAIL, ResponseType.STATUS_ONLY);
-    	
-    	typeEnumToRequestTypeIntMap.put(RequestType.UPDATE_USER_DISPATCHER_QUEUE, 9103);
-    	typeEnumToResponseTypeIntMap.put(RequestType.UPDATE_USER_DISPATCHER_QUEUE, 9002);
-    	typeEnumToServiceOpMap.put(RequestType.UPDATE_USER_DISPATCHER_QUEUE, "updateUserDispatcherQueue");
-    	typeEnumToResponseTypeMap.put(RequestType.UPDATE_USER_DISPATCHER_QUEUE, ResponseType.STATUS_ONLY);
+    	typeEnumToRequestTypeIntMap.put(RequestType.UPDATE_USER_PROFILE, 9102);
+    	typeEnumToResponseTypeIntMap.put(RequestType.UPDATE_USER_PROFILE, 9002);
+    	typeEnumToServiceOpMap.put(RequestType.UPDATE_USER_PROFILE, "updateUserProfile");
+    	typeEnumToResponseTypeMap.put(RequestType.UPDATE_USER_PROFILE, ResponseType.STATUS_ONLY);
 
-// TODO
     	typeEnumToRequestTypeIntMap.put(RequestType.GET_RESOURCE_TYPES, -1);
     	typeEnumToResponseTypeIntMap.put(RequestType.GET_RESOURCE_TYPES, 9120);
     	typeEnumToServiceOpMap.put(RequestType.GET_RESOURCE_TYPES, "getResourceTypes");
     	typeEnumToResponseTypeMap.put(RequestType.GET_RESOURCE_TYPES, ResponseType.SINGLE_OBJECT);
 
-// TODO
     	typeEnumToRequestTypeIntMap.put(RequestType.GET_RESOURCES_OF_TYPE, 9121);
     	typeEnumToResponseTypeIntMap.put(RequestType.GET_RESOURCES_OF_TYPE, 9123);
     	typeEnumToServiceOpMap.put(RequestType.GET_RESOURCES_OF_TYPE, "getResourcesOfType");
     	typeEnumToResponseTypeMap.put(RequestType.GET_RESOURCES_OF_TYPE, ResponseType.SINGLE_OBJECT);
 
-// TODO
     	typeEnumToRequestTypeIntMap.put(RequestType.GET_RESOURCE, 9124);
     	typeEnumToResponseTypeIntMap.put(RequestType.GET_RESOURCE, 9126);
     	typeEnumToServiceOpMap.put(RequestType.GET_RESOURCE, "getResource");
@@ -414,6 +406,7 @@ public class AppIntegrationService {
             // If error response, convert info and return
             if (msgWrapper.getObjectValue() instanceof ApplicationIntegrationServiceError) {
             	ApplicationIntegrationServiceError responseMsg = (ApplicationIntegrationServiceError)msgWrapper.getObjectValue();
+            	status = responseMsg.getErrorNum();
             	errorMessage = JsonFormat.printToString(responseMsg);
             	return null;
             }

@@ -1,5 +1,8 @@
 package ion.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ion.core.messaging.IonMessage;
 import ion.core.messaging.MessagingName;
 import ion.core.messaging.MsgBrokerClient;
@@ -14,6 +17,8 @@ import net.ooici.core.container.Container;
  * @author Chris Mueller
  */
 public class BaseProcess {
+    
+    private static final Logger log = LoggerFactory.getLogger(BaseProcess.class);
 
     protected MessagingName mProcessId;
     protected MsgBrokerClient mBrokerClient;
@@ -32,7 +37,9 @@ public class BaseProcess {
         mInQueue = mBrokerClient.declareQueue(null);
         mBrokerClient.bindQueue(mInQueue, mProcessId, null);
         mBrokerClient.attachConsumer(mInQueue);
-        System.out.println("Spawned process " + mProcessId);
+        if (log.isDebugEnabled()) { 
+            log.debug("Spawned process " + mProcessId);
+        }
     }
 
     public void dispose() {
