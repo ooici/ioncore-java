@@ -1,18 +1,14 @@
 <project name="ioncore-java" default="dist" xmlns:ivy="antlib:org.apache.ivy.ant" basedir=".">
     <!-- Begin Unit Test Section R.U. -->
-    <property name="src" value="./src" />
-    <property name="lib" value="./lib" />
-    <property name="classes" value="./build" />
     <property name="reports" value="./reports" />
-     
 
     <target name="test">
 	<mkdir dir="${reports}"/>
       <junit printsummary="yes" haltonfailure="no">
         <classpath>
-          <pathelement location="${classes}" />
+          <pathelement location="${build.dir}" />
           <pathelement location="/path/to/junit.jar" />
-          <fileset dir="${lib}">
+          <fileset dir="${lib.dir}">
             <include name="**/*.jar"/>
           </fileset>
         </classpath>
@@ -21,7 +17,7 @@
 
         <batchtest fork="yes" todir="${reports}">
           <formatter type="xml"/>
-          <fileset dir="${src}">
+          <fileset dir="${src.dir}">
             <include name="**/Test*.java"/>
             <exclude name="**/foo.java"/>
           </fileset>
