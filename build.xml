@@ -86,7 +86,7 @@
 	</target>
 
 	<target name="gen-pom" depends="ivy-init">
-		<ivy:makepom ivyfile="ivy.xml" pomfile="bin/poms/${ant.project.name}.pom">
+		<ivy:makepom ivyfile="ivy.xml" pomfile="dist/lib/${project.name}-${version}.pom">
 			<mapping conf="default" scope="compile"/>
 		</ivy:makepom>
 	</target>
