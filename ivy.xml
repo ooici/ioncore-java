@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
-    <info module="ioncore-java" organisation="net.ooici" revision="0.2.5"/>
+    <info module="ioncore-java" organisation="net.ooici" revision="0.2.6-dev"/>
     <configurations>
         <conf name="compile"/>
     </configurations>
@@ -30,7 +30,7 @@
         <!-- JUnit -->
         <dependency org="junit" name="junit" rev="4.8.2" conf="*->*,!sources,!javadoc"/>
         <!-- OOICI Package Server -->
-        <dependency name="ionproto" rev="0.3.16-pl22" conf="*->*,!sources,!javadoc" />
+        <dependency name="ionproto" rev="0.3.17-pl38" conf="*->*,!sources,!javadoc" />
         
     </dependencies>
 
