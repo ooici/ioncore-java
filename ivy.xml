@@ -26,7 +26,7 @@
         <!-- JUnit -->
         <dependency org="junit" name="junit" rev="4.8.2" conf="*->*,!sources,!javadoc"/>
         <!-- OOICI Package Server -->
-        <dependency name="ionproto" rev="0.3.17-pl7" conf="*->*,!sources,!javadoc" />
+        <dependency name="ionproto" rev="0.3.17-pl51" conf="*->*,!sources,!javadoc" />
         
     </dependencies>
 
