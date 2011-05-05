@@ -49,11 +49,10 @@ public class AppIntegrationService {
     // associated with the passed Json data.
     public enum RequestType {
     	CREATE_DOWNLOAD_URL,
-    	FIND_USER_CONFIG, UPDATE_USER_CONFIG,
-    	CREATE_DATA_RESOURCE_SUBSCRIPTION, UPDATE_DATA_RESOURCE_SUBSCRIPTION, DELETE_DATA_RESOURCE_SUBSCRIPTION,
+    	REGISTER_USER, GET_USER_PROFILE, UPDATE_USER_PROFILE,
+    	FIND_DATA_RESOURCE_SUBSCRIPTION, CREATE_DATA_RESOURCE_SUBSCRIPTION, UPDATE_DATA_RESOURCE_SUBSCRIPTION, DELETE_DATA_RESOURCE_SUBSCRIPTION,
     	FIND_DATA_RESOURCES, FIND_DATA_RESOURCES_BY_USER, GET_DATA_RESOURCE_DETAIL,
     	CREATE_DATA_RESOURCE, UPDATE_DATA_RESOURCE, DELETE_DATA_RESOURCE,
-    	REGISTER_USER, UPDATE_USER_PROFILE,
     	GET_RESOURCE_TYPES, GET_RESOURCES_OF_TYPE, GET_RESOURCE
     }
 
@@ -77,40 +76,45 @@ public class AppIntegrationService {
     // Map enum values to int GPB type ids
     // TODO define all mappings.  Currently using echo service to validate functionality.
     static {
-    	typeEnumToRequestTypeIntMap.put(RequestType.CREATE_DOWNLOAD_URL, 9035);
-    	typeEnumToResponseTypeIntMap.put(RequestType.CREATE_DOWNLOAD_URL, 9036);
-    	typeEnumToServiceOpMap.put(RequestType.CREATE_DOWNLOAD_URL, "createDownloadURL");
-    	typeEnumToResponseTypeMap.put(RequestType.CREATE_DOWNLOAD_URL, ResponseType.SINGLE_OBJECT);
+    	typeEnumToRequestTypeIntMap.put(RequestType.REGISTER_USER, 9101);
+    	typeEnumToResponseTypeIntMap.put(RequestType.REGISTER_USER, 9103);
+    	typeEnumToServiceOpMap.put(RequestType.REGISTER_USER, "registerUser");
+    	typeEnumToResponseTypeMap.put(RequestType.REGISTER_USER, ResponseType.SINGLE_OBJECT);
 
-// TODO
-    	typeEnumToRequestTypeIntMap.put(RequestType.FIND_USER_CONFIG, -1);
-    	typeEnumToResponseTypeIntMap.put(RequestType.FIND_USER_CONFIG, -1);
-    	typeEnumToServiceOpMap.put(RequestType.FIND_USER_CONFIG, "");
-    	typeEnumToResponseTypeMap.put(RequestType.FIND_USER_CONFIG, ResponseType.SINGLE_OBJECT);
+    	typeEnumToRequestTypeIntMap.put(RequestType.GET_USER_PROFILE, 9104);
+    	typeEnumToResponseTypeIntMap.put(RequestType.GET_USER_PROFILE, 9105);
+    	typeEnumToServiceOpMap.put(RequestType.GET_USER_PROFILE, "getUser");
+    	typeEnumToResponseTypeMap.put(RequestType.GET_USER_PROFILE, ResponseType.SINGLE_OBJECT);
 
-// TODO
-    	typeEnumToRequestTypeIntMap.put(RequestType.UPDATE_USER_CONFIG, -1);
-    	typeEnumToResponseTypeIntMap.put(RequestType.UPDATE_USER_CONFIG, -1);
-    	typeEnumToServiceOpMap.put(RequestType.UPDATE_USER_CONFIG, "");
-    	typeEnumToResponseTypeMap.put(RequestType.UPDATE_USER_CONFIG, ResponseType.SINGLE_OBJECT);
+    	typeEnumToRequestTypeIntMap.put(RequestType.UPDATE_USER_PROFILE, 9102);
+    	typeEnumToResponseTypeIntMap.put(RequestType.UPDATE_USER_PROFILE, 9002);
+    	typeEnumToServiceOpMap.put(RequestType.UPDATE_USER_PROFILE, "updateUserProfile");
+    	typeEnumToResponseTypeMap.put(RequestType.UPDATE_USER_PROFILE, ResponseType.STATUS_ONLY);
 
-// TODO
+    	typeEnumToRequestTypeIntMap.put(RequestType.FIND_DATA_RESOURCE_SUBSCRIPTION, 9218);
+    	typeEnumToResponseTypeIntMap.put(RequestType.FIND_DATA_RESOURCE_SUBSCRIPTION, 9208);
+    	typeEnumToServiceOpMap.put(RequestType.FIND_DATA_RESOURCE_SUBSCRIPTION, "findDataResourceSubscriptions");
+    	typeEnumToResponseTypeMap.put(RequestType.FIND_DATA_RESOURCE_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
+
     	typeEnumToRequestTypeIntMap.put(RequestType.CREATE_DATA_RESOURCE_SUBSCRIPTION, 9203);
     	typeEnumToResponseTypeIntMap.put(RequestType.CREATE_DATA_RESOURCE_SUBSCRIPTION, 9204);
     	typeEnumToServiceOpMap.put(RequestType.CREATE_DATA_RESOURCE_SUBSCRIPTION, "createDataResourceSubscription");
     	typeEnumToResponseTypeMap.put(RequestType.CREATE_DATA_RESOURCE_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
 
-// TODO
     	typeEnumToRequestTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, 9203);
-    	typeEnumToResponseTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, 9204);
+    	typeEnumToResponseTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, 9210);
     	typeEnumToServiceOpMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, "updateDataResourceSubscription");
     	typeEnumToResponseTypeMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
 
-// TODO
     	typeEnumToRequestTypeIntMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, 9203);
-    	typeEnumToResponseTypeIntMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, 9204);
+    	typeEnumToResponseTypeIntMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, 9206);
     	typeEnumToServiceOpMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, "deleteDataResourceSubscription");
     	typeEnumToResponseTypeMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
+    	
+    	typeEnumToRequestTypeIntMap.put(RequestType.CREATE_DOWNLOAD_URL, 9035);
+    	typeEnumToResponseTypeIntMap.put(RequestType.CREATE_DOWNLOAD_URL, 9036);
+    	typeEnumToServiceOpMap.put(RequestType.CREATE_DOWNLOAD_URL, "createDownloadURL");
+    	typeEnumToResponseTypeMap.put(RequestType.CREATE_DOWNLOAD_URL, ResponseType.SINGLE_OBJECT);
     	
     	typeEnumToRequestTypeIntMap.put(RequestType.FIND_DATA_RESOURCES, 9031);
     	typeEnumToResponseTypeIntMap.put(RequestType.FIND_DATA_RESOURCES, 9032);
@@ -118,7 +122,7 @@ public class AppIntegrationService {
     	typeEnumToResponseTypeMap.put(RequestType.FIND_DATA_RESOURCES, ResponseType.SINGLE_OBJECT);
     	
     	typeEnumToRequestTypeIntMap.put(RequestType.FIND_DATA_RESOURCES_BY_USER, 9031);
-    	typeEnumToResponseTypeIntMap.put(RequestType.FIND_DATA_RESOURCES_BY_USER, 9032);
+    	typeEnumToResponseTypeIntMap.put(RequestType.FIND_DATA_RESOURCES_BY_USER, 9038);
     	typeEnumToServiceOpMap.put(RequestType.FIND_DATA_RESOURCES_BY_USER, "findDataResourcesByUser");
     	typeEnumToResponseTypeMap.put(RequestType.FIND_DATA_RESOURCES_BY_USER, ResponseType.SINGLE_OBJECT);
     	
@@ -141,16 +145,6 @@ public class AppIntegrationService {
     	typeEnumToResponseTypeIntMap.put(RequestType.DELETE_DATA_RESOURCE, 9214);
     	typeEnumToServiceOpMap.put(RequestType.DELETE_DATA_RESOURCE, "deleteDataResource");
     	typeEnumToResponseTypeMap.put(RequestType.DELETE_DATA_RESOURCE, ResponseType.STATUS_ONLY);
-    	
-    	typeEnumToRequestTypeIntMap.put(RequestType.REGISTER_USER, 9101);
-    	typeEnumToResponseTypeIntMap.put(RequestType.REGISTER_USER, 9103);
-    	typeEnumToServiceOpMap.put(RequestType.REGISTER_USER, "registerUser");
-    	typeEnumToResponseTypeMap.put(RequestType.REGISTER_USER, ResponseType.SINGLE_OBJECT);
-    	
-    	typeEnumToRequestTypeIntMap.put(RequestType.UPDATE_USER_PROFILE, 9102);
-    	typeEnumToResponseTypeIntMap.put(RequestType.UPDATE_USER_PROFILE, 9002);
-    	typeEnumToServiceOpMap.put(RequestType.UPDATE_USER_PROFILE, "updateUserProfile");
-    	typeEnumToResponseTypeMap.put(RequestType.UPDATE_USER_PROFILE, ResponseType.STATUS_ONLY);
 
     	typeEnumToRequestTypeIntMap.put(RequestType.GET_RESOURCE_TYPES, -1);
     	typeEnumToResponseTypeIntMap.put(RequestType.GET_RESOURCE_TYPES, 9120);
