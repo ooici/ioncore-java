@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
-    <info module="ioncore-java" organisation="net.ooici" revision="0.2.5-dev"/>
+    <info module="ioncore-java" organisation="net.ooici" revision="0.2.6-dev"/>
     <configurations>
         <conf name="compile"/>
     </configurations>
+    <publications>
+    	<artifact type="pom" ext="pom" conf="compile"/>
+    	<artifact type="jar" ext="jar" conf="compile"/>
+    </publications>
     <dependencies>
         <!-- Public dependencies -->
         <dependency org="org.slf4j" name="slf4j-api" rev="1.6.1" conf="*->*,!sources,!javadoc" />
@@ -26,7 +30,7 @@
         <!-- JUnit -->
         <dependency org="junit" name="junit" rev="4.8.2" conf="*->*,!sources,!javadoc"/>
         <!-- OOICI Package Server -->
-        <dependency name="ionproto" rev="0.3.17-pl51" conf="*->*,!sources,!javadoc" />
+        <dependency name="ionproto" rev="0.3.17-pl52" conf="*->*,!sources,!javadoc" />
         
     </dependencies>
 

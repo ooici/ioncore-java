@@ -78,7 +78,7 @@ public class MsgBrokerClient {
         } catch (IOException e) {
             // TODO This exception should be handled by the caller
             log.error("some error thrown in attach() call", e);
-            System.exit(1);
+            throw new IonException("Error attaching to broker", e);
         }
     }
 

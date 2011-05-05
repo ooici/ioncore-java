@@ -19,8 +19,8 @@ import com.rabbitmq.client.AMQP;
 public class TestAppIntegrationService extends TestCase {
 
 	// Alter these values as necessary for your system configuration
-	private String sysName = "R1_UI_DEMO";
-	private String hostName = "amoeba.ucsd.edu";
+	private String sysName = "sysName-UNIQUE";
+	private String hostName = "localhost";
 	private int portNumber = AMQP.PROTOCOL.PORT;
 	private String exchange = "magnet.topic";
 
