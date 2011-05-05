@@ -8,6 +8,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
 import junit.framework.TestCase;
 
 import com.rabbitmq.client.AMQP;
@@ -105,144 +109,273 @@ public class TestAppIntegrationService extends TestCase {
 			String requestJsonString = "{\"certificate\": \"" + certificate + "\",";
 			requestJsonString += "\"rsa_private_key\": \"" + privateKey + "\"}";
 			String replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.REGISTER_USER, "ANONYMOUS", "0");
-			assertTrue(replyJsonString.startsWith("{\"ooi_id\":"));
 			printStream.println("REGISTER_USER");
 			printStream.println("  request: " + requestJsonString);
 			printStream.println("  reply: " + replyJsonString);
-
-			String ooi_id = replyJsonString.substring(12,48);
-
-			// Update user email
-			requestJsonString = "{\"user_ooi_id\": \"" + ooi_id + "\",\"email_address\": \"my.email@gmail.com\"}";
-			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.UPDATE_USER_PROFILE, ooi_id, "0");
-			assertTrue(replyJsonString == null);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
 			assertTrue(ais.getStatus() == 200);
-			printStream.println("UPDATE_USER_EMAIL");
+			assertTrue(replyJsonString.startsWith("{\"ooi_id\":"));
+
+			JSONObject registerUserResp = (JSONObject)JSONValue.parse(replyJsonString);
+			String ooi_id = registerUserResp.get("ooi_id").toString();
+
+			// Update user profile
+			requestJsonString = "{\"user_ooi_id\": \"" + ooi_id + "\",\"name\": \"MyOOICI\",\"institution\": \"OOICI\",\"email_address\": \"myooici@gmail.com\", \"profile\": [{\"name\": \"mobile\",\"value\": \"555-555-5555\"}]}";
+			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.UPDATE_USER_PROFILE, ooi_id, "0");
+			printStream.println("UPDATE_USER_PROFILE");
 			printStream.println("  request: " + requestJsonString);
 			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString == null);
+
+			// get user profile
+			requestJsonString = "{\"user_ooi_id\": \"" + ooi_id + "\"}";
+			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_USER_PROFILE, ooi_id, "0");
+			printStream.println("GET_USER_PROFILE");
+			printStream.println("  request: " + requestJsonString);
+			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.startsWith("{\"name\": \"MyOOICI\",\"institution\": \"OOICI\",\"email_address\": \"myooici@gmail.com\",\"authenticating_organization\": \"Google\",\"profile\": [{\"name\": \"mobile\",\"value\": \"555-555-5555\"}"));
 
 			// Get data resources
-//			requestJsonString = "{\"user_ooi_id\": \"" + ooi_id + "\",\"minLatitude\": 40.2216682434,\"maxLatitude\": 40.2216682434,\"minLongitude\": -74.13,\"maxLongitude\": -73.50,\"minVertical\": 20,\"maxVertical\": 30,\"posVertical\": \"down\",\"minTime\": \"2010-07-26T00:02:00Z\",\"maxTime\": \"2010-07-26T00:02:00Z\",\"identity\": \"\"}";
 			requestJsonString = "{}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.FIND_DATA_RESOURCES, ooi_id, "0");
-			assertTrue(replyJsonString.startsWith("{\"dataResourceSummary\": [{\"user_ooi_id\": "));
-			assertTrue(ais.getStatus() == 200);
 			printStream.println("FIND_DATA_RESOURCES");
 			printStream.println("  request: " + requestJsonString);
 			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.startsWith("{\"dataResourceSummary\":"));
 
-//			requestJsonString = "{\"user_ooi_id\": \"" + ooi_id + "\",\"minLatitude\": 40.2216682434,\"maxLatitude\": 40.2216682434,\"minLongitude\": -74.13,\"maxLongitude\": -73.50,\"minVertical\": 20,\"maxVertical\": 30,\"posVertical\": \"down\",\"minTime\": \"2010-07-26T00:02:00Z\",\"maxTime\": \"2010-07-26T00:02:00Z\",\"identity\": \"\"}";
+			// Grab stuff for use in later calls
+			JSONObject dataResourceSummary = (JSONObject)JSONValue.parse(replyJsonString);
+			JSONArray array = (JSONArray)dataResourceSummary.get("dataResourceSummary");
+			JSONObject datasetMetadata = (JSONObject)array.get(0);
+			JSONObject dataResourceMetadataObj = (JSONObject)datasetMetadata.get("datasetMetadata");
+			String dataResourceMetadata = dataResourceMetadataObj.toString();
+			dataResourceMetadata = dataResourceMetadata.replaceAll("\\\\/", "/");
+			String dataResourceId = dataResourceMetadataObj.get("data_resource_id").toString();
+
 			requestJsonString = "{\"user_ooi_id\": \"" + ooi_id + "\"}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.FIND_DATA_RESOURCES_BY_USER, ooi_id, "0");
-			assertTrue(replyJsonString.startsWith("{\"dataResourceSummary\": [{\"user_ooi_id\": "));
-			assertTrue(ais.getStatus() == 200);
-			printStream.println("FIND_DATA_RESOURCES");
+			printStream.println("FIND_DATA_RESOURCES_BY_USER");
 			printStream.println("  request: " + requestJsonString);
 			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.startsWith("{\"datasetByOwnerMetadata\":"));
 
 			// Get data resource details
-			String dataResourceId = replyJsonString.substring(101, 137);
 			requestJsonString = "{\"data_resource_id\": \"" + dataResourceId + "\"}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_DATA_RESOURCE_DETAIL, ooi_id, "0");
-			assertTrue(replyJsonString.startsWith("{\"data_resource_id\": "));
-			assertTrue(ais.getStatus() == 200);
 			printStream.println("GET_DATA_RESOURCE_DETAIL");
 			printStream.println("  request: " + requestJsonString);
 			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.startsWith("{\"data_resource_id\": "));
 
 			// Create download URL
 			requestJsonString = "{\"user_ooi_id\": \"" + ooi_id + "\",\"data_resource_id\": \"" + dataResourceId + "\"}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.CREATE_DOWNLOAD_URL, ooi_id, "0");
-			assertTrue(replyJsonString.startsWith("{\"download_url\":"));
-			assertTrue(ais.getStatus() == 200);
 			printStream.println("CREATE_DOWNLOAD_URL");
 			printStream.println("  request: " + requestJsonString);
 			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.startsWith("{\"download_url\":"));
 
 			// Create subscription
-			requestJsonString = "{\"dispatcher_id\": \"dispatcherId\", \"script_path\": \"/script/path\", \"resource_id\": \"" + dataResourceId + "\"}";
+			requestJsonString = "{\"subscriptionInfo\": {\"user_ooi_id\": \"" + ooi_id + "\",\"data_src_id\": \"" + dataResourceId + "\",\"subscription_type\": 0, \"email_alerts_filter\": 0, \"dispatcher_alerts_filter\": 0,\"dispatcher_script_path\": \"path\"}, \"datasetMetadata\": " + dataResourceMetadata + "}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.CREATE_DATA_RESOURCE_SUBSCRIPTION, ooi_id, "0");
-			assertTrue(replyJsonString.startsWith("{\"download_url\":"));
-			assertTrue(ais.getStatus() == 200);
 			printStream.println("CREATE_DATA_RESOURCE_SUBSCRIPTION");
 			printStream.println("  request: " + requestJsonString);
 			printStream.println("  reply: " + replyJsonString);
-//
-//			// Update subscription
-//			requestJsonString = "{\"dispatcher_id\": \"dispatcherId\", \"script_path\": \"/updated/script/path\", \"resource_id\": \"" + dataResourceId + "\"}";
-//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, ooi_id, "0");
-//			assertTrue(replyJsonString.startsWith("{\"download_url\":"));
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.equals("{\"success\": true}"));
+
+			// Find subscription
+			requestJsonString = "{\"user_ooi_id\": \"" + ooi_id + "\"}";
+			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.FIND_DATA_RESOURCE_SUBSCRIPTION, ooi_id, "0");
+			printStream.println("FIND_DATA_RESOURCE_SUBSCRIPTION");
+			printStream.println("  request: " + requestJsonString);
+			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.startsWith("{\"subscriptionListResults\":"));
+
+			// Update subscription
+			requestJsonString = "{\"subscriptionInfo\": {\"user_ooi_id\": \"" + ooi_id + "\",\"data_src_id\": \"" + dataResourceId + "\",\"subscription_type\": 0, \"email_alerts_filter\": 0, \"dispatcher_alerts_filter\": 0,\"dispatcher_script_path\": \"newpath\"}, \"datasetMetadata\": " + dataResourceMetadata + "}";
+			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, ooi_id, "0");
+			printStream.println("UPDATE_DATA_RESOURCE_SUBSCRIPTION");
+			printStream.println("  request: " + requestJsonString);
+			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.equals("{\"success\": true}"));
+
+			// Delete subscription
+			requestJsonString = "{\"subscriptionInfo\": {\"user_ooi_id\": \"" + ooi_id + "\",\"data_src_id\": \"" + dataResourceId + "\",\"subscription_type\": 0, \"email_alerts_filter\": 0, \"dispatcher_alerts_filter\": 0,\"dispatcher_script_path\": \"newpath\"}, \"datasetMetadata\": " + dataResourceMetadata + "}";
+			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, ooi_id, "0");
+			printStream.println("DELETE_DATA_RESOURCE_SUBSCRIPTION");
+			printStream.println("  request: " + requestJsonString);
+			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.equals("{\"success\": true}"));
+
+			// Create data resource
+			requestJsonString = "{\"user_id\": \"" + ooi_id + "\",\"source_type\": 1,\"request_type\": 1, \"ion_title\": \"ion_title\",\"ion_description\": \"ion_description\", \"ion_institution_id\": \"ion_institution_id\",\"base_url\": \"http://foo\"}";
+			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.CREATE_DATA_RESOURCE, ooi_id, "0");
+			printStream.println("CREATE_DATA_RESOURCE");
+			printStream.println("  request: " + requestJsonString);
+			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.startsWith("{\"data_source_id\": "));
+
+			// Update data resource
+//			requestJsonString = "{\"user_id\": \"" + ooi_id + "\",\"source_type\": 1,\"request_type\": 1, \"ion_title\": \"ion_title\",\"ion_description\": \"ion_description\", \"ion_institution_id\": \"ion_institution_id\",\"base_url\": \"http://foo\"}";
+//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.UPDATE_DATA_RESOURCE, ooi_id, "0");
+//			assertTrue(replyJsonString.startsWith("{\"data_source_id\": "));
 //			assertTrue(ais.getStatus() == 200);
-//			printStream.println("UPDATE_DATA_RESOURCE_SUBSCRIPTION");
+//			printStream.println("UPDATE_DATA_RESOURCE");
 //			printStream.println("  request: " + requestJsonString);
 //			printStream.println("  reply: " + replyJsonString);
 //
-//			// Delete subscription
-//			requestJsonString = "{\"dispatcher_id\": \"dispatcherId\", \"script_path\": \"/updated/script/path\", \"resource_id\": \"" + dataResourceId + "\"}";
-//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, ooi_id, "0");
-//			assertTrue(replyJsonString.startsWith("{\"download_url\":"));
+//			// Delete data resource
+//			requestJsonString = "{\"user_id\": \"" + ooi_id + "\",\"source_type\": 1,\"request_type\": 1, \"ion_title\": \"ion_title\",\"ion_description\": \"ion_description\", \"ion_institution_id\": \"ion_institution_id\",\"base_url\": \"http://foo\"}";
+//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.DELETE_DATA_RESOURCE, ooi_id, "0");
+//			assertTrue(replyJsonString.startsWith("{\"data_source_id\": "));
 //			assertTrue(ais.getStatus() == 200);
-//			printStream.println("DELETE_DATA_RESOURCE_SUBSCRIPTION");
+//			printStream.println("DELETE_DATA_RESOURCE");
 //			printStream.println("  request: " + requestJsonString);
 //			printStream.println("  reply: " + replyJsonString);
 
 			// Get resource types
 			requestJsonString = null;
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_RESOURCE_TYPES, ooi_id, "0");
-			assertTrue(replyJsonString.startsWith("{\"resource_types_list\": ["));
-			assertTrue(ais.getStatus() == 200);
 			printStream.println("GET_RESOURCE_TYPES");
 			printStream.println("  request: " + requestJsonString);
 			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.startsWith("{\"resource_types_list\": ["));
 
 			// Get resources of type
 			requestJsonString = "{\"resource_type\": \"datasets\"}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_RESOURCES_OF_TYPE, ooi_id, "0");
-			assertTrue(replyJsonString.startsWith("{\"column_names\": ["));
-			assertTrue(ais.getStatus() == 200);
 			printStream.println("GET_RESOURCES_OF_TYPE: datasets");
 			printStream.println("  request: " + requestJsonString);
 			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.startsWith("{\"column_names\": ["));
 
 			requestJsonString = "{\"ooi_id\": \"" + replyJsonString.substring(65, 101) + "\"}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_RESOURCE, ooi_id, "0");
-			assertTrue(replyJsonString.startsWith("{\"resource\": ["));
-			assertTrue(ais.getStatus() == 200);
 			printStream.println("GET_RESOURCE: dataset");
 			printStream.println("  request: " + requestJsonString);
 			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.startsWith("{\"resource\": ["));
 
 			requestJsonString = "{\"resource_type\": \"identities\"}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_RESOURCES_OF_TYPE, ooi_id, "0");
-			assertTrue(replyJsonString.startsWith("{\"column_names\": ["));
-			assertTrue(ais.getStatus() == 200);
 			printStream.println("GET_RESOURCES_OF_TYPE: identities");
 			printStream.println("  request: " + requestJsonString);
 			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.startsWith("{\"column_names\": ["));
 
 			requestJsonString = "{\"ooi_id\": \"" + replyJsonString.substring(67, 103) + "\"}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_RESOURCE, ooi_id, "0");
-			assertTrue(replyJsonString.startsWith("{\"resource\": ["));
-			assertTrue(ais.getStatus() == 200);
 			printStream.println("GET_RESOURCE: identities");
 			printStream.println("  request: " + requestJsonString);
 			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.startsWith("{\"resource\": ["));
 
 			requestJsonString = "{\"resource_type\": \"datasources\"}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_RESOURCES_OF_TYPE, ooi_id, "0");
-			assertTrue(replyJsonString.startsWith("{\"column_names\": ["));
-			assertTrue(ais.getStatus() == 200);
 			printStream.println("GET_RESOURCES_OF_TYPE: datasources");
 			printStream.println("  request: " + requestJsonString);
 			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.startsWith("{\"column_names\": ["));
 
 			requestJsonString = "{\"ooi_id\": \"" + replyJsonString.substring(70, 106) + "\"}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_RESOURCE, ooi_id, "0");
-			assertTrue(replyJsonString.startsWith("{\"resource\": ["));
-			assertTrue(ais.getStatus() == 200);
 			printStream.println("GET_RESOURCE: datasources");
 			printStream.println("  request: " + requestJsonString);
 			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.startsWith("{\"resource\": ["));
+
+			requestJsonString = "{\"resource_type\": \"epucontrollers\"}";
+			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_RESOURCES_OF_TYPE, ooi_id, "0");
+			printStream.println("GET_RESOURCES_OF_TYPE: epucontrollers");
+			printStream.println("  request: " + requestJsonString);
+			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.startsWith("{\"column_names\": ["));
+//
+//			requestJsonString = "{\"ooi_id\": \"" + replyJsonString.substring(65, 101) + "\"}";
+//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_RESOURCE, ooi_id, "0");
+//			assertTrue(replyJsonString.startsWith("{\"resource\": ["));
+//			assertTrue(ais.getStatus() == 200);
+//			printStream.println("GET_RESOURCE: epucontrollers");
+//			printStream.println("  request: " + requestJsonString);
+//			printStream.println("  reply: " + replyJsonString);
 
 			out.close();
 		} catch (FileNotFoundException e) {
