@@ -231,8 +231,6 @@ public class MsgBrokerClient {
         Envelope envelope = delivery.getEnvelope();
         byte[] body = delivery.getBody();
 
-        log.error("Envelope={}", envelope.toString());
-
         IonAmqpMessage msg = new IonAmqpMessage(envelope, body);
         return msg;
     }
