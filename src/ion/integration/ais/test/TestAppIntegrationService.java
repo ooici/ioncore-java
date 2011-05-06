@@ -1,5 +1,6 @@
 package ion.integration.ais.test;
 
+import ion.core.utils.IonUtils;
 import ion.integration.ais.AppIntegrationService;
 import ion.integration.ais.AppIntegrationService.RequestType;
 
@@ -7,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashMap;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -18,11 +20,15 @@ import com.rabbitmq.client.AMQP;
 
 public class TestAppIntegrationService extends TestCase {
 
-	// Alter these values as necessary for your system configuration
-	private String sysName = "sysName-UNIQUE";
-	private String hostName = "localhost";
-	private int portNumber = AMQP.PROTOCOL.PORT;
-	private String exchange = "magnet.topic";
+	private String SYSNAME_KEY = "ion.sysname";
+	private String HOSTNAME_KEY = "ion.host";
+	private String PORTNUMBER_KEY = "ion.port";
+	private String EXCHANGE_KEY = "ion.exchange";
+
+	private String SYSNAME_DEFAULT = "sysName-UNIQUE";
+	private String HOSTNAME_DEFAULT = "localhost";
+	private int PORTNUMBER_DEFAULT = AMQP.PROTOCOL.PORT;
+	private String EXCHANGE_DEFAULT = "magnet.topic";
 
 	private AppIntegrationService ais;
 
@@ -77,6 +83,20 @@ public class TestAppIntegrationService extends TestCase {
 	}
 
 	protected void setUp() {
+		HashMap<String, String> propertyMap = null;
+		try {
+			propertyMap = IonUtils.parseProperties();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String sysName = (propertyMap != null && propertyMap.get(SYSNAME_KEY) != null) ? propertyMap.get(SYSNAME_KEY) : SYSNAME_DEFAULT;
+		String hostName = (propertyMap != null && propertyMap.get(HOSTNAME_KEY) != null) ? propertyMap.get(HOSTNAME_KEY) : HOSTNAME_DEFAULT;
+		int portNumber = (propertyMap != null && propertyMap.get(PORTNUMBER_KEY) != null) ? new Integer(propertyMap.get(PORTNUMBER_KEY)) : PORTNUMBER_DEFAULT;
+		String exchange = (propertyMap != null && propertyMap.get(EXCHANGE_KEY) != null) ? propertyMap.get(EXCHANGE_KEY) : EXCHANGE_DEFAULT;
+		
+		System.out.println("Connecting to " + hostName + ":" + portNumber + ":" + exchange + ":" + sysName);
+
 		ais = new AppIntegrationService(sysName, hostName, portNumber, exchange);
 	}
 
@@ -260,24 +280,32 @@ public class TestAppIntegrationService extends TestCase {
 			}
 			assertTrue(ais.getStatus() == 200);
 			assertTrue(replyJsonString.startsWith("{\"data_source_id\": "));
+			
+			String newDataSourceId = replyJsonString.substring(20,56);
 
 			// Update data resource
-//			requestJsonString = "{\"user_id\": \"" + ooi_id + "\",\"source_type\": 1,\"request_type\": 1, \"ion_title\": \"ion_title\",\"ion_description\": \"ion_description\", \"ion_institution_id\": \"ion_institution_id\",\"base_url\": \"http://foo\"}";
-//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.UPDATE_DATA_RESOURCE, ooi_id, "0");
-//			assertTrue(replyJsonString.startsWith("{\"data_source_id\": "));
-//			assertTrue(ais.getStatus() == 200);
-//			printStream.println("UPDATE_DATA_RESOURCE");
-//			printStream.println("  request: " + requestJsonString);
-//			printStream.println("  reply: " + replyJsonString);
-//
-//			// Delete data resource
-//			requestJsonString = "{\"user_id\": \"" + ooi_id + "\",\"source_type\": 1,\"request_type\": 1, \"ion_title\": \"ion_title\",\"ion_description\": \"ion_description\", \"ion_institution_id\": \"ion_institution_id\",\"base_url\": \"http://foo\"}";
-//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.DELETE_DATA_RESOURCE, ooi_id, "0");
-//			assertTrue(replyJsonString.startsWith("{\"data_source_id\": "));
-//			assertTrue(ais.getStatus() == 200);
-//			printStream.println("DELETE_DATA_RESOURCE");
-//			printStream.println("  request: " + requestJsonString);
-//			printStream.println("  reply: " + replyJsonString);
+			requestJsonString = "{\"user_id\": \"" + ooi_id + "\",\"data_source_resource_id\":\"" + newDataSourceId + "\",\"isPublic\":true,\"max_ingest_millis\": 1,\"update_start_datetime_millis\": 1,\"update_interval_seconds\": 1,\"ion_title\": \"ion_title\",\"ion_description\": \"ion_description\"}";
+			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.UPDATE_DATA_RESOURCE, ooi_id, "0");
+			printStream.println("UPDATE_DATA_RESOURCE");
+			printStream.println("  request: " + requestJsonString);
+			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.equals("{\"success\": true}"));
+
+			// Delete data resource
+			requestJsonString = "{\"data_source_resource_id\":\"" + newDataSourceId + "\"}";
+			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.DELETE_DATA_RESOURCE, ooi_id, "0");
+			printStream.println("DELETE_DATA_RESOURCE");
+			printStream.println("  request: " + requestJsonString);
+			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.startsWith("{\"successfully_deleted_id\":"));
 
 			// Get resource types
 			requestJsonString = null;
