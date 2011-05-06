@@ -223,8 +223,8 @@ public class AppIntegrationService {
         StructureManager sm = StructureManager.Factory(replyMessage);
         
         // Extract the IonMsg from the head
-        assert(sm.getHeadIds().size() == 1);
-        String ionMsgKey = sm.getHeadIds().get(0);
+        assert(sm.getHeadId() != null);
+        String ionMsgKey = sm.getHeadId();
         GPBWrapper msgWrapper = sm.getObjectWrapper(ionMsgKey);
         assert(msgWrapper.getObjectValue() instanceof IonMsg);
         IonMsg ionMsg = (IonMsg)msgWrapper.getObjectValue();
