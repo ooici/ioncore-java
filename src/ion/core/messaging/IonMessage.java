@@ -118,4 +118,18 @@ public class IonMessage {
 		
 	    return dataObject;
 	}
+
+    @Override
+    public String toString() {
+        String nl = System.getProperty("line.separator");
+        StringBuilder sb = new StringBuilder("IonMessage {").append(nl);
+        sb.append("Headers: ").append(nl);
+        java.util.HashMap<String, Object> headers = (java.util.HashMap<String, Object>) this.getIonHeaders();
+        for (String s : headers.keySet()) {
+            sb.append("\t").append(s).append(" :: ").append(headers.get(s)).append(nl);
+        }
+        sb.append("CONTENT: ").append(nl);
+        sb.append("\t").append(this.getContent()).append(nl).append("}").append(nl);
+        return sb.toString();
+    }
 }
