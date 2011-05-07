@@ -94,11 +94,11 @@ public class IonMessage {
 	/**
 	 * Determines if the message content contains an "ERROR" under the "status property
 	 * @return Returns a boolean value of true if the message contains an "ERROR" value within
-	 * the "status" property
+	 * the "status" property or the "performative" property is "failure"
 	 *
 	 */
 	public boolean isErrorMessage() {
-        return (mContent instanceof Map && "ERROR".equals(((Map) mContent).get("status")));
+        return (mHeaders instanceof Map && (((Map) mHeaders).get("status").toString().equalsIgnoreCase("error") || ((Map) mHeaders).get("performative").toString().equalsIgnoreCase("failure")));
 	}
 
 	/**
