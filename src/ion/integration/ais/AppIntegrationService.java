@@ -139,12 +139,12 @@ public class AppIntegrationService {
     	typeEnumToRequestTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE, 9215);
     	typeEnumToResponseTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE, 9216);
     	typeEnumToServiceOpMap.put(RequestType.UPDATE_DATA_RESOURCE, "updateDataResource");
-    	typeEnumToResponseTypeMap.put(RequestType.UPDATE_DATA_RESOURCE, ResponseType.STATUS_ONLY);
+    	typeEnumToResponseTypeMap.put(RequestType.UPDATE_DATA_RESOURCE, ResponseType.SINGLE_OBJECT);
     	
     	typeEnumToRequestTypeIntMap.put(RequestType.DELETE_DATA_RESOURCE, 9213);
     	typeEnumToResponseTypeIntMap.put(RequestType.DELETE_DATA_RESOURCE, 9214);
     	typeEnumToServiceOpMap.put(RequestType.DELETE_DATA_RESOURCE, "deleteDataResource");
-    	typeEnumToResponseTypeMap.put(RequestType.DELETE_DATA_RESOURCE, ResponseType.STATUS_ONLY);
+    	typeEnumToResponseTypeMap.put(RequestType.DELETE_DATA_RESOURCE, ResponseType.SINGLE_OBJECT);
 
     	typeEnumToRequestTypeIntMap.put(RequestType.GET_RESOURCE_TYPES, -1);
     	typeEnumToResponseTypeIntMap.put(RequestType.GET_RESOURCE_TYPES, 9120);
