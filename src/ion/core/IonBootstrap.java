@@ -46,17 +46,13 @@ public class IonBootstrap {
 			createProtoMap();
 		}
 		catch (Exception e) {
-			// TODO log exception
-			// Exit with non-zero code to indicate error
-			System.exit(1);
+			throw new IonException("Error generating proto map");
 		}
 	}
 	
 	private static void checkInitialized() {
 		if (instance == null) {
-			// TODO log exception
-			// Exit with non-zero code to indate error
-			System.exit(1);
+			throw new IonException("IonBootstrap is not initialized");
 		}
 	}
 
