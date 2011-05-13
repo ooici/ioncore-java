@@ -73,4 +73,21 @@ public class IonUtils {
 
         return (GeneratedMessage) builder.build();
     }
+    
+    public static Message.Builder convertJsonToGPBBuilder(String jsonRequest, int typeInt) throws Exception {
+        assert (jsonRequest != null && jsonRequest.length() > 0);
+
+        // Get GeneratedMessage class for type id
+        Class clazz = IonBootstrap.getMappedClassForKeyValue(typeInt);
+        assert (clazz != null);
+
+        // Get builder instance by invoking static newBuilder() via reflection
+        Method method = clazz.getMethod("newBuilder", (Class[]) null);
+        Message.Builder builder = (Message.Builder) method.invoke(null, (Object[]) null);
+
+        // Copy Json into GPB
+        JsonFormat.merge(jsonRequest, builder);
+        
+        return builder;
+    }
 }
