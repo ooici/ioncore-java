@@ -90,12 +90,12 @@ public class DatasetRegistration {
             for (File regFile : regFiles) {
 
                 try {
-                    net.ooici.core.container.Container.Structure struct = DataResourceBuilder.getDataSourceResourceStructure(regFile.getCanonicalPath());
+                    net.ooici.core.container.Container.Structure struct = DataResourceBuilder.getDataResourceCreateRequestStructure(regFile.getCanonicalPath());
                     log.debug(GPBWrapper.Factory(struct).toString());
 //            log.debug("\n\n\nOutput:");
 //            log.debug(JsonFormat.printToString(struct));
 
-                    IonMessage sendMessage = mainBroker.createMessage(ooiMyName, ooiRegistrationName, "get_object", struct.toByteArray());
+                    IonMessage sendMessage = mainBroker.createMessage(ooiMyName, ooiRegistrationName, "createDataResource", struct.toByteArray());
                     sendMessage.getIonHeaders().put("encoding", "ION R1 GPB");
                     sendMessage.getIonHeaders().put("user-id", "ANONYMOUS");
                     sendMessage.getIonHeaders().put("expiry", "0");

@@ -4,11 +4,6 @@
  */
 package ion.integration.eoi;
 
-import com.rabbitmq.client.AMQP;
-import ion.core.IonException;
-import ion.core.messaging.IonMessage;
-import ion.core.messaging.MessagingName;
-import ion.core.messaging.MsgBrokerClient;
 import ion.core.utils.GPBWrapper;
 import ion.core.utils.IonUtils;
 import ion.core.utils.ProtoUtils;
@@ -22,8 +17,6 @@ import java.nio.charset.Charset;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -31,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DataResourceBuilder {
 
-    public static net.ooici.core.container.Container.Structure getDataSourceResourceStructure(String filePath) throws FileNotFoundException, IOException, Exception {
+    public static net.ooici.core.container.Container.Structure getDataResourceCreateRequestStructure(String filePath) throws FileNotFoundException, IOException, Exception {
         File infile = new File(filePath);
         if (!infile.exists()) {
             throw new FileNotFoundException("Missing file containing the context object in json form");
@@ -49,7 +42,7 @@ public class DataResourceBuilder {
             int resId = Integer.valueOf(fileContent.substring(m.start(1), m.end(1)));
             String json = fileContent.substring(m.start(2), m.end(2));
             switch (resId) {
-                case 9211://DataSourceResource
+                case 9211://DataResourceCreateRequest
                     dscrBldr = (net.ooici.integration.ais.manageDataResource.ManageDataResource.DataResourceCreateRequest.Builder) IonUtils.convertJsonToGPBBuilder(json, resId);
                     break;
                 case 4504://ThreddsAuthentication
@@ -70,10 +63,10 @@ public class DataResourceBuilder {
                 dscrBldr.setSearchPattern(srchWrap.getCASRef());
                 ProtoUtils.addStructureElementToStructureBuilder(sbldr, srchWrap.getStructureElement());
             }
-            GPBWrapper<net.ooici.services.sa.DataSource.DataSourceResource> dsrWrap = GPBWrapper.Factory(dscrBldr.build());
-            ProtoUtils.addStructureElementToStructureBuilder(sbldr, dsrWrap.getStructureElement());
+            GPBWrapper<net.ooici.integration.ais.manageDataResource.ManageDataResource.DataResourceCreateRequest> dscrWrap = GPBWrapper.Factory(dscrBldr.build());
+            ProtoUtils.addStructureElementToStructureBuilder(sbldr, dscrWrap.getStructureElement());
 
-            net.ooici.core.message.IonMessage.IonMsg ionMsg = net.ooici.core.message.IonMessage.IonMsg.newBuilder().setIdentity(UUID.randomUUID().toString()).setMessageObject(dsrWrap.getCASRef()).build();
+            net.ooici.core.message.IonMessage.IonMsg ionMsg = net.ooici.core.message.IonMessage.IonMsg.newBuilder().setIdentity(UUID.randomUUID().toString()).setMessageObject(dscrWrap.getCASRef()).build();
             ProtoUtils.addStructureElementToStructureBuilder(sbldr, GPBWrapper.Factory(ionMsg).getStructureElement(), true);
 
             /* Do something with the structure*/
