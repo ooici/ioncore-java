@@ -194,11 +194,12 @@ public class MsgBrokerClient {
                 log.debug("Message received on queue " + queueName + ", msglen " + msgin.getBody().length);
             }
 
-            if (msgin.isErrorMessage()) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Received message is an ERROR message: " + ((Map) msgin.getContent()).get("value"));
-                }
-            }
+            /* Commented this out because the content is NOT a map, so this log.debug call throws a ClassCastException */
+//            if (msgin.isErrorMessage()) {
+//                if (log.isDebugEnabled()) {
+//                    log.debug("Received message is an ERROR message: " + ((Map) msgin.getContent()).get("value"));
+//                }
+//            }
         } catch (ShutdownSignalException e) {
             // TODO Auto-generated catch block
 //            e.printStackTrace();
