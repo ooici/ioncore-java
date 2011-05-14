@@ -150,9 +150,8 @@
 
 	    <!-- Create JAR file with all library classes -->
         <jar jarfile="${dist.dir}/lib/${project.name}-${version}.jar" 
-	    	basedir="${build.dir}"
 	    	manifest="MANIFEST.MF" >
-            <fileset dir=".">
+            <fileset dir="${build.dir}">
                 <exclude name="**/log4j.properties"/>
                 <exclude name="ion/example/**"/>
             </fileset>
