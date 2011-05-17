@@ -5,6 +5,7 @@
 package ion.integration.eoi;
 
 import ion.core.utils.GPBWrapper;
+import ion.core.utils.IonTime;
 import ion.core.utils.IonUtils;
 import ion.core.utils.ProtoUtils;
 import java.io.File;
@@ -17,6 +18,13 @@ import java.nio.charset.Charset;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.ooici.core.container.Container;
+import net.ooici.core.message.IonMessage;
+import net.ooici.integration.ais.AisRequestResponse;
+import net.ooici.integration.ais.manageDataResource.ManageDataResource;
+import net.ooici.services.sa.DataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -24,16 +32,18 @@ import java.util.regex.Pattern;
  */
 public class DataResourceBuilder {
 
-    public static net.ooici.core.container.Container.Structure getDataResourceCreateRequestStructure(String filePath) throws FileNotFoundException, IOException, Exception {
+    private static final Logger log = LoggerFactory.getLogger(DataResourceBuilder.class);
+    
+    public static Container.Structure getDataResourceCreateRequestStructure(String filePath, final StringBuilder sb) throws FileNotFoundException, IOException, Exception {
         File infile = new File(filePath);
         if (!infile.exists()) {
             throw new FileNotFoundException("Missing file containing the context object in json form");
         }
 
-        net.ooici.core.container.Container.Structure struct = null;
-        GPBWrapper<net.ooici.services.sa.DataSource.ThreddsAuthentication> tdsWrap = null;
-        GPBWrapper<net.ooici.services.sa.DataSource.SearchPattern> srchWrap = null;
-        net.ooici.integration.ais.manageDataResource.ManageDataResource.DataResourceCreateRequest.Builder dscrBldr = null;
+        Container.Structure struct = null;
+        GPBWrapper<DataSource.ThreddsAuthentication> tdsWrap = null;
+        GPBWrapper<DataSource.SearchPattern> srchWrap = null;
+        ManageDataResource.DataResourceCreateRequest.Builder dscrBldr = null;
 
         String fileContent = readFile(infile.getCanonicalPath());
         Pattern p = Pattern.compile("(?m)#\\s*[a-zA-Z]+?:([0-9]+)\\s*(\\{[^{}]+?\\})");
@@ -43,18 +53,18 @@ public class DataResourceBuilder {
             String json = fileContent.substring(m.start(2), m.end(2));
             switch (resId) {
                 case 9211://DataResourceCreateRequest
-                    dscrBldr = (net.ooici.integration.ais.manageDataResource.ManageDataResource.DataResourceCreateRequest.Builder) IonUtils.convertJsonToGPBBuilder(json, resId);
+                    dscrBldr = (ManageDataResource.DataResourceCreateRequest.Builder) IonUtils.convertJsonToGPBBuilder(json, resId);
                     break;
                 case 4504://ThreddsAuthentication
-                    tdsWrap = GPBWrapper.Factory((net.ooici.services.sa.DataSource.ThreddsAuthentication) IonUtils.convertJsonToGPB(json, resId));
+                    tdsWrap = GPBWrapper.Factory((DataSource.ThreddsAuthentication) IonUtils.convertJsonToGPB(json, resId));
                     break;
                 case 4505://SearchPattern
-                    srchWrap = GPBWrapper.Factory((net.ooici.services.sa.DataSource.SearchPattern) IonUtils.convertJsonToGPB(json, resId));
+                    srchWrap = GPBWrapper.Factory((DataSource.SearchPattern) IonUtils.convertJsonToGPB(json, resId));
                     break;
             }
         }
         if (dscrBldr != null) {
-            net.ooici.core.container.Container.Structure.Builder sbldr = net.ooici.core.container.Container.Structure.newBuilder();
+            Container.Structure.Builder sbldr = Container.Structure.newBuilder();
             if (tdsWrap != null) {
                 dscrBldr.setAuthentication(tdsWrap.getCASRef());
                 ProtoUtils.addStructureElementToStructureBuilder(sbldr, tdsWrap.getStructureElement());
@@ -63,10 +73,22 @@ public class DataResourceBuilder {
                 dscrBldr.setSearchPattern(srchWrap.getCASRef());
                 ProtoUtils.addStructureElementToStructureBuilder(sbldr, srchWrap.getStructureElement());
             }
-            GPBWrapper<net.ooici.integration.ais.manageDataResource.ManageDataResource.DataResourceCreateRequest> dscrWrap = GPBWrapper.Factory(dscrBldr.build());
+            
+            /* Set the update_start_datetime_millis field to now */
+            dscrBldr.setUpdateStartDatetimeMillis(IonTime.now().getMillis());
+            
+            GPBWrapper<ManageDataResource.DataResourceCreateRequest> dscrWrap = GPBWrapper.Factory(dscrBldr.build());
+            log.debug(dscrWrap.toString());
+            String nl = System.getProperty("line.separator");
+            sb.append("Resource Registered:").append(nl).append("*************************").append(nl);
+            sb.append(dscrWrap.getObjectValue()).append("*************************").append(nl);
             ProtoUtils.addStructureElementToStructureBuilder(sbldr, dscrWrap.getStructureElement());
 
-            net.ooici.core.message.IonMessage.IonMsg ionMsg = net.ooici.core.message.IonMessage.IonMsg.newBuilder().setIdentity(UUID.randomUUID().toString()).setMessageObject(dscrWrap.getCASRef()).build();
+            GPBWrapper<AisRequestResponse.ApplicationIntegrationServiceRequestMsg> aisReqMsgWrap = GPBWrapper.Factory(AisRequestResponse.ApplicationIntegrationServiceRequestMsg.newBuilder().setMessageParametersReference(dscrWrap.getCASRef()).build());
+            log.debug(aisReqMsgWrap.toString());
+            ProtoUtils.addStructureElementToStructureBuilder(sbldr, aisReqMsgWrap.getStructureElement());
+            
+            IonMessage.IonMsg ionMsg = IonMessage.IonMsg.newBuilder().setIdentity(UUID.randomUUID().toString()).setMessageObject(aisReqMsgWrap.getCASRef()).build();
             ProtoUtils.addStructureElementToStructureBuilder(sbldr, GPBWrapper.Factory(ionMsg).getStructureElement(), true);
 
             /* Do something with the structure*/
