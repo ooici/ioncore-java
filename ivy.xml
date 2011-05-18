@@ -30,7 +30,7 @@
         <!-- JUnit -->
         <dependency org="junit" name="junit" rev="4.8.2" conf="*->*,!sources,!javadoc"/>
         <!-- OOICI Package Server -->
-        <dependency name="ionproto" rev="0.3.21-pl4" conf="*->*,!sources,!javadoc" />
+        <dependency org="net.ooici" name="ionproto" rev="0.3.23" conf="*->*,!sources,!javadoc" />
         
     </dependencies>
 
