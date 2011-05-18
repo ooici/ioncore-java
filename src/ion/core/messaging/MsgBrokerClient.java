@@ -30,7 +30,7 @@ public class MsgBrokerClient {
     
     private static final Logger log = LoggerFactory.getLogger(MsgBrokerClient.class);
 	
-	private static final int DEFAULT_TIMEOUT_MS = 30000;
+	private static final int DEFAULT_TIMEOUT_MS = 300000;
 
     private String mBrokerHost;
     private int mBrokerPort;
