@@ -50,9 +50,10 @@ public class AppIntegrationService {
     public enum RequestType {
     	CREATE_DOWNLOAD_URL,
     	REGISTER_USER, GET_USER_PROFILE, UPDATE_USER_PROFILE,
-    	FIND_DATA_RESOURCE_SUBSCRIPTION, CREATE_DATA_RESOURCE_SUBSCRIPTION, UPDATE_DATA_RESOURCE_SUBSCRIPTION, DELETE_DATA_RESOURCE_SUBSCRIPTION,
+    	FIND_DATA_RESOURCE_SUBSCRIPTION, CREATE_DATA_RESOURCE_SUBSCRIPTION,
+    	UPDATE_DATA_RESOURCE_SUBSCRIPTION, DELETE_DATA_RESOURCE_SUBSCRIPTION,
     	FIND_DATA_RESOURCES, FIND_DATA_RESOURCES_BY_USER, GET_DATA_RESOURCE_DETAIL,
-    	CREATE_DATA_RESOURCE, UPDATE_DATA_RESOURCE, DELETE_DATA_RESOURCE,
+    	CREATE_DATA_RESOURCE, VALIDATE_DATA_RESOURCE, UPDATE_DATA_RESOURCE, DELETE_DATA_RESOURCE,
     	GET_RESOURCE_TYPES, GET_RESOURCES_OF_TYPE, GET_RESOURCE
     }
 
@@ -101,12 +102,12 @@ public class AppIntegrationService {
     	typeEnumToServiceOpMap.put(RequestType.CREATE_DATA_RESOURCE_SUBSCRIPTION, "createDataResourceSubscription");
     	typeEnumToResponseTypeMap.put(RequestType.CREATE_DATA_RESOURCE_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
 
-    	typeEnumToRequestTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, 9203);
+    	typeEnumToRequestTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, 9209);
     	typeEnumToResponseTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, 9210);
     	typeEnumToServiceOpMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, "updateDataResourceSubscription");
     	typeEnumToResponseTypeMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
 
-    	typeEnumToRequestTypeIntMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, 9203);
+    	typeEnumToRequestTypeIntMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, 9205);
     	typeEnumToResponseTypeIntMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, 9206);
     	typeEnumToServiceOpMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, "deleteDataResourceSubscription");
     	typeEnumToResponseTypeMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
@@ -135,6 +136,11 @@ public class AppIntegrationService {
     	typeEnumToResponseTypeIntMap.put(RequestType.CREATE_DATA_RESOURCE, 9212);
     	typeEnumToServiceOpMap.put(RequestType.CREATE_DATA_RESOURCE, "createDataResource");
     	typeEnumToResponseTypeMap.put(RequestType.CREATE_DATA_RESOURCE, ResponseType.SINGLE_OBJECT);
+    	
+    	typeEnumToRequestTypeIntMap.put(RequestType.VALIDATE_DATA_RESOURCE, 9010);
+    	typeEnumToResponseTypeIntMap.put(RequestType.VALIDATE_DATA_RESOURCE, 9011);
+    	typeEnumToServiceOpMap.put(RequestType.VALIDATE_DATA_RESOURCE, "validateDataResource");
+    	typeEnumToResponseTypeMap.put(RequestType.VALIDATE_DATA_RESOURCE, ResponseType.SINGLE_OBJECT);
     	
     	typeEnumToRequestTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE, 9215);
     	typeEnumToResponseTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE, 9216);
