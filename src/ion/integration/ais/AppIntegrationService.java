@@ -15,7 +15,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 import net.ooici.core.container.Container;
 import net.ooici.core.container.Container.Structure;
@@ -24,9 +23,7 @@ import net.ooici.core.message.IonMessage.ResponseCodes;
 import net.ooici.integration.ais.AisRequestResponse.ApplicationIntegrationServiceError;
 import net.ooici.integration.ais.AisRequestResponse.ApplicationIntegrationServiceRequestMsg;
 import net.ooici.integration.ais.AisRequestResponse.ApplicationIntegrationServiceResponseMsg;
-import net.ooici.integration.ais.findDataResources.FindDataResources.FindDataResourcesRspMsg;
 
-import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.JsonFormat;
 import com.google.protobuf.Message;
@@ -37,6 +34,9 @@ public class AppIntegrationService {
 	
 	private static final String AIS_SERVICE_NAME = "app_integration";
     private MessagingName applicationIntegrationSvc;
+    
+    private static final String INSTRUMENT_INTEGRATION_SERVICE_NAME = "instrument_integration_service";
+    private MessagingName instrumentIntegrationSvc;
 
     private MsgBrokerClient msgBrokerClient;
     private BaseProcess baseProcess;
@@ -54,12 +54,19 @@ public class AppIntegrationService {
     	UPDATE_DATA_RESOURCE_SUBSCRIPTION, DELETE_DATA_RESOURCE_SUBSCRIPTION,
     	FIND_DATA_RESOURCES, FIND_DATA_RESOURCES_BY_USER, GET_DATA_RESOURCE_DETAIL,
     	CREATE_DATA_RESOURCE, VALIDATE_DATA_RESOURCE, UPDATE_DATA_RESOURCE, DELETE_DATA_RESOURCE,
-    	GET_RESOURCE_TYPES, GET_RESOURCES_OF_TYPE, GET_RESOURCE
+    	GET_RESOURCE_TYPES, GET_RESOURCES_OF_TYPE, GET_RESOURCE,
+    	CREATE_INSTRUMENT, START_INSTRUMENT_AGENT, START_INSTRUMENT_SAMPLING, STOP_INSTRUMENT_SAMPLING,
+    	GET_INSTRUMENT_STATE, SET_INSTRUMENT_STATE, GET_INSTRUMENT_LIST
     }
 
     // Enum identifying expected response "type".
     public enum ResponseType {
     	STATUS_ONLY, SINGLE_OBJECT, LIST_OF_OBJECTS
+    }
+
+    // Enum identifying which backend service to target.
+    public enum ServiceName {
+    	APP_INTEGRATION, INSTRUMENT_INTEGRATION
     }
 
     // Map of RequestType enum values to request payload GPB id values
@@ -68,7 +75,10 @@ public class AppIntegrationService {
     // Map of RequestType enum values to response payload GPB id values
     private static final HashMap<RequestType,Integer> typeEnumToResponseTypeIntMap = new HashMap<RequestType,Integer>();
 
-    // Map of RequestType enum values to AIS service op name values
+    // Map of RequestType enum values to service name
+    private static final HashMap<RequestType,ServiceName> typeEnumToServiceNameMap = new HashMap<RequestType,ServiceName>();
+
+    // Map of RequestType enum values to service op name values
     private static final HashMap<RequestType,String> typeEnumToServiceOpMap = new HashMap<RequestType,String>();
 
     // Map of RequestType enum values to expected response "type"
@@ -79,93 +89,154 @@ public class AppIntegrationService {
     static {
     	typeEnumToRequestTypeIntMap.put(RequestType.REGISTER_USER, 9101);
     	typeEnumToResponseTypeIntMap.put(RequestType.REGISTER_USER, 9103);
+    	typeEnumToServiceNameMap.put(RequestType.REGISTER_USER, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.REGISTER_USER, "registerUser");
     	typeEnumToResponseTypeMap.put(RequestType.REGISTER_USER, ResponseType.SINGLE_OBJECT);
 
     	typeEnumToRequestTypeIntMap.put(RequestType.GET_USER_PROFILE, 9104);
     	typeEnumToResponseTypeIntMap.put(RequestType.GET_USER_PROFILE, 9105);
+    	typeEnumToServiceNameMap.put(RequestType.GET_USER_PROFILE, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.GET_USER_PROFILE, "getUser");
     	typeEnumToResponseTypeMap.put(RequestType.GET_USER_PROFILE, ResponseType.SINGLE_OBJECT);
 
     	typeEnumToRequestTypeIntMap.put(RequestType.UPDATE_USER_PROFILE, 9102);
     	typeEnumToResponseTypeIntMap.put(RequestType.UPDATE_USER_PROFILE, 9002);
+    	typeEnumToServiceNameMap.put(RequestType.UPDATE_USER_PROFILE, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.UPDATE_USER_PROFILE, "updateUserProfile");
     	typeEnumToResponseTypeMap.put(RequestType.UPDATE_USER_PROFILE, ResponseType.STATUS_ONLY);
 
     	typeEnumToRequestTypeIntMap.put(RequestType.FIND_DATA_RESOURCE_SUBSCRIPTION, 9218);
     	typeEnumToResponseTypeIntMap.put(RequestType.FIND_DATA_RESOURCE_SUBSCRIPTION, 9208);
+    	typeEnumToServiceNameMap.put(RequestType.FIND_DATA_RESOURCE_SUBSCRIPTION, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.FIND_DATA_RESOURCE_SUBSCRIPTION, "findDataResourceSubscriptions");
     	typeEnumToResponseTypeMap.put(RequestType.FIND_DATA_RESOURCE_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
 
     	typeEnumToRequestTypeIntMap.put(RequestType.CREATE_DATA_RESOURCE_SUBSCRIPTION, 9203);
     	typeEnumToResponseTypeIntMap.put(RequestType.CREATE_DATA_RESOURCE_SUBSCRIPTION, 9204);
+    	typeEnumToServiceNameMap.put(RequestType.CREATE_DATA_RESOURCE_SUBSCRIPTION, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.CREATE_DATA_RESOURCE_SUBSCRIPTION, "createDataResourceSubscription");
     	typeEnumToResponseTypeMap.put(RequestType.CREATE_DATA_RESOURCE_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
 
     	typeEnumToRequestTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, 9209);
     	typeEnumToResponseTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, 9204);
+    	typeEnumToServiceNameMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, "updateDataResourceSubscription");
     	typeEnumToResponseTypeMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
 
     	typeEnumToRequestTypeIntMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, 9205);
     	typeEnumToResponseTypeIntMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, 9206);
+    	typeEnumToServiceNameMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, "deleteDataResourceSubscription");
     	typeEnumToResponseTypeMap.put(RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
     	
     	typeEnumToRequestTypeIntMap.put(RequestType.CREATE_DOWNLOAD_URL, 9035);
     	typeEnumToResponseTypeIntMap.put(RequestType.CREATE_DOWNLOAD_URL, 9036);
+    	typeEnumToServiceNameMap.put(RequestType.CREATE_DOWNLOAD_URL, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.CREATE_DOWNLOAD_URL, "createDownloadURL");
     	typeEnumToResponseTypeMap.put(RequestType.CREATE_DOWNLOAD_URL, ResponseType.SINGLE_OBJECT);
     	
     	typeEnumToRequestTypeIntMap.put(RequestType.FIND_DATA_RESOURCES, 9031);
     	typeEnumToResponseTypeIntMap.put(RequestType.FIND_DATA_RESOURCES, 9032);
+    	typeEnumToServiceNameMap.put(RequestType.FIND_DATA_RESOURCES, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.FIND_DATA_RESOURCES, "findDataResources");
     	typeEnumToResponseTypeMap.put(RequestType.FIND_DATA_RESOURCES, ResponseType.SINGLE_OBJECT);
     	
     	typeEnumToRequestTypeIntMap.put(RequestType.FIND_DATA_RESOURCES_BY_USER, 9031);
     	typeEnumToResponseTypeIntMap.put(RequestType.FIND_DATA_RESOURCES_BY_USER, 9038);
+    	typeEnumToServiceNameMap.put(RequestType.FIND_DATA_RESOURCES_BY_USER, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.FIND_DATA_RESOURCES_BY_USER, "findDataResourcesByUser");
     	typeEnumToResponseTypeMap.put(RequestType.FIND_DATA_RESOURCES_BY_USER, ResponseType.SINGLE_OBJECT);
     	
     	typeEnumToRequestTypeIntMap.put(RequestType.GET_DATA_RESOURCE_DETAIL, 9033);
     	typeEnumToResponseTypeIntMap.put(RequestType.GET_DATA_RESOURCE_DETAIL, 9034);
+    	typeEnumToServiceNameMap.put(RequestType.GET_DATA_RESOURCE_DETAIL, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.GET_DATA_RESOURCE_DETAIL, "getDataResourceDetail");
     	typeEnumToResponseTypeMap.put(RequestType.GET_DATA_RESOURCE_DETAIL, ResponseType.SINGLE_OBJECT);
     	
     	typeEnumToRequestTypeIntMap.put(RequestType.CREATE_DATA_RESOURCE, 9211);
     	typeEnumToResponseTypeIntMap.put(RequestType.CREATE_DATA_RESOURCE, 9212);
+    	typeEnumToServiceNameMap.put(RequestType.CREATE_DATA_RESOURCE, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.CREATE_DATA_RESOURCE, "createDataResource");
     	typeEnumToResponseTypeMap.put(RequestType.CREATE_DATA_RESOURCE, ResponseType.SINGLE_OBJECT);
     	
     	typeEnumToRequestTypeIntMap.put(RequestType.VALIDATE_DATA_RESOURCE, 9010);
     	typeEnumToResponseTypeIntMap.put(RequestType.VALIDATE_DATA_RESOURCE, 9011);
+    	typeEnumToServiceNameMap.put(RequestType.VALIDATE_DATA_RESOURCE, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.VALIDATE_DATA_RESOURCE, "validateDataResource");
     	typeEnumToResponseTypeMap.put(RequestType.VALIDATE_DATA_RESOURCE, ResponseType.SINGLE_OBJECT);
     	
     	typeEnumToRequestTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE, 9215);
     	typeEnumToResponseTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE, 9216);
+    	typeEnumToServiceNameMap.put(RequestType.UPDATE_DATA_RESOURCE, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.UPDATE_DATA_RESOURCE, "updateDataResource");
     	typeEnumToResponseTypeMap.put(RequestType.UPDATE_DATA_RESOURCE, ResponseType.SINGLE_OBJECT);
     	
     	typeEnumToRequestTypeIntMap.put(RequestType.DELETE_DATA_RESOURCE, 9213);
     	typeEnumToResponseTypeIntMap.put(RequestType.DELETE_DATA_RESOURCE, 9214);
+    	typeEnumToServiceNameMap.put(RequestType.DELETE_DATA_RESOURCE, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.DELETE_DATA_RESOURCE, "deleteDataResource");
     	typeEnumToResponseTypeMap.put(RequestType.DELETE_DATA_RESOURCE, ResponseType.SINGLE_OBJECT);
 
     	typeEnumToRequestTypeIntMap.put(RequestType.GET_RESOURCE_TYPES, -1);
     	typeEnumToResponseTypeIntMap.put(RequestType.GET_RESOURCE_TYPES, 9120);
+    	typeEnumToServiceNameMap.put(RequestType.GET_RESOURCE_TYPES, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.GET_RESOURCE_TYPES, "getResourceTypes");
     	typeEnumToResponseTypeMap.put(RequestType.GET_RESOURCE_TYPES, ResponseType.SINGLE_OBJECT);
 
     	typeEnumToRequestTypeIntMap.put(RequestType.GET_RESOURCES_OF_TYPE, 9121);
     	typeEnumToResponseTypeIntMap.put(RequestType.GET_RESOURCES_OF_TYPE, 9123);
+    	typeEnumToServiceNameMap.put(RequestType.GET_RESOURCES_OF_TYPE, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.GET_RESOURCES_OF_TYPE, "getResourcesOfType");
     	typeEnumToResponseTypeMap.put(RequestType.GET_RESOURCES_OF_TYPE, ResponseType.SINGLE_OBJECT);
 
     	typeEnumToRequestTypeIntMap.put(RequestType.GET_RESOURCE, 9124);
     	typeEnumToResponseTypeIntMap.put(RequestType.GET_RESOURCE, 9126);
+    	typeEnumToServiceNameMap.put(RequestType.GET_RESOURCE, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.GET_RESOURCE, "getResource");
     	typeEnumToResponseTypeMap.put(RequestType.GET_RESOURCE, ResponseType.SINGLE_OBJECT);
+
+    	// Everything below here is serviced by the instrument integration service
+    	typeEnumToRequestTypeIntMap.put(RequestType.CREATE_INSTRUMENT, 9301);
+    	typeEnumToResponseTypeIntMap.put(RequestType.CREATE_INSTRUMENT, 9302);
+    	typeEnumToServiceNameMap.put(RequestType.CREATE_INSTRUMENT, ServiceName.INSTRUMENT_INTEGRATION);
+    	typeEnumToServiceOpMap.put(RequestType.CREATE_INSTRUMENT, "createNewInstrument");
+    	typeEnumToResponseTypeMap.put(RequestType.CREATE_INSTRUMENT, ResponseType.SINGLE_OBJECT);
+
+    	typeEnumToRequestTypeIntMap.put(RequestType.START_INSTRUMENT_AGENT, 9303);
+    	typeEnumToResponseTypeIntMap.put(RequestType.START_INSTRUMENT_AGENT, 9304);
+    	typeEnumToServiceNameMap.put(RequestType.START_INSTRUMENT_AGENT, ServiceName.INSTRUMENT_INTEGRATION);
+    	typeEnumToServiceOpMap.put(RequestType.START_INSTRUMENT_AGENT, "startInstrumentAgent");
+    	typeEnumToResponseTypeMap.put(RequestType.START_INSTRUMENT_AGENT, ResponseType.SINGLE_OBJECT);
+
+    	typeEnumToRequestTypeIntMap.put(RequestType.START_INSTRUMENT_SAMPLING, 9305);
+    	typeEnumToResponseTypeIntMap.put(RequestType.START_INSTRUMENT_SAMPLING, 9306);
+    	typeEnumToServiceNameMap.put(RequestType.START_INSTRUMENT_SAMPLING, ServiceName.INSTRUMENT_INTEGRATION);
+    	typeEnumToServiceOpMap.put(RequestType.START_INSTRUMENT_SAMPLING, "startAutoSampling");
+    	typeEnumToResponseTypeMap.put(RequestType.START_INSTRUMENT_SAMPLING, ResponseType.SINGLE_OBJECT);
+
+    	typeEnumToRequestTypeIntMap.put(RequestType.STOP_INSTRUMENT_SAMPLING, 9307);
+    	typeEnumToResponseTypeIntMap.put(RequestType.STOP_INSTRUMENT_SAMPLING, 9308);
+    	typeEnumToServiceNameMap.put(RequestType.STOP_INSTRUMENT_SAMPLING, ServiceName.INSTRUMENT_INTEGRATION);
+    	typeEnumToServiceOpMap.put(RequestType.STOP_INSTRUMENT_SAMPLING, "stopAutoSampling");
+    	typeEnumToResponseTypeMap.put(RequestType.STOP_INSTRUMENT_SAMPLING, ResponseType.SINGLE_OBJECT);
+
+    	typeEnumToRequestTypeIntMap.put(RequestType.GET_INSTRUMENT_STATE, 9309);
+    	typeEnumToResponseTypeIntMap.put(RequestType.GET_INSTRUMENT_STATE, 9310);
+    	typeEnumToServiceNameMap.put(RequestType.GET_INSTRUMENT_STATE, ServiceName.INSTRUMENT_INTEGRATION);
+    	typeEnumToServiceOpMap.put(RequestType.GET_INSTRUMENT_STATE, "getInstrumentState");
+    	typeEnumToResponseTypeMap.put(RequestType.GET_INSTRUMENT_STATE, ResponseType.SINGLE_OBJECT);
+
+    	typeEnumToRequestTypeIntMap.put(RequestType.SET_INSTRUMENT_STATE, 9311);
+    	typeEnumToResponseTypeIntMap.put(RequestType.SET_INSTRUMENT_STATE, 9312);
+    	typeEnumToServiceNameMap.put(RequestType.SET_INSTRUMENT_STATE, ServiceName.INSTRUMENT_INTEGRATION);
+    	typeEnumToServiceOpMap.put(RequestType.SET_INSTRUMENT_STATE, "setInstrumentState");
+    	typeEnumToResponseTypeMap.put(RequestType.SET_INSTRUMENT_STATE, ResponseType.SINGLE_OBJECT);
+
+    	typeEnumToRequestTypeIntMap.put(RequestType.GET_INSTRUMENT_LIST, 9313);
+    	typeEnumToResponseTypeIntMap.put(RequestType.GET_INSTRUMENT_LIST, 9314);
+    	typeEnumToServiceNameMap.put(RequestType.GET_INSTRUMENT_LIST, ServiceName.INSTRUMENT_INTEGRATION);
+    	typeEnumToServiceOpMap.put(RequestType.GET_INSTRUMENT_LIST, "getInstrumentList");
+    	typeEnumToResponseTypeMap.put(RequestType.GET_INSTRUMENT_LIST, ResponseType.SINGLE_OBJECT);
     }
 
     /**
@@ -184,26 +255,31 @@ public class AppIntegrationService {
 		msgBrokerClient.attach();
 		baseProcess = new BaseProcess(msgBrokerClient);
 		baseProcess.spawn();
-		createMessagingName(sysName);
+		createMessagingNames(sysName);
 	}
 
 	public AppIntegrationService(String sysName, MsgBrokerClient brokerClient) {
 		baseProcess = new BaseProcess(brokerClient);
 		baseProcess.spawn();
-		createMessagingName(sysName);
+		createMessagingNames(sysName);
 	}
 
 	public AppIntegrationService(String sysName, BaseProcess baseProcess) {
 		this.baseProcess = baseProcess;
-		createMessagingName(sysName);
+		createMessagingNames(sysName);
 	}
 
 	public void dispose() {
 		baseProcess.dispose();
 	}
 
-	private void createMessagingName(String sysName) {
+	public BaseProcess getBaseProcess() {
+		return baseProcess;
+	}
+
+	private void createMessagingNames(String sysName) {
 		applicationIntegrationSvc = new MessagingName(sysName, AIS_SERVICE_NAME);
+		instrumentIntegrationSvc = new MessagingName(sysName, INSTRUMENT_INTEGRATION_SERVICE_NAME);
 	}
 
 	/**
@@ -244,8 +320,13 @@ public class AppIntegrationService {
 		if (requestMessage == null) {
 			return null;
 		}
-		
-		IonMessage replyMessage = baseProcess.rpcSendContainerContent(applicationIntegrationSvc, serviceOperation, requestMessage, userId, expiry);
+
+		MessagingName messagingName = applicationIntegrationSvc;
+		if (typeEnumToServiceNameMap.get(requestType) == ServiceName.INSTRUMENT_INTEGRATION) {
+			messagingName = instrumentIntegrationSvc;
+		}
+
+		IonMessage replyMessage = baseProcess.rpcSendContainerContent(messagingName, serviceOperation, requestMessage, userId, expiry);
 		
 		if (replyMessage == null) {
     		errorMessage = "Request timeout";
