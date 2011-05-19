@@ -28,8 +28,7 @@ public class UpdateEventGenerator {
     private static final Logger log = LoggerFactory.getLogger(UpdateEventGenerator.class);
 
     public static void main(String[] args) throws IOException {
-        args = new String[]{"3319A67F-81F3-424F-8E69-4F28C4E04808"};
-
+        
         generateUpdateEvent(args);
 
     }
