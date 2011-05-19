@@ -103,7 +103,7 @@ public class AppIntegrationService {
     	typeEnumToResponseTypeMap.put(RequestType.CREATE_DATA_RESOURCE_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
 
     	typeEnumToRequestTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, 9209);
-    	typeEnumToResponseTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, 9210);
+    	typeEnumToResponseTypeIntMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, 9204);
     	typeEnumToServiceOpMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, "updateDataResourceSubscription");
     	typeEnumToResponseTypeMap.put(RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, ResponseType.SINGLE_OBJECT);
 

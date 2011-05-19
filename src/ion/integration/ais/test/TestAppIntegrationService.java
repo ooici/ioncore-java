@@ -222,7 +222,7 @@ public class TestAppIntegrationService extends TestCase {
 			assertTrue(replyJsonString.startsWith("{\"download_url\":"));
 
 			// Create subscription
-			requestJsonString = "{\"subscriptionInfo\": {\"user_ooi_id\": \"" + ooi_id + "\",\"data_src_id\": \"" + dataResourceId + "\",\"subscription_type\": 0, \"email_alerts_filter\": 0, \"dispatcher_alerts_filter\": 0,\"dispatcher_script_path\": \"path\"}, \"datasetMetadata\": " + dataResourceMetadata + "}";
+			requestJsonString = "{\"subscriptionInfo\": {\"user_ooi_id\": \"" + ooi_id + "\",\"data_src_id\": \"" + dataResourceId + "\",\"subscription_type\": \"EMAIL\", \"email_alerts_filter\": \"UPDATES\", \"dispatcher_alerts_filter\": \"UPDATES\",\"dispatcher_script_path\": \"path\"}, \"datasetMetadata\": " + dataResourceMetadata + "}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.CREATE_DATA_RESOURCE_SUBSCRIPTION, ooi_id, "0");
 			printStream.println("CREATE_DATA_RESOURCE_SUBSCRIPTION");
 			printStream.println("  request: " + requestJsonString);
@@ -246,7 +246,7 @@ public class TestAppIntegrationService extends TestCase {
 			assertTrue(replyJsonString.startsWith("{\"subscriptionListResults\":"));
 
 			// Update subscription
-			requestJsonString = "{\"subscriptionInfo\": {\"user_ooi_id\": \"" + ooi_id + "\",\"data_src_id\": \"" + dataResourceId + "\",\"subscription_type\": 0, \"email_alerts_filter\": 0, \"dispatcher_alerts_filter\": 0,\"dispatcher_script_path\": \"newpath\"}, \"datasetMetadata\": " + dataResourceMetadata + "}";
+			requestJsonString = "{\"subscriptionInfo\": {\"user_ooi_id\": \"" + ooi_id + "\",\"data_src_id\": \"" + dataResourceId + "\",\"subscription_type\": \"EMAIL\", \"email_alerts_filter\": \"UPDATES\", \"dispatcher_alerts_filter\": \"UPDATES\",\"dispatcher_script_path\": \"newpath\"}, \"datasetMetadata\": " + dataResourceMetadata + "}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.UPDATE_DATA_RESOURCE_SUBSCRIPTION, ooi_id, "0");
 			printStream.println("UPDATE_DATA_RESOURCE_SUBSCRIPTION");
 			printStream.println("  request: " + requestJsonString);
@@ -258,7 +258,7 @@ public class TestAppIntegrationService extends TestCase {
 			assertTrue(replyJsonString.equals("{\"success\": true}"));
 
 			// Delete subscription
-			requestJsonString = "{\"subscriptionInfo\": {\"user_ooi_id\": \"" + ooi_id + "\",\"data_src_id\": \"" + dataResourceId + "\",\"subscription_type\": 0, \"email_alerts_filter\": 0, \"dispatcher_alerts_filter\": 0,\"dispatcher_script_path\": \"newpath\"}, \"datasetMetadata\": " + dataResourceMetadata + "}";
+			requestJsonString = "{\"subscriptionInfo\": {\"user_ooi_id\": \"" + ooi_id + "\",\"data_src_id\": \"" + dataResourceId + "\",\"subscription_type\": \"EMAIL\", \"email_alerts_filter\": \"UPDATES\", \"dispatcher_alerts_filter\": \"UPDATES\",\"dispatcher_script_path\": \"newpath\"}}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, ooi_id, "0");
 			printStream.println("DELETE_DATA_RESOURCE_SUBSCRIPTION");
 			printStream.println("  request: " + requestJsonString);
@@ -269,8 +269,30 @@ public class TestAppIntegrationService extends TestCase {
 			assertTrue(ais.getStatus() == 200);
 			assertTrue(replyJsonString.equals("{\"success\": true}"));
 
+			// Validate data resource good case
+			requestJsonString = "{\"data_resource_url\": \"http://geoport.whoi.edu/thredds/dodsC/usgs/data0/rsignell/data/oceansites/OS_WHOTS_2010_R_M-1.nc\"}";
+//			requestJsonString = "{\"data_resource_url\": \"http://geoport.whoi.edu/thredds/dodsC/usgs/data0/rsignell/data/oceansites/OS_NTAS_2010_R_M-1.nc\"}";
+			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.VALIDATE_DATA_RESOURCE, ooi_id, "0");
+			printStream.println("VALIDATE_DATA_RESOURCE");
+			printStream.println("  request: " + requestJsonString);
+			printStream.println("  reply: " + replyJsonString);
+			if (ais.getStatus() != 200) {
+				printStream.println("  error string: " + ais.getErrorMessage());
+			}
+			assertTrue(ais.getStatus() == 200);
+			assertTrue(replyJsonString.startsWith("{\"dataResourceSummary\": "));
+			
+			// Validate data resource fail case
+			requestJsonString = "{\"data_resource_url\": \"http://hfrnet.ucsd.edu:8080/thredds/dodsC/HFRNet/USEGC/6km/hourly/RTV\"}";
+			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.VALIDATE_DATA_RESOURCE, ooi_id, "0");
+			printStream.println("VALIDATE_DATA_RESOURCE");
+			printStream.println("  request: " + requestJsonString);
+			printStream.println("  reply: " + ais.getErrorMessage());
+			assertTrue(ais.getStatus() == 500);
+			assertTrue(ais.getErrorMessage().startsWith("{\"error_num\": 500,\"error_str\":"));
+
 			// Create data resource
-			requestJsonString = "{\"user_id\": \"" + ooi_id + "\",\"source_type\": 1,\"request_type\": 1, \"ion_title\": \"ion_title\",\"ion_description\": \"ion_description\", \"ion_institution_id\": \"ion_institution_id\",\"base_url\": \"http://foo\"}";
+			requestJsonString = "{\"user_id\": \"" + ooi_id + "\",\"source_type\": 1,\"request_type\": 1, \"ion_title\": \"ion_title\",\"ion_description\": \"ion_description\", \"ion_institution_id\": \"ion_institution_id\",\"base_url\": \"http://foo\",\"is_public\":true}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.CREATE_DATA_RESOURCE, ooi_id, "0");
 			printStream.println("CREATE_DATA_RESOURCE");
 			printStream.println("  request: " + requestJsonString);
@@ -353,7 +375,7 @@ public class TestAppIntegrationService extends TestCase {
 			assertTrue(ais.getStatus() == 200);
 			assertTrue(replyJsonString.startsWith("{\"column_names\": ["));
 
-			requestJsonString = "{\"ooi_id\": \"" + replyJsonString.substring(67, 103) + "\"}";
+			requestJsonString = "{\"ooi_id\": \"" + ooi_id + "\"}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_RESOURCE, ooi_id, "0");
 			printStream.println("GET_RESOURCE: identities");
 			printStream.println("  request: " + requestJsonString);
