@@ -8,11 +8,12 @@
     </path>
     <path id="runtime.classpath">
         <path refid="lib.path.id" />
-        <fileset dir="${build.dir}">
-            <exclude name="log4j.properties"/>
-        </fileset>
-<!--        <path location="${build.dir}/"/>-->
+        <path location="${build.dir}" />
     </path>
+    <path id="package.classpath">
+        <path refid="lib.path.id" />
+    </path>
+    
     
     <!-- ================================= 
           target: resolve
@@ -121,11 +122,11 @@
 		
 		<!-- Convert project class path to string property -->
         <pathconvert property="manifest.classpath" pathsep=" ">
-            <path refid="runtime.classpath"/>
+            <path refid="package.classpath"/>
             <mapper>
                 <chainedmapper>
                     <flattenmapper/>
-                    <globmapper from="*.jar" to="lib/*.jar"/>
+                    <!-- <globmapper from="*.jar" to="lib/*.jar"/>-->
                 </chainedmapper>
             </mapper>
         </pathconvert>
@@ -140,7 +141,7 @@
             <attribute name="Main-Class" value="${runtime.main.class}"/>
             <attribute name="Implementation-Version" value="${version}"/>   
             <attribute name="Built-Date" value="${TODAY}"/>
-            <attribute name="Class-Path" value="${manifest.classpath}" />
+            <attribute name="Class-Path" value=". ${manifest.classpath}" />
         </manifest>
 
 	    <!-- Create JAR file with library classes, tests and example code -->

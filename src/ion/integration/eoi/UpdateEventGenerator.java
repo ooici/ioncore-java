@@ -28,7 +28,6 @@ public class UpdateEventGenerator {
     private static final Logger log = LoggerFactory.getLogger(UpdateEventGenerator.class);
 
     public static void main(String[] args) throws IOException {
-        args = new String[]{"3319A67F-81F3-424F-8E69-4F28C4E04808"};
 
         generateUpdateEvent(args);
 
@@ -36,8 +35,8 @@ public class UpdateEventGenerator {
 
     private static void generateUpdateEvent(String[] args) throws IOException {
         if (args.length < 1) {
-            log.error("Must provide at least 1 argument");
-            System.out.println(usageString());
+            log.info("Must provide at least 1 argument");
+            log.info(usageString());
             System.exit(1);
         }
         String connInfoPath = null;
@@ -52,9 +51,11 @@ public class UpdateEventGenerator {
 
         java.util.HashMap<String, String> connInfo = null;
         try {
-            java.io.File propsFile = new java.io.File(connInfoPath);
-            if (connInfoPath != null && propsFile.exists()) {
-                connInfo = IonUtils.parseProperties(propsFile);
+            if (connInfoPath != null) {
+                java.io.File propsFile = new java.io.File(connInfoPath);
+                if (propsFile.exists()) {
+                    connInfo = IonUtils.parseProperties(propsFile);
+                }
             } else {
                 connInfo = IonUtils.parseProperties();
             }
@@ -72,7 +73,9 @@ public class UpdateEventGenerator {
         String ooiciSysname = connInfo.get("sysname");
         String ooiciTopic = connInfo.get("update_event_topic");
 
-        log.error("Connection Parameters:: host={} : xp={} : topic={} : sysname={}", new Object[]{ooiciHost, ooiciExchange, ooiciTopic, ooiciSysname});
+        if(log.isDebugEnabled()) {
+            log.debug("Connection Parameters:: host={} : xp={} : topic={} : sysname={}", new Object[]{ooiciHost, ooiciExchange, ooiciTopic, ooiciSysname});
+        }
 
         MsgBrokerClient mainBroker = null;
         try {
@@ -88,7 +91,9 @@ public class UpdateEventGenerator {
             mainBroker.bindQueue(mainQueue, ooiMyName, null);
             mainBroker.attachConsumer(mainQueue);
 
-            log.error("MainBroker || binding_key={} : to_name={} : queue_name = {}", new Object[]{ooiMyName, ooiToName, mainQueue});
+            if(log.isDebugEnabled()) {
+                log.debug("MainBroker || binding_key={} : to_name={} : queue_name = {}", new Object[]{ooiMyName, ooiToName, mainQueue});
+            }
 
 //            net.ooici.services.dm.Event.ResourceModificationEventMessage.Builder resModBldr = net.ooici.services.dm.Event.ResourceModificationEventMessage.newBuilder();
 //            net.ooici.core.link.Link.IDRef idRef = net.ooici.core.link.Link.IDRef.newBuilder().setKey(dsResourceId).build();
@@ -137,7 +142,9 @@ public class UpdateEventGenerator {
 
             Container.Structure struct = structBldr.build();
             GPBWrapper structWrap = GPBWrapper.Factory(struct);
-            System.out.println(structWrap);
+            if(log.isDebugEnabled()) {
+                log.debug(structWrap.toString());
+            }
 
             IonMessage sendMessage = mainBroker.createMessage(ooiMyName, ooiToName, "", struct.toByteArray());
             sendMessage.getIonHeaders().put("encoding", "ION R1 GPB");
@@ -146,6 +153,8 @@ public class UpdateEventGenerator {
             sendMessage.getIonHeaders().put("performative", "request");
             mainBroker.sendMessage(sendMessage);
 
+            log.info("Successfully sent an update event for dataset_id={} to binding={}", dsResourceId, ooiToName);
+            
             System.exit(0);
         } finally {
             if (mainBroker != null) {
