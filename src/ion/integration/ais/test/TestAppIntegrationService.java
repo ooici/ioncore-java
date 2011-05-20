@@ -24,11 +24,13 @@ public class TestAppIntegrationService extends TestCase {
 	private String HOSTNAME_KEY = "ion.host";
 	private String PORTNUMBER_KEY = "ion.port";
 	private String EXCHANGE_KEY = "ion.exchange";
+	private String RUN_INSTRUMENT_TESTS_KEY = "ion.runInstrumentTests";
 
 	private String SYSNAME_DEFAULT = "sysName-UNIQUE";
 	private String HOSTNAME_DEFAULT = "localhost";
 	private int PORTNUMBER_DEFAULT = AMQP.PROTOCOL.PORT;
 	private String EXCHANGE_DEFAULT = "magnet.topic";
+	private boolean runInstrumentTests = false;
 
 	private AppIntegrationService ais;
 
@@ -94,6 +96,7 @@ public class TestAppIntegrationService extends TestCase {
 		String hostName = (propertyMap != null && propertyMap.get(HOSTNAME_KEY) != null) ? propertyMap.get(HOSTNAME_KEY) : HOSTNAME_DEFAULT;
 		int portNumber = (propertyMap != null && propertyMap.get(PORTNUMBER_KEY) != null) ? new Integer(propertyMap.get(PORTNUMBER_KEY)) : PORTNUMBER_DEFAULT;
 		String exchange = (propertyMap != null && propertyMap.get(EXCHANGE_KEY) != null) ? propertyMap.get(EXCHANGE_KEY) : EXCHANGE_DEFAULT;
+		runInstrumentTests = (propertyMap != null && propertyMap.get(RUN_INSTRUMENT_TESTS_KEY) != null) ? Boolean.getBoolean(propertyMap.get(RUN_INSTRUMENT_TESTS_KEY)) : false;
 		
 		System.out.println("Connecting to " + hostName + ":" + portNumber + ":" + exchange + ":" + sysName);
 
@@ -141,92 +144,101 @@ public class TestAppIntegrationService extends TestCase {
 			JSONObject registerUserResp = (JSONObject)JSONValue.parse(replyJsonString);
 			String ooi_id = registerUserResp.get("ooi_id").toString();
 
-//			// create instrument
-//			requestJsonString = "{\"name\": \"SeaBird SBE37\",\"description\": \"SeaBird Sensor\", \"manufacturer\": \"SeaBird Electronics\", \"model\": \"SBE37\", \"serial_num\": \"123ABC\",\"fw_version\": \"1.0\"}";
-//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.CREATE_INSTRUMENT, ooi_id, "0");
-//			printStream.println("CREATE_INSTRUMENT");
-//			printStream.println("  request: " + requestJsonString);
-//			printStream.println("  reply: " + replyJsonString);
-//			if (ais.getStatus() != 200) {
-//				printStream.println("  error string: " + ais.getErrorMessage());
-//			}
-//			assertTrue(ais.getStatus() == 200);
-//			assertTrue(replyJsonString.startsWith("{\"instrument_resource_id\": "));
-//
-//			JSONObject createInstrumentResp = (JSONObject)JSONValue.parse(replyJsonString);
-//			String instrument_resource_id = createInstrumentResp.get("instrument_resource_id").toString();
-//
-//			// start instrument agent
-//			requestJsonString = "{\"name\": \"SeaBird SBE37\", \"model\": \"SBE37\", \"instrument_resource_id\": \"" + instrument_resource_id + "\"}";
-//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.START_INSTRUMENT_AGENT, ooi_id, "0");
-//			printStream.println("START_INSTRUMENT_AGENT");
-//			printStream.println("  request: " + requestJsonString);
-//			printStream.println("  reply: " + replyJsonString);
-//			if (ais.getStatus() != 200) {
-//				printStream.println("  error string: " + ais.getErrorMessage());
-//			}
-//			assertTrue(ais.getStatus() == 200);
-//			assertTrue(replyJsonString.startsWith("{\"instrument_resource_id\": "));
-//
-//			// get instrument list
-//			requestJsonString = "{}";
-//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_INSTRUMENT_LIST, ooi_id, "0");
-//			printStream.println("GET_INSTRUMENT_LIST");
-//			printStream.println("  request: " + requestJsonString);
-//			printStream.println("  reply: " + replyJsonString);
-//			if (ais.getStatus() != 200) {
-//				printStream.println("  error string: " + ais.getErrorMessage());
-//			}
-//			assertTrue(ais.getStatus() == 200);
-//			assertTrue(replyJsonString.startsWith("{\"result\": "));
-//
-//			// start instrument sampling
-//			requestJsonString = "{\"instrument_resource_id\": \"" + instrument_resource_id + "\"}";
-//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.START_INSTRUMENT_SAMPLING, ooi_id, "0");
-//			printStream.println("START_INSTRUMENT_SAMPLING");
-//			printStream.println("  request: " + requestJsonString);
-//			printStream.println("  reply: " + replyJsonString);
-//			if (ais.getStatus() != 200) {
-//				printStream.println("  error string: " + ais.getErrorMessage());
-//			}
-//			assertTrue(ais.getStatus() == 200);
-//			assertTrue(replyJsonString.startsWith("{\"result\": "));
-//
-//			// stop instrument sampling
-//			requestJsonString = "{\"instrument_resource_id\": \"" + instrument_resource_id + "\"}";
-//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.STOP_INSTRUMENT_SAMPLING, ooi_id, "0");
-//			printStream.println("STOP_INSTRUMENT_SAMPLING");
-//			printStream.println("  request: " + requestJsonString);
-//			printStream.println("  reply: " + replyJsonString);
-//			if (ais.getStatus() != 200) {
-//				printStream.println("  error string: " + ais.getErrorMessage());
-//			}
-//			assertTrue(ais.getStatus() == 200);
-//			assertTrue(replyJsonString.startsWith("{\"result\": "));
-//
-//			// get instrument state
-//			requestJsonString = "{\"instrument_resource_id\": \"" + instrument_resource_id + "\"}";
-//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_INSTRUMENT_STATE, ooi_id, "0");
-//			printStream.println("GET_INSTRUMENT_STATE");
-//			printStream.println("  request: " + requestJsonString);
-//			printStream.println("  reply: " + replyJsonString);
-//			if (ais.getStatus() != 200) {
-//				printStream.println("  error string: " + ais.getErrorMessage());
-//			}
-//			assertTrue(ais.getStatus() == 200);
-//			assertTrue(replyJsonString.startsWith("{\"result\": "));
-//
-//			// set instrument state
-//			requestJsonString = "{\"instrument_resource_id\": \"" + instrument_resource_id + "\"}";
-//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.SET_INSTRUMENT_STATE, ooi_id, "0");
-//			printStream.println("SET_INSTRUMENT_STATE");
-//			printStream.println("  request: " + requestJsonString);
-//			printStream.println("  reply: " + replyJsonString);
-//			if (ais.getStatus() != 200) {
-//				printStream.println("  error string: " + ais.getErrorMessage());
-//			}
-//			assertTrue(ais.getStatus() == 200);
-//			assertTrue(replyJsonString.startsWith("{\"result\": "));
+			if (runInstrumentTests) {
+				// create instrument
+				requestJsonString = "{\"name\": \"SeaBird SBE37\",\"description\": \"SeaBird Sensor\", \"manufacturer\": \"SeaBird Electronics\", \"model\": \"SBE37\", \"serial_num\": \"123ABC\",\"fw_version\": \"1.0\"}";
+				replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.CREATE_INSTRUMENT, ooi_id, "0");
+				printStream.println("CREATE_INSTRUMENT");
+				printStream.println("  request: " + requestJsonString);
+				printStream.println("  reply: " + replyJsonString);
+				if (ais.getStatus() != 200) {
+					printStream.println("  error string: " + ais.getErrorMessage());
+				}
+				assertTrue(ais.getStatus() == 200);
+				assertTrue(replyJsonString.startsWith("{\"instrument_resource_id\": "));
+
+				JSONObject createInstrumentResp = (JSONObject)JSONValue.parse(replyJsonString);
+				String instrument_resource_id = createInstrumentResp.get("instrument_resource_id").toString();
+
+				// start instrument agent
+				requestJsonString = "{\"name\": \"SeaBird Electronics\", \"model\": \"SBE37\", \"instrument_resource_id\": \"" + instrument_resource_id + "\"}";
+				replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.START_INSTRUMENT_AGENT, ooi_id, "0");
+				printStream.println("START_INSTRUMENT_AGENT");
+				printStream.println("  request: " + requestJsonString);
+				printStream.println("  reply: " + replyJsonString);
+				if (ais.getStatus() != 200) {
+					printStream.println("  error string: " + ais.getErrorMessage());
+				}
+				assertTrue(ais.getStatus() == 200);
+				assertTrue(replyJsonString.startsWith("{\"instrument_agent_resource_id\": "));
+
+				// get instrument list
+				requestJsonString = "{}";
+				replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_INSTRUMENT_LIST, ooi_id, "0");
+				printStream.println("GET_INSTRUMENT_LIST");
+				printStream.println("  request: " + requestJsonString);
+				printStream.println("  reply: " + replyJsonString);
+				if (ais.getStatus() != 200) {
+					printStream.println("  error string: " + ais.getErrorMessage());
+				}
+				assertTrue(ais.getStatus() == 200);
+				assertTrue(replyJsonString.startsWith("{\"instrument_metadata\": "));
+
+				// start instrument sampling
+				requestJsonString = "{\"instrument_resource_id\": \"" + instrument_resource_id + "\"}";
+				replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.START_INSTRUMENT_SAMPLING, ooi_id, "0");
+				printStream.println("START_INSTRUMENT_SAMPLING");
+				printStream.println("  request: " + requestJsonString);
+				printStream.println("  reply: " + replyJsonString);
+				if (ais.getStatus() != 200) {
+					printStream.println("  error string: " + ais.getErrorMessage());
+				}
+				assertTrue(ais.getStatus() == 200);
+				assertTrue(replyJsonString.equals("{\"status\": \"OK\"}"));
+
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				// stop instrument sampling
+				requestJsonString = "{\"instrument_resource_id\": \"" + instrument_resource_id + "\"}";
+				replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.STOP_INSTRUMENT_SAMPLING, ooi_id, "0");
+				printStream.println("STOP_INSTRUMENT_SAMPLING");
+				printStream.println("  request: " + requestJsonString);
+				printStream.println("  reply: " + replyJsonString);
+				if (ais.getStatus() != 200) {
+					printStream.println("  error string: " + ais.getErrorMessage());
+				}
+				assertTrue(ais.getStatus() == 200);
+				assertTrue(replyJsonString.equals("{\"status\": \"OK\"}"));
+
+				// get instrument state
+				requestJsonString = "{\"instrument_resource_id\": \"" + instrument_resource_id + "\"}";
+				replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_INSTRUMENT_STATE, ooi_id, "0");
+				printStream.println("GET_INSTRUMENT_STATE");
+				printStream.println("  request: " + requestJsonString);
+				printStream.println("  reply: " + replyJsonString);
+				if (ais.getStatus() != 200) {
+					printStream.println("  error string: " + ais.getErrorMessage());
+				}
+				assertTrue(ais.getStatus() == 200);
+				assertTrue(replyJsonString.startsWith("{\"properties\": "));
+
+				// set instrument state
+				requestJsonString = "{\"instrument_resource_id\": \"" + instrument_resource_id + "\", \"properties\": {\"navg\": 1,\"interval\": 5,\"outputsv\": true,\"outputsal\": true,\"txrealtime\": true,\"storetime\": true}}";
+				replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.SET_INSTRUMENT_STATE, ooi_id, "0");
+				printStream.println("SET_INSTRUMENT_STATE");
+				printStream.println("  request: " + requestJsonString);
+				printStream.println("  reply: " + replyJsonString);
+				if (ais.getStatus() != 200) {
+					printStream.println("  error string: " + ais.getErrorMessage());
+				}
+				assertTrue(ais.getStatus() == 200);
+				assertTrue(replyJsonString.equals("{\"status\": \"OK\"}"));
+			}
 
 			// Update user profile
 			requestJsonString = "{\"user_ooi_id\": \"" + ooi_id + "\",\"name\": \"MyOOICI\",\"institution\": \"OOICI\",\"email_address\": \"myooici@gmail.com\", \"profile\": [{\"name\": \"mobile\",\"value\": \"555-555-5555\"}]}";
@@ -253,7 +265,7 @@ public class TestAppIntegrationService extends TestCase {
 			assertTrue(replyJsonString.startsWith("{\"name\": \"MyOOICI\",\"institution\": \"OOICI\",\"email_address\": \"myooici@gmail.com\",\"authenticating_organization\": \"Google\",\"profile\": [{\"name\": \"mobile\",\"value\": \"555-555-5555\"}"));
 
 			// Get data resources
-			requestJsonString = "{}";
+			requestJsonString = "{\"user_ooi_id\": \"" + ooi_id + "\"}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.FIND_DATA_RESOURCES, ooi_id, "0");
 			printStream.println("FIND_DATA_RESOURCES");
 			printStream.println("  request: " + requestJsonString);
@@ -345,7 +357,7 @@ public class TestAppIntegrationService extends TestCase {
 			assertTrue(replyJsonString.equals("{\"success\": true}"));
 
 			// Delete subscription
-			requestJsonString = "{\"subscriptionInfo\": {\"user_ooi_id\": \"" + ooi_id + "\",\"data_src_id\": \"" + dataResourceId + "\",\"subscription_type\": \"EMAIL\", \"email_alerts_filter\": \"UPDATES\", \"dispatcher_alerts_filter\": \"UPDATES\",\"dispatcher_script_path\": \"newpath\"}}";
+			requestJsonString = "{\"subscriptions\": [{\"user_ooi_id\": \"" + ooi_id + "\",\"data_src_id\": \"" + dataResourceId + "\",\"subscription_type\": \"EMAIL\", \"email_alerts_filter\": \"UPDATES\", \"dispatcher_alerts_filter\": \"UPDATES\",\"dispatcher_script_path\": \"newpath\"}]}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.DELETE_DATA_RESOURCE_SUBSCRIPTION, ooi_id, "0");
 			printStream.println("DELETE_DATA_RESOURCE_SUBSCRIPTION");
 			printStream.println("  request: " + requestJsonString);
@@ -356,27 +368,27 @@ public class TestAppIntegrationService extends TestCase {
 			assertTrue(ais.getStatus() == 200);
 			assertTrue(replyJsonString.equals("{\"success\": true}"));
 
-			// Validate data resource good case
-			requestJsonString = "{\"data_resource_url\": \"http://geoport.whoi.edu/thredds/dodsC/usgs/data0/rsignell/data/oceansites/OS_WHOTS_2010_R_M-1.nc\"}";
-//			requestJsonString = "{\"data_resource_url\": \"http://geoport.whoi.edu/thredds/dodsC/usgs/data0/rsignell/data/oceansites/OS_NTAS_2010_R_M-1.nc\"}";
-			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.VALIDATE_DATA_RESOURCE, ooi_id, "0");
-			printStream.println("VALIDATE_DATA_RESOURCE");
-			printStream.println("  request: " + requestJsonString);
-			printStream.println("  reply: " + replyJsonString);
-			if (ais.getStatus() != 200) {
-				printStream.println("  error string: " + ais.getErrorMessage());
-			}
-			assertTrue(ais.getStatus() == 200);
-			assertTrue(replyJsonString.startsWith("{\"dataResourceSummary\": "));
-			
-			// Validate data resource fail case
-			requestJsonString = "{\"data_resource_url\": \"http://hfrnet.ucsd.edu:8080/thredds/dodsC/HFRNet/USEGC/6km/hourly/RTV\"}";
-			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.VALIDATE_DATA_RESOURCE, ooi_id, "0");
-			printStream.println("VALIDATE_DATA_RESOURCE");
-			printStream.println("  request: " + requestJsonString);
-			printStream.println("  reply: " + ais.getErrorMessage());
-			assertTrue(ais.getStatus() == 500);
-			assertTrue(ais.getErrorMessage().startsWith("{\"error_num\": 500,\"error_str\":"));
+//			// Validate data resource good case
+//			requestJsonString = "{\"data_resource_url\": \"http://geoport.whoi.edu/thredds/dodsC/usgs/data0/rsignell/data/oceansites/OS_WHOTS_2010_R_M-1.nc\"}";
+////			requestJsonString = "{\"data_resource_url\": \"http://geoport.whoi.edu/thredds/dodsC/usgs/data0/rsignell/data/oceansites/OS_NTAS_2010_R_M-1.nc\"}";
+//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.VALIDATE_DATA_RESOURCE, ooi_id, "0");
+//			printStream.println("VALIDATE_DATA_RESOURCE");
+//			printStream.println("  request: " + requestJsonString);
+//			printStream.println("  reply: " + replyJsonString);
+//			if (ais.getStatus() != 200) {
+//				printStream.println("  error string: " + ais.getErrorMessage());
+//			}
+//			assertTrue(ais.getStatus() == 200);
+//			assertTrue(replyJsonString.startsWith("{\"dataResourceSummary\": "));
+//			
+//			// Validate data resource fail case
+//			requestJsonString = "{\"data_resource_url\": \"http://hfrnet.ucsd.edu:8080/thredds/dodsC/HFRNet/USEGC/6km/hourly/RTV\"}";
+//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.VALIDATE_DATA_RESOURCE, ooi_id, "0");
+//			printStream.println("VALIDATE_DATA_RESOURCE");
+//			printStream.println("  request: " + requestJsonString);
+//			printStream.println("  reply: " + ais.getErrorMessage());
+//			assertTrue(ais.getStatus() == 500);
+//			assertTrue(ais.getErrorMessage().startsWith("{\"error_num\": 500,\"error_str\":"));
 
 			// Create data resource
 			requestJsonString = "{\"user_id\": \"" + ooi_id + "\",\"source_type\": 1,\"request_type\": 1, \"ion_title\": \"ion_title\",\"ion_description\": \"ion_description\", \"ion_institution_id\": \"ion_institution_id\",\"base_url\": \"http://foo\",\"is_public\":true}";
@@ -390,10 +402,12 @@ public class TestAppIntegrationService extends TestCase {
 			assertTrue(ais.getStatus() == 200);
 			assertTrue(replyJsonString.startsWith("{\"data_source_id\": "));
 			
-			String newDataSourceId = replyJsonString.substring(20,56);
+			// Grab stuff for use in later calls
+			JSONObject createDataResourceMsg = (JSONObject)JSONValue.parse(replyJsonString);
+			String dataSetID = (String)createDataResourceMsg.get("data_set_id");
 
 			// Update data resource
-			requestJsonString = "{\"user_id\": \"" + ooi_id + "\",\"data_source_resource_id\":\"" + newDataSourceId + "\",\"isPublic\":true,\"max_ingest_millis\": 1,\"update_start_datetime_millis\": 1,\"update_interval_seconds\": 1,\"ion_title\": \"ion_title\",\"ion_description\": \"ion_description\"}";
+			requestJsonString = "{\"user_id\": \"" + ooi_id + "\",\"data_set_resource_id\":\"" + dataSetID + "\",\"isPublic\":true,\"max_ingest_millis\": 1,\"update_start_datetime_millis\": 1,\"update_interval_seconds\": 1,\"ion_title\": \"ion_title\",\"ion_description\": \"ion_description\"}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.UPDATE_DATA_RESOURCE, ooi_id, "0");
 			printStream.println("UPDATE_DATA_RESOURCE");
 			printStream.println("  request: " + requestJsonString);
@@ -405,7 +419,7 @@ public class TestAppIntegrationService extends TestCase {
 			assertTrue(replyJsonString.equals("{\"success\": true}"));
 
 			// Delete data resource
-			requestJsonString = "{\"data_source_resource_id\":\"" + newDataSourceId + "\"}";
+			requestJsonString = "{\"data_set_resource_id\":\"" + dataSetID + "\"}";
 			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.DELETE_DATA_RESOURCE, ooi_id, "0");
 			printStream.println("DELETE_DATA_RESOURCE");
 			printStream.println("  request: " + requestJsonString);
