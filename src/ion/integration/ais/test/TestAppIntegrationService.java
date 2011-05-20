@@ -10,11 +10,11 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
 
+import junit.framework.TestCase;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-
-import junit.framework.TestCase;
 
 import com.rabbitmq.client.AMQP;
 
@@ -140,6 +140,93 @@ public class TestAppIntegrationService extends TestCase {
 
 			JSONObject registerUserResp = (JSONObject)JSONValue.parse(replyJsonString);
 			String ooi_id = registerUserResp.get("ooi_id").toString();
+
+//			// create instrument
+//			requestJsonString = "{\"name\": \"SeaBird SBE37\",\"description\": \"SeaBird Sensor\", \"manufacturer\": \"SeaBird Electronics\", \"model\": \"SBE37\", \"serial_num\": \"123ABC\",\"fw_version\": \"1.0\"}";
+//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.CREATE_INSTRUMENT, ooi_id, "0");
+//			printStream.println("CREATE_INSTRUMENT");
+//			printStream.println("  request: " + requestJsonString);
+//			printStream.println("  reply: " + replyJsonString);
+//			if (ais.getStatus() != 200) {
+//				printStream.println("  error string: " + ais.getErrorMessage());
+//			}
+//			assertTrue(ais.getStatus() == 200);
+//			assertTrue(replyJsonString.startsWith("{\"instrument_resource_id\": "));
+//
+//			JSONObject createInstrumentResp = (JSONObject)JSONValue.parse(replyJsonString);
+//			String instrument_resource_id = createInstrumentResp.get("instrument_resource_id").toString();
+//
+//			// start instrument agent
+//			requestJsonString = "{\"name\": \"SeaBird SBE37\", \"model\": \"SBE37\", \"instrument_resource_id\": \"" + instrument_resource_id + "\"}";
+//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.START_INSTRUMENT_AGENT, ooi_id, "0");
+//			printStream.println("START_INSTRUMENT_AGENT");
+//			printStream.println("  request: " + requestJsonString);
+//			printStream.println("  reply: " + replyJsonString);
+//			if (ais.getStatus() != 200) {
+//				printStream.println("  error string: " + ais.getErrorMessage());
+//			}
+//			assertTrue(ais.getStatus() == 200);
+//			assertTrue(replyJsonString.startsWith("{\"instrument_resource_id\": "));
+//
+//			// get instrument list
+//			requestJsonString = "{}";
+//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_INSTRUMENT_LIST, ooi_id, "0");
+//			printStream.println("GET_INSTRUMENT_LIST");
+//			printStream.println("  request: " + requestJsonString);
+//			printStream.println("  reply: " + replyJsonString);
+//			if (ais.getStatus() != 200) {
+//				printStream.println("  error string: " + ais.getErrorMessage());
+//			}
+//			assertTrue(ais.getStatus() == 200);
+//			assertTrue(replyJsonString.startsWith("{\"result\": "));
+//
+//			// start instrument sampling
+//			requestJsonString = "{\"instrument_resource_id\": \"" + instrument_resource_id + "\"}";
+//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.START_INSTRUMENT_SAMPLING, ooi_id, "0");
+//			printStream.println("START_INSTRUMENT_SAMPLING");
+//			printStream.println("  request: " + requestJsonString);
+//			printStream.println("  reply: " + replyJsonString);
+//			if (ais.getStatus() != 200) {
+//				printStream.println("  error string: " + ais.getErrorMessage());
+//			}
+//			assertTrue(ais.getStatus() == 200);
+//			assertTrue(replyJsonString.startsWith("{\"result\": "));
+//
+//			// stop instrument sampling
+//			requestJsonString = "{\"instrument_resource_id\": \"" + instrument_resource_id + "\"}";
+//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.STOP_INSTRUMENT_SAMPLING, ooi_id, "0");
+//			printStream.println("STOP_INSTRUMENT_SAMPLING");
+//			printStream.println("  request: " + requestJsonString);
+//			printStream.println("  reply: " + replyJsonString);
+//			if (ais.getStatus() != 200) {
+//				printStream.println("  error string: " + ais.getErrorMessage());
+//			}
+//			assertTrue(ais.getStatus() == 200);
+//			assertTrue(replyJsonString.startsWith("{\"result\": "));
+//
+//			// get instrument state
+//			requestJsonString = "{\"instrument_resource_id\": \"" + instrument_resource_id + "\"}";
+//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_INSTRUMENT_STATE, ooi_id, "0");
+//			printStream.println("GET_INSTRUMENT_STATE");
+//			printStream.println("  request: " + requestJsonString);
+//			printStream.println("  reply: " + replyJsonString);
+//			if (ais.getStatus() != 200) {
+//				printStream.println("  error string: " + ais.getErrorMessage());
+//			}
+//			assertTrue(ais.getStatus() == 200);
+//			assertTrue(replyJsonString.startsWith("{\"result\": "));
+//
+//			// set instrument state
+//			requestJsonString = "{\"instrument_resource_id\": \"" + instrument_resource_id + "\"}";
+//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.SET_INSTRUMENT_STATE, ooi_id, "0");
+//			printStream.println("SET_INSTRUMENT_STATE");
+//			printStream.println("  request: " + requestJsonString);
+//			printStream.println("  reply: " + replyJsonString);
+//			if (ais.getStatus() != 200) {
+//				printStream.println("  error string: " + ais.getErrorMessage());
+//			}
+//			assertTrue(ais.getStatus() == 200);
+//			assertTrue(replyJsonString.startsWith("{\"result\": "));
 
 			// Update user profile
 			requestJsonString = "{\"user_ooi_id\": \"" + ooi_id + "\",\"name\": \"MyOOICI\",\"institution\": \"OOICI\",\"email_address\": \"myooici@gmail.com\", \"profile\": [{\"name\": \"mobile\",\"value\": \"555-555-5555\"}]}";
@@ -418,14 +505,14 @@ public class TestAppIntegrationService extends TestCase {
 			}
 			assertTrue(ais.getStatus() == 200);
 			assertTrue(replyJsonString.startsWith("{\"column_names\": ["));
-//
-//			requestJsonString = "{\"ooi_id\": \"" + replyJsonString.substring(65, 101) + "\"}";
-//			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_RESOURCE, ooi_id, "0");
-//			assertTrue(replyJsonString.startsWith("{\"resource\": ["));
-//			assertTrue(ais.getStatus() == 200);
-//			printStream.println("GET_RESOURCE: epucontrollers");
-//			printStream.println("  request: " + requestJsonString);
-//			printStream.println("  reply: " + replyJsonString);
+
+			requestJsonString = "{\"ooi_id\": \"" + ooi_id + "\"}";
+			replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_RESOURCE, ooi_id, "0");
+			assertTrue(replyJsonString.startsWith("{\"resource\": ["));
+			assertTrue(ais.getStatus() == 200);
+			printStream.println("GET_RESOURCE: epucontrollers");
+			printStream.println("  request: " + requestJsonString);
+			printStream.println("  reply: " + replyJsonString);
 
 			out.close();
 		} catch (FileNotFoundException e) {
