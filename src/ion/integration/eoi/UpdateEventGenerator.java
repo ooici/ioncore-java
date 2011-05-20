@@ -28,7 +28,7 @@ public class UpdateEventGenerator {
     private static final Logger log = LoggerFactory.getLogger(UpdateEventGenerator.class);
 
     public static void main(String[] args) throws IOException {
-        
+
         generateUpdateEvent(args);
 
     }
@@ -51,9 +51,11 @@ public class UpdateEventGenerator {
 
         java.util.HashMap<String, String> connInfo = null;
         try {
-            java.io.File propsFile = new java.io.File(connInfoPath);
-            if (connInfoPath != null && propsFile.exists()) {
-                connInfo = IonUtils.parseProperties(propsFile);
+            if (connInfoPath != null) {
+                java.io.File propsFile = new java.io.File(connInfoPath);
+                if (propsFile.exists()) {
+                    connInfo = IonUtils.parseProperties(propsFile);
+                }
             } else {
                 connInfo = IonUtils.parseProperties();
             }
