@@ -2,14 +2,18 @@ package ion.integration.ais;
 
 import ion.core.BaseProcess;
 import ion.core.IonBootstrap;
+import ion.core.IonException;
 import ion.core.messaging.IonMessage;
 import ion.core.messaging.MessagingName;
 import ion.core.messaging.MsgBrokerClient;
 import ion.core.utils.GPBWrapper;
+import ion.core.utils.IonConstants;
+import ion.core.utils.IonUtils;
 import ion.core.utils.ProtoUtils;
 import ion.core.utils.StructureManager;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -240,8 +244,41 @@ public class AppIntegrationService {
     }
 
     /**
-     * Constructor taking the full set of parameters required to target
-     * requests to the Application Integration Service running in a specific
+     * Default constructor which relies on the MsgBrokerClient constructor
+     * to lookup the connection parameters.
+     */
+	public AppIntegrationService() {
+		String sysName = System.getProperty(IonConstants.SYSNAME_KEY, IonConstants.SYSNAME_DEFAULT);
+
+		msgBrokerClient = new MsgBrokerClient();
+		msgBrokerClient.attach();
+		baseProcess = new BaseProcess(msgBrokerClient);
+		baseProcess.spawn();
+		createMessagingNames(sysName);
+	}
+
+    /**
+     * Constructor which relies on the MsgBrokerClient constructor
+     * to lookup the connection parameters but allows the overriding
+     * of the sysname.
+     * 
+     * @param sysName system name under which the ION Core Python capability container is
+     * running
+     */
+	public AppIntegrationService(String sysName) {
+		msgBrokerClient = new MsgBrokerClient();
+		msgBrokerClient.attach();
+		
+		System.out.println("Connected to host: " + msgBrokerClient.toString());
+
+		baseProcess = new BaseProcess(msgBrokerClient);
+		baseProcess.spawn();
+		createMessagingNames(sysName);
+	}
+
+    /**
+     * Constructor taking all parameters minus user name and password required to
+     * target requests to the Application Integration Service running in a specific
      * capability container with topic being hosted on a specific node.
      * 
      * @param sysName system name under which the ION Core Python capability container is
@@ -252,6 +289,27 @@ public class AppIntegrationService {
      */
 	public AppIntegrationService(String sysName, String hostName, int portNumber, String exchange) {
 		msgBrokerClient = new MsgBrokerClient(hostName, portNumber, exchange);
+		msgBrokerClient.attach();
+		baseProcess = new BaseProcess(msgBrokerClient);
+		baseProcess.spawn();
+		createMessagingNames(sysName);
+	}
+
+    /**
+     * Constructor taking the full set of parameters required to target
+     * requests to the Application Integration Service running in a specific
+     * capability container with topic being hosted on a specific node.
+     * 
+     * @param sysName system name under which the ION Core Python capability container is
+     * running
+     * @param hostName machine hosting the broker
+     * @param portNumber port number of the broker
+     * @param username Rabbit MQ user name
+     * @param password Rabbit MQ password
+     * @param exchange name of the exchange being hosted by the broker
+     */
+	public AppIntegrationService(String sysName, String hostName, int portNumber, String username, String password, String exchange) {
+		msgBrokerClient = new MsgBrokerClient(hostName, portNumber, username, password, exchange);
 		msgBrokerClient.attach();
 		baseProcess = new BaseProcess(msgBrokerClient);
 		baseProcess.spawn();
@@ -404,7 +462,6 @@ public class AppIntegrationService {
 
     		// Copy Json into GPB
     		JsonFormat.merge(jsonRequest, builder);
-    		System.out.println("builder: " + builder);
     		
     		return (GeneratedMessage)builder.build();
     	} catch(Exception e) {
@@ -630,16 +687,12 @@ public class AppIntegrationService {
 						}
 						assert (found);
 					}
-					if (inputParam[0] == null) {
-						System.out.println("HERE");
-					}
 					methods[j].invoke(builder, inputParam);
 				}
 			}
 			else if (methods[j].getName().startsWith("add") && (!methods[j].getName().startsWith("addAll"))) {
 				Class[] parameters = methods[j].getParameterTypes();
 				if (parameters.length == 1) {
-					System.out.println("Simple name: " + parameters[0].getSimpleName());
 					if (parameters[0].getSimpleName().equals("Builder")) {
 						Object[] inputParam = new Object[1];
 						Class inputParamClazz = (Class)parameters[0];
@@ -661,7 +714,7 @@ public class AppIntegrationService {
      * @param args
      */
 	public static void main(String[] args) {
-		AppIntegrationService ais = new AppIntegrationService("Tom", "localhost", AMQP.PROTOCOL.PORT, "magnet.topic");
+		AppIntegrationService ais = new AppIntegrationService();
 
 		ArrayList<String> requestMessages = new ArrayList<String>();
 		ArrayList<String> responseMessages = new ArrayList<String>();
@@ -676,7 +729,6 @@ public class AppIntegrationService {
 					requestMsgString = JsonFormat.printToString(builder.build());
 				}
 				requestMessages.add(requestMsgString);
-				System.out.println("JSON Request for " + requestTypeArray[i] + ": <" + requestMsgString + ">");
 			}
 
 			for (int i = 0; i < requestTypeArray.length; i++) {
@@ -697,7 +749,6 @@ public class AppIntegrationService {
 					}
 				}
 				responseMessages.add(responseMsgString);
-				System.out.println("JSON Response for " + requestTypeArray[i] + ": <" + responseMsgString + ">");
 			}
 
 			FileOutputStream out;
