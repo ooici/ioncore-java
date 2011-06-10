@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,7 +35,7 @@ import org.slf4j.LoggerFactory;
 public class DataResourceBuilder {
 
     private static final Logger log = LoggerFactory.getLogger(DataResourceBuilder.class);
-    
+
     public static Container.Structure getDataResourceCreateRequestStructure(String filePath, final StringBuilder sb) throws FileNotFoundException, IOException, Exception {
         File infile = new File(filePath);
         if (!infile.exists()) {
@@ -43,6 +45,7 @@ public class DataResourceBuilder {
         Container.Structure struct = null;
         GPBWrapper<DataSource.ThreddsAuthentication> tdsWrap = null;
         GPBWrapper<DataSource.SearchPattern> srchWrap = null;
+        List<GPBWrapper<DataSource.SubRange>> subRngList = new ArrayList<GPBWrapper<DataSource.SubRange>>();
         ManageDataResource.DataResourceCreateRequest.Builder dscrBldr = null;
 
         String fileContent = readFile(infile.getCanonicalPath());
@@ -61,6 +64,9 @@ public class DataResourceBuilder {
                 case 4505://SearchPattern
                     srchWrap = GPBWrapper.Factory((DataSource.SearchPattern) IonUtils.convertJsonToGPB(json, resId));
                     break;
+                case 4506://SubRange - can be repeated
+                    subRngList.add(GPBWrapper.Factory((DataSource.SubRange) IonUtils.convertJsonToGPB(json, resId)));
+                    break;
             }
         }
         if (dscrBldr != null) {
@@ -73,10 +79,15 @@ public class DataResourceBuilder {
                 dscrBldr.setSearchPattern(srchWrap.getCASRef());
                 ProtoUtils.addStructureElementToStructureBuilder(sbldr, srchWrap.getStructureElement());
             }
-            
+            if (!subRngList.isEmpty()) {
+                for(GPBWrapper<DataSource.SubRange> rng : subRngList) {
+                    dscrBldr.addSubRanges(rng.getObjectValue());
+                }
+            }
+
             /* Set the update_start_datetime_millis field to now */
             dscrBldr.setUpdateStartDatetimeMillis(IonTime.now().getMillis());
-            
+
             GPBWrapper<ManageDataResource.DataResourceCreateRequest> dscrWrap = GPBWrapper.Factory(dscrBldr.build());
             log.debug(dscrWrap.toString());
             String nl = System.getProperty("line.separator");
@@ -87,7 +98,7 @@ public class DataResourceBuilder {
             GPBWrapper<AisRequestResponse.ApplicationIntegrationServiceRequestMsg> aisReqMsgWrap = GPBWrapper.Factory(AisRequestResponse.ApplicationIntegrationServiceRequestMsg.newBuilder().setMessageParametersReference(dscrWrap.getCASRef()).build());
             log.debug(aisReqMsgWrap.toString());
             ProtoUtils.addStructureElementToStructureBuilder(sbldr, aisReqMsgWrap.getStructureElement());
-            
+
             IonMessage.IonMsg ionMsg = IonMessage.IonMsg.newBuilder().setIdentity(UUID.randomUUID().toString()).setMessageObject(aisReqMsgWrap.getCASRef()).build();
             ProtoUtils.addStructureElementToStructureBuilder(sbldr, GPBWrapper.Factory(ionMsg).getStructureElement(), true);
 

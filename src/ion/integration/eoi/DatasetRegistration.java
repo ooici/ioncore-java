@@ -99,7 +99,7 @@ public class DatasetRegistration {
                 try {
                     mainBroker.attach();
                     if (log.isDebugEnabled()) {
-                        log.debug("Main Broker Attached:: myBindingKey={}", ooiMyName.toString());
+                        log.debug("Broker Attached:: myBindingKey={}", ooiMyName.toString());
                     }
                 } catch (IonException ex) {
                     throw new IOException("Error opening file: Could not connect to broker", ex);
@@ -192,7 +192,7 @@ public class DatasetRegistration {
         } finally {
             if (mainBroker != null) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Data Broker Detached");
+                    log.debug("Broker Detached");
                 }
                 mainBroker.detach();
                 mainBroker = null;
