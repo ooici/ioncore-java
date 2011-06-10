@@ -51,12 +51,10 @@ public class MsgBrokerClient {
      * @param ionExchange The RabbitMQ exchange name
      */
     public MsgBrokerClient() {
-    	HashMap<String, String> propertyMap = null;
     	try {
-    		propertyMap = IonUtils.parseProperties();
+    		IonUtils.parseProperties();
     	} catch (IOException e) {
-    		// TODO Auto-generated catch block
-    		e.printStackTrace();
+    		log.warn("Failed to parse ooici-conn.properties configuration file.  System defaults will be used.");
     	}
 
     	String hostName = System.getProperty(IonConstants.HOSTNAME_KEY, IonConstants.HOSTNAME_DEFAULT);
@@ -78,12 +76,10 @@ public class MsgBrokerClient {
     }
 
     public MsgBrokerClient(String hostName, int portNumber, String ionExchange) {
-    	HashMap<String, String> propertyMap = null;
     	try {
-    		propertyMap = IonUtils.parseProperties();
+    		IonUtils.parseProperties();
     	} catch (IOException e) {
-    		// TODO Auto-generated catch block
-    		e.printStackTrace();
+    		log.warn("Failed to parse ooici-conn.properties configuration file.  System defaults will be used.");
     	}
 
     	String username = System.getProperty(IonConstants.USERNAME_KEY, IonConstants.USERNAME_DEFAULT);
