@@ -10,6 +10,7 @@ import ion.core.messaging.IonMessage;
 import ion.core.messaging.MessagingName;
 import ion.core.messaging.MsgBrokerClient;
 import ion.core.utils.GPBWrapper;
+import ion.core.utils.IonConstants;
 import ion.core.utils.IonTime;
 import ion.core.utils.IonUtils;
 import ion.core.utils.ProtoUtils;
@@ -49,32 +50,28 @@ public class UpdateEventGenerator {
                 break;
         }
 
-        java.util.HashMap<String, String> connInfo = null;
         try {
             if (connInfoPath != null) {
                 java.io.File propsFile = new java.io.File(connInfoPath);
                 if (propsFile.exists()) {
-                    connInfo = IonUtils.parseProperties(propsFile);
+                    IonUtils.parseProperties(propsFile);
+                }else {
+                    IonUtils.parseProperties();
                 }
             } else {
-                connInfo = IonUtils.parseProperties();
+                IonUtils.parseProperties();
             }
         } catch (IOException ex) {
             log.error("Error reading connection info:", ex);
             System.exit(1);
         }
-        if (connInfo == null || connInfo.isEmpty()) {
-            log.error("Connection info is empty or doesn't exist");
-            System.exit(1);
-        }
-
-        String ooiciHost = connInfo.get("host");
-        String ooiciExchange = connInfo.get("event_xp_name");
-        String ooiciSysname = connInfo.get("sysname");
-        String ooiciTopic = connInfo.get("update_event_topic");
+        String ooiciHost = System.getProperty(IonConstants.HOSTNAME_KEY, IonConstants.HOSTNAME_DEFAULT);
+        String ooiciExchange = System.getProperty(IonConstants.EVENT_EXCHANGE_KEY, IonConstants.EVENT_EXCHANGE_DEFAULT);
+        String ooiciSysname = System.getProperty(IonConstants.SYSNAME_KEY, IonConstants.SYSNAME_DEFAULT);
+        String ooiciTopic = System.getProperty(IonConstants.UPDATE_EVENT_TOPIC_KEY, IonConstants.UPDATE_EVENT_TOPIC_DEFAULT);
 
         if(log.isDebugEnabled()) {
-            log.debug("Connection Parameters:: host={} : xp={} : topic={} : sysname={}", new Object[]{ooiciHost, ooiciExchange, ooiciTopic, ooiciSysname});
+            log.debug("Connection Parameters:: host={} : exchange={} : topic={} : sysname={}", new Object[]{ooiciHost, ooiciExchange, ooiciTopic, ooiciSysname});
         }
 
         MsgBrokerClient mainBroker = null;
@@ -92,16 +89,8 @@ public class UpdateEventGenerator {
             mainBroker.attachConsumer(mainQueue);
 
             if(log.isDebugEnabled()) {
-                log.debug("MainBroker || binding_key={} : to_name={} : queue_name = {}", new Object[]{ooiMyName, ooiToName, mainQueue});
+                log.debug("MainBroker:: binding_key={} : to_name={} : queue_name={}", new Object[]{ooiMyName, ooiToName, mainQueue});
             }
-
-//            net.ooici.services.dm.Event.ResourceModificationEventMessage.Builder resModBldr = net.ooici.services.dm.Event.ResourceModificationEventMessage.newBuilder();
-//            net.ooici.core.link.Link.IDRef idRef = net.ooici.core.link.Link.IDRef.newBuilder().setKey(dsResourceId).build();
-//            GPBWrapper idWrap = GPBWrapper.Factory(idRef);
-//            resModBldr.setResource(idWrap.getCASRef());
-//
-//            GPBWrapper resModWrap = GPBWrapper.Factory(resModBldr.build());
-
 
             /* Make the SchedulerPerformIngestionUpdateMessage */
             net.ooici.services.dm.Scheduler.SchedulerPerformIngestionUpdateMessage updMsg = net.ooici.services.dm.Scheduler.SchedulerPerformIngestionUpdateMessage.newBuilder().setDatasetId(dsResourceId).build();
@@ -111,14 +100,8 @@ public class UpdateEventGenerator {
             net.ooici.services.dm.Event.TriggerEventMessage trigMsg = net.ooici.services.dm.Event.TriggerEventMessage.newBuilder().setPayload(updMsgWrap.getCASRef()).build();
             GPBWrapper trigMsgWrap = GPBWrapper.Factory(trigMsg);
 
-
-
             /* Build the EventMessage that "holds" the ResourceModificationEventMessage */
             net.ooici.services.dm.Event.EventMessage.Builder evtBldr = net.ooici.services.dm.Event.EventMessage.newBuilder();
-//            evtBldr.setName("External ResourceModifiedEvent Trigger");
-//            evtBldr.setDataResourceId(dsResourceId);// ??TODO: Find out what this is supposed to be!!
-//            evtBldr.setDescription("Contains a \"ResourceModificationEventMessage\" which will result in an update cycle for the indicated dataset");
-//            evtBldr.setStatus(Status.IN_PROGRESS);// ??
             evtBldr.setOrigin("1001");
             evtBldr.setDatetime(IonTime.now().getMillis());
             /* Add the TriggerEventMessage */
@@ -126,15 +109,12 @@ public class UpdateEventGenerator {
             GPBWrapper evtWrap = GPBWrapper.Factory(evtBldr.build());
 
             net.ooici.core.message.IonMessage.IonMsg.Builder ionMsgBldr = net.ooici.core.message.IonMessage.IonMsg.newBuilder();
-//        ionMsgBldr.setName("Dataset Update Event");//deprecated
             ionMsgBldr.setIdentity(UUID.randomUUID().toString());
             ionMsgBldr.setMessageObject(evtWrap.getCASRef());
             GPBWrapper ionMsgWrap = GPBWrapper.Factory(ionMsgBldr.build());
 
             /* Add everything to a Container.Structure */
             net.ooici.core.container.Container.Structure.Builder structBldr = net.ooici.core.container.Container.Structure.newBuilder();
-//            ProtoUtils.addStructureElementToStructureBuilder(structBldr, idWrap.getStructureElement());
-//            ProtoUtils.addStructureElementToStructureBuilder(structBldr, resModWrap.getStructureElement());
             ProtoUtils.addStructureElementToStructureBuilder(structBldr, updMsgWrap.getStructureElement());
             ProtoUtils.addStructureElementToStructureBuilder(structBldr, trigMsgWrap.getStructureElement());
             ProtoUtils.addStructureElementToStructureBuilder(structBldr, evtWrap.getStructureElement());
@@ -153,7 +133,7 @@ public class UpdateEventGenerator {
             sendMessage.getIonHeaders().put("performative", "request");
             mainBroker.sendMessage(sendMessage);
 
-            log.info("Successfully sent an update event for dataset_id={} to binding={}", dsResourceId, ooiToName);
+            log.info("Successfully sent an update event for dataset_id={}", dsResourceId);
             
             System.exit(0);
         } finally {
