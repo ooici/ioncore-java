@@ -3,6 +3,8 @@ package ion.core.messaging;
 import ion.core.IonException;
 import ion.core.data.DataObject;
 import ion.core.data.DataObjectManager;
+import ion.core.utils.IonConstants;
+import ion.core.utils.IonUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -29,11 +31,11 @@ import com.rabbitmq.client.ShutdownSignalException;
 public class MsgBrokerClient {
     
     private static final Logger log = LoggerFactory.getLogger(MsgBrokerClient.class);
-	
-	private static final int DEFAULT_TIMEOUT_MS = 300000;
 
     private String mBrokerHost;
     private int mBrokerPort;
+    private String mUsername;
+    private String mPassword;
     private String mBaseExchange;
     private Connection mBrokerConnection = null;
     protected Channel mDefaultChannel = null;
@@ -48,11 +50,56 @@ public class MsgBrokerClient {
      * @param portNumber  The RabbitMQ broker port number
      * @param ionExchange The RabbitMQ exchange name
      */
+    public MsgBrokerClient() {
+    	try {
+    		IonUtils.parseProperties();
+    	} catch (IOException e) {
+    		log.warn("Failed to parse ooici-conn.properties configuration file.  System defaults will be used.");
+    	}
+
+    	String hostName = System.getProperty(IonConstants.HOSTNAME_KEY, IonConstants.HOSTNAME_DEFAULT);
+    	int portNumber = IonConstants.PORTNUMBER_DEFAULT;
+    	String portNumberStr = System.getProperty(IonConstants.PORTNUMBER_KEY);
+    	if (portNumberStr != null) {
+    		portNumber = Integer.valueOf(portNumberStr);
+    	}
+    	String username = System.getProperty(IonConstants.USERNAME_KEY, IonConstants.USERNAME_DEFAULT);
+    	String password = System.getProperty(IonConstants.PASSWORD_KEY, IonConstants.PASSWORD_DEFAULT);
+    	String ionExchange = System.getProperty(IonConstants.EXCHANGE_KEY, IonConstants.EXCHANGE_DEFAULT);
+
+    	mBrokerHost = hostName;
+    	mBrokerPort = portNumber;
+    	mUsername = username;
+    	mPassword = password;
+    	mBaseExchange = ionExchange;
+    	mConsumerMap = new HashMap();
+    }
+
     public MsgBrokerClient(String hostName, int portNumber, String ionExchange) {
-        mBrokerHost = hostName;
-        mBrokerPort = portNumber;
-        mBaseExchange = ionExchange;
-        mConsumerMap = new HashMap();
+    	try {
+    		IonUtils.parseProperties();
+    	} catch (IOException e) {
+    		log.warn("Failed to parse ooici-conn.properties configuration file.  System defaults will be used.");
+    	}
+
+    	String username = System.getProperty(IonConstants.USERNAME_KEY, IonConstants.USERNAME_DEFAULT);
+    	String password = System.getProperty(IonConstants.PASSWORD_KEY, IonConstants.PASSWORD_DEFAULT);
+
+    	mBrokerHost = hostName;
+    	mBrokerPort = portNumber;
+    	mUsername = username;
+    	mPassword = password;
+    	mBaseExchange = ionExchange;
+    	mConsumerMap = new HashMap();
+    }
+
+    public MsgBrokerClient(String hostName, int portNumber, String username, String password, String ionExchange) {
+    	mBrokerHost = hostName;
+    	mBrokerPort = portNumber;
+    	mUsername = username;
+    	mPassword = password;
+    	mBaseExchange = ionExchange;
+    	mConsumerMap = new HashMap();
     }
 
     /**
@@ -67,6 +114,12 @@ public class MsgBrokerClient {
             ConnectionFactory cfconn = new ConnectionFactory();
             cfconn.setHost(mBrokerHost);
             cfconn.setPort(mBrokerPort);
+            if (mUsername != null) {
+            	cfconn.setUsername(mUsername);
+            }
+            if (mPassword != null) {
+            	cfconn.setPassword(mPassword);
+            }
             mBrokerConnection = cfconn.newConnection();
 
             mDefaultChannel = mBrokerConnection.createChannel();
@@ -162,7 +215,7 @@ public class MsgBrokerClient {
     }
 
     public IonMessage consumeMessage(String queueName) {
-        return consumeMessage(queueName, DEFAULT_TIMEOUT_MS);
+        return consumeMessage(queueName, IonConstants.DEFAULT_TIMEOUT_MS);
     }
 
     /**
@@ -363,5 +416,9 @@ public class MsgBrokerClient {
         }
         mDefaultChannel = null;
         mBrokerConnection = null;
+    }
+    
+    public String toString() {
+    	return "Broker host: <" + mBrokerHost + "> port: <" + mBrokerPort + "> username: <" + mUsername + "> exchange: <" + mBaseExchange + ">";
     }
 }

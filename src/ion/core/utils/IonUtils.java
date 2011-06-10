@@ -37,6 +37,8 @@ public class IonUtils {
         for (Iterator<Entry<Object, Object>> iter = propsIn.entrySet().iterator(); iter.hasNext();) {
             Entry<Object, Object> entry = iter.next();
             props.put((String) entry.getKey(), (String) entry.getValue());
+            // Add to System properties
+            System.setProperty((String) entry.getKey(), (String) entry.getValue());
         }
         return props;
     }
@@ -48,7 +50,7 @@ public class IonUtils {
      */
     public static HashMap<String, String> parseProperties() throws IOException {
         /* Look for connection properties in the user.home directory */
-        java.io.File connFile = new java.io.File(System.getProperty("user.home") + "/ooici-conn.properties");
+        java.io.File connFile = new java.io.File(System.getProperty("user.home") + "/" + IonConstants.OOICI_CONN_FILENAME);
 
         HashMap<String, String> props = null;
         if (connFile.exists()) {
