@@ -26,5 +26,22 @@ public class IonConstants {
 	// Properties file and default constants pertaining to sysname
 	public static String SYSNAME_KEY = "ion.sysname";
 	public static String SYSNAME_DEFAULT = "sysName-UNIQUE";
+    
+    // Properties pertaining to data retrieval
+    public static String DATASTORE_TOPIC_KEY = "ion.datastore_topic";
+    public static String DATASTORE_TOPIC_DEFAULT = "datastore";
+    
+    // Properties pertaining to dataset_registration
+    public static String DATASET_REGISTRATION_TOPIC_KEY = "ion.dataset_registration_topic";
+    public static String DATASET_REGISTRATION_TOPIC_DEFAULT = "app_integration";
+    
+    // Properties pertaining to events
+    public static String EVENT_EXCHANGE_KEY = "ion.event_exchange";
+    public static String EVENT_EXCHANGE_DEFAULT = "events.topic";
+    
+    // Properties pertaining to update events
+    public static String UPDATE_EVENT_TOPIC_KEY = "ion.update_event_topic";
+    public static String UPDATE_EVENT_TOPIC_DEFAULT = "2001.1001";
+    
 	
 }
