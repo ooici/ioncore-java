@@ -219,7 +219,6 @@ public class TestAppIntegrationService extends TestCase {
 		assertTrue(replyJsonString.startsWith("{\"download_url\":"));
 	}
 
-
 	public void testShowManageDataResourcesUser() {
 		if (ooi_id == null) {
 			registerUser();
@@ -299,7 +298,7 @@ public class TestAppIntegrationService extends TestCase {
 		assertTrue(replyJsonString.startsWith("{\"data_resource_id\": "));
 
 		// Update data resource
-		requestJsonString = "{\"user_id\": \"" + ooi_id + "\",\"data_set_resource_id\":\"" + dataSetID + "\",\"isPublic\":true,\"max_ingest_millis\": 1,\"update_start_datetime_millis\": 1,\"update_interval_seconds\": 1,\"ion_title\": \"ion_title\",\"ion_description\": \"ion_description\"}";
+		requestJsonString = "{\"user_id\": \"" + ooi_id + "\",\"data_set_resource_id\":\"" + dataSetID + "\",\"isPublic\":true,\"max_ingest_millis\": 1,\"update_start_datetime_millis\": 1,\"update_interval_seconds\": 1,\"ion_title\": \"ion_title\",\"ion_description\": \"ion_description\", \"visualization_url\":\"http://foo.org/bar\"}";
 		replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.UPDATE_DATA_RESOURCE, ooi_id, "0");
 		printStream.println("UPDATE_DATA_RESOURCE");
 		printStream.println("  request: " + requestJsonString);
@@ -359,7 +358,7 @@ public class TestAppIntegrationService extends TestCase {
 		assertTrue(replyJsonString.equals("{\"success\": true}"));
 
 		// Delete data resource
-		requestJsonString = "{\"data_set_resource_id\":\"" + dataSetID + "\"}";
+		requestJsonString = "{\"data_set_resource_id\": [\"" + dataSetID + "\"]}";
 		replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.DELETE_DATA_RESOURCE, ooi_id, "0");
 		printStream.println("DELETE_DATA_RESOURCE");
 		printStream.println("  request: " + requestJsonString);
@@ -400,7 +399,14 @@ public class TestAppIntegrationService extends TestCase {
 		assertTrue(ais.getStatus() == 200);
 		assertTrue(replyJsonString.startsWith("{\"column_names\": ["));
 
-		requestJsonString = "{\"ooi_id\": \"" + replyJsonString.substring(65, 101) + "\"}";
+		// Grab stuff for use in later calls
+		JSONObject getResourceTypeMsg = (JSONObject)JSONValue.parse(replyJsonString);
+		JSONArray resourcesArray = (JSONArray)getResourceTypeMsg.get("resources");
+		JSONObject jsonObj = (JSONObject)resourcesArray.get(3);
+		JSONArray attributeArray = (JSONArray)jsonObj.get("attribute");
+		String id = (String)attributeArray.get(0);
+
+		requestJsonString = "{\"ooi_id\": \"" + id + "\"}";
 		replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_RESOURCE, ooi_id, "0");
 		printStream.println("GET_RESOURCE: dataset");
 		printStream.println("  request: " + requestJsonString);
@@ -444,7 +450,14 @@ public class TestAppIntegrationService extends TestCase {
 		assertTrue(ais.getStatus() == 200);
 		assertTrue(replyJsonString.startsWith("{\"column_names\": ["));
 
-		requestJsonString = "{\"ooi_id\": \"" + replyJsonString.substring(70, 106) + "\"}";
+		// Grab stuff for use in later calls
+		getResourceTypeMsg = (JSONObject)JSONValue.parse(replyJsonString);
+		resourcesArray = (JSONArray)getResourceTypeMsg.get("resources");
+		jsonObj = (JSONObject)resourcesArray.get(1);
+		attributeArray = (JSONArray)jsonObj.get("attribute");
+		id = (String)attributeArray.get(0);
+
+		requestJsonString = "{\"ooi_id\": \"" + id + "\"}";
 		replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_RESOURCE, ooi_id, "0");
 		printStream.println("GET_RESOURCE: datasources");
 		printStream.println("  request: " + requestJsonString);
