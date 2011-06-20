@@ -6,6 +6,9 @@ public class IonConstants {
 
 	// Message receive timeout
 	public static final int DEFAULT_TIMEOUT_MS = 300000;
+    
+    // AMQP Heartbeat seconds
+    public static final int DEFAULT_AMQP_HEARTBEAT = 30;
 
 	// Properties file constants pertaining to configuring
 	// the MsgBrokerClient

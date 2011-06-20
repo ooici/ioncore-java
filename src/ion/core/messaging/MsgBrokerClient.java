@@ -120,6 +120,7 @@ public class MsgBrokerClient {
             if (mPassword != null) {
             	cfconn.setPassword(mPassword);
             }
+            cfconn.setRequestedHeartbeat(IonConstants.DEFAULT_AMQP_HEARTBEAT);
             mBrokerConnection = cfconn.newConnection();
 
             mDefaultChannel = mBrokerConnection.createChannel();
