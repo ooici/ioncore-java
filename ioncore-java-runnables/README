@@ -1,0 +1,19 @@
+NOTES:
+a) .dsreg files are located in "Dropbox/EOI_Shared/dataset_registration".  If you don't have access to this directory, ask Chris Mueller or David Stuebe.
+b) You may need to set the executable bit on the two scripts mentioned below
+
+INSTRUCTIONS:
+0) Copy/move the "ooici-conn.properties" file into your user's home directory and edit the 'ion.host' and 'ion.sysname' properties accordingly - defaults are:
+	ion.host=localhost
+	ion.sysname=mysysname
+
+1) Start a CC that runs at least one instance of everything up to boot_level_10
+
+2) Resolve the ioncore_java_runnables project with:
+>> ant resolve
+
+3) Register datasets with:
+>> dataset_registration <path-to-dsreg-files-or-directory>
+
+4) Submit an update event with:
+>> generate_update_event <dataset_resource_id>

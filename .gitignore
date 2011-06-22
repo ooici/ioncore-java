@@ -18,6 +18,9 @@ bin
 .settings/ivy-publish
 ivy-report
 .settings/override-repo
+ioncore-java-runnables/.settings/
+ioncore-java-runnables/lib/
+ioncore-java-runnables/ivy-report/
 
 ######################
 # OS generated files #
