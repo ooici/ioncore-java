@@ -14,6 +14,8 @@ import ion.core.utils.StructureManager;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.ooici.core.container.Container;
 import net.ooici.core.link.Link.CASRef;
 import net.ooici.integration.ais.AisRequestResponse;
@@ -113,14 +115,21 @@ public class DatasetRegistration {
                 sb = new StringBuilder(nl).append(">>>>>>>>>>").append(nl);
                 sb.append("Data resource file \"").append(filepath).append("\" registered successfully!").append(nl);
                 try {
+                    String user_id = null;
                     Container.Structure struct = DataResourceBuilder.getDataResourceCreateRequestStructure(filepath, sb);
                     if (log.isDebugEnabled()) {
                         log.debug(GPBWrapper.Factory(struct).toString());
                     }
+                    Pattern p = Pattern.compile("user_id: \"([0-9A-Za-z-]+)\"");
+                    Matcher m = p.matcher(sb.toString());
+                    m.find();
+                    user_id = sb.substring(m.start(1), m.end(1));
 
                     IonMessage sendMessage = mainBroker.createMessage(ooiMyName, ooiRegistrationName, "createDataResource", struct.toByteArray());
                     sendMessage.getIonHeaders().put("encoding", "ION R1 GPB");
                     sendMessage.getIonHeaders().put("performative", "request");
+                    sendMessage.getIonHeaders().put("user-id", user_id);
+                    sendMessage.getIonHeaders().put("expiry", "0");
                     if (log.isDebugEnabled()) {
                         log.debug(sendMessage.toString());
                     }
