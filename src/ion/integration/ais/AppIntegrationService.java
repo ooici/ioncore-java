@@ -53,7 +53,7 @@ public class AppIntegrationService {
     // associated with the passed Json data.
     public enum RequestType {
     	CREATE_DOWNLOAD_URL,
-    	REGISTER_USER, GET_USER_PROFILE, UPDATE_USER_PROFILE,
+    	REGISTER_USER, GET_USER_PROFILE, UPDATE_USER_PROFILE, SET_USER_ROLE,
     	FIND_DATA_RESOURCE_SUBSCRIPTION, CREATE_DATA_RESOURCE_SUBSCRIPTION,
     	UPDATE_DATA_RESOURCE_SUBSCRIPTION, DELETE_DATA_RESOURCE_SUBSCRIPTION,
     	FIND_DATA_RESOURCES, FIND_DATA_RESOURCES_BY_USER, GET_DATA_RESOURCE_DETAIL,
@@ -108,6 +108,12 @@ public class AppIntegrationService {
     	typeEnumToServiceNameMap.put(RequestType.UPDATE_USER_PROFILE, ServiceName.APP_INTEGRATION);
     	typeEnumToServiceOpMap.put(RequestType.UPDATE_USER_PROFILE, "updateUserProfile");
     	typeEnumToResponseTypeMap.put(RequestType.UPDATE_USER_PROFILE, ResponseType.STATUS_ONLY);
+
+    	typeEnumToRequestTypeIntMap.put(RequestType.SET_USER_ROLE, 9106);
+    	typeEnumToResponseTypeIntMap.put(RequestType.SET_USER_ROLE, 9002);
+    	typeEnumToServiceNameMap.put(RequestType.SET_USER_ROLE, ServiceName.APP_INTEGRATION);
+    	typeEnumToServiceOpMap.put(RequestType.SET_USER_ROLE, "setUserProfile");
+    	typeEnumToResponseTypeMap.put(RequestType.SET_USER_ROLE, ResponseType.STATUS_ONLY);
 
     	typeEnumToRequestTypeIntMap.put(RequestType.FIND_DATA_RESOURCE_SUBSCRIPTION, 9218);
     	typeEnumToResponseTypeIntMap.put(RequestType.FIND_DATA_RESOURCE_SUBSCRIPTION, 9208);
