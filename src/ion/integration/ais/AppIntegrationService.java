@@ -112,7 +112,7 @@ public class AppIntegrationService {
     	typeEnumToRequestTypeIntMap.put(RequestType.SET_USER_ROLE, 9106);
     	typeEnumToResponseTypeIntMap.put(RequestType.SET_USER_ROLE, 9002);
     	typeEnumToServiceNameMap.put(RequestType.SET_USER_ROLE, ServiceName.APP_INTEGRATION);
-    	typeEnumToServiceOpMap.put(RequestType.SET_USER_ROLE, "setUserProfile");
+    	typeEnumToServiceOpMap.put(RequestType.SET_USER_ROLE, "setUserRole");
     	typeEnumToResponseTypeMap.put(RequestType.SET_USER_ROLE, ResponseType.STATUS_ONLY);
 
     	typeEnumToRequestTypeIntMap.put(RequestType.FIND_DATA_RESOURCE_SUBSCRIPTION, 9218);
