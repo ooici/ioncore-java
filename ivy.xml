@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
-    <info module="ioncore-java" organisation="net.ooici" revision="0.2.14" />
+    <info module="ioncore-java" organisation="net.ooici" revision="0.2.15-dev" />
     <configurations>
         <conf name="compile"/>
     </configurations>
