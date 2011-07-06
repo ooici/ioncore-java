@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
-    <info module="ioncore-java-runnables" organisation="net.ooici" revision="0.0.3"/>
+    <info module="ioncore-java-runnables" organisation="net.ooici" revision="0.0.4"/>
     <configurations>
         <conf name="compile"/>
     </configurations>
     <dependencies>
         <!-- Public dependencies -->
-        <dependency org="net.ooici" name="ioncore-java" rev="0.2.14" conf="*->*,!sources,!javadoc" transitive="true"/>
+        <dependency org="net.ooici" name="ioncore-java" rev="0.2.15" conf="*->*,!sources,!javadoc" transitive="true"/>
         
     </dependencies>
 </ivy-module>
