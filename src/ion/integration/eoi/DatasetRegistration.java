@@ -52,9 +52,10 @@ public class DatasetRegistration {
     public DatasetRegistration(String dirOrFile) {
         MsgBrokerClient mainBroker = null;
         try {
+            boolean isDir;
             File[] regFiles = null;
             File dir = new File(dirOrFile);
-            if (dir.isDirectory()) {
+            if ((isDir = dir.isDirectory())) {
                 regFiles = dir.listFiles(new FilenameFilter() {
 
                     public boolean accept(File dir, String name) {
@@ -112,7 +113,7 @@ public class DatasetRegistration {
                 } catch (IOException ex) {
                     throw new IonException("Could not resolve file path", ex);
                 }
-                sb = new StringBuilder(nl).append(">>>>>>>>>>").append(nl);
+                sb = new StringBuilder(nl).append(">>>>>>>>>>").append("Registering .dsreg file \"").append(filepath).append("\"").append(nl);
                 sb.append("Data resource file \"").append(filepath).append("\" registered successfully!").append(nl);
                 try {
                     String user_id = null;
@@ -179,6 +180,14 @@ public class DatasetRegistration {
 
                 } catch (Exception ex) {
                     throw new IonException("Error creating resource for dsreg file: " + filepath, ex);
+                }
+                if (isDir) {
+                    try {
+                        log.info("Waiting 10 seconds before registering next \".dsreg\" file...");
+                        Thread.sleep(10000);
+                    } catch (InterruptedException ex) {
+                        log.error("Thread wait failed - proceeding to next \".dsreg\" file...", ex);
+                    }
                 }
             }
         } finally {
