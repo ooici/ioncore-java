@@ -1,2 +1,2 @@
 #!/bin/bash
-java -cp .:*:lib/* ion.integration.eoi.UpdateEventGenerator $*
+java -cp .:"${0%/*}/"*:"${0%/*}/"lib/* ion.integration.eoi.UpdateEventGenerator $*
