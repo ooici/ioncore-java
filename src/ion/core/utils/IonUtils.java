@@ -36,9 +36,9 @@ public class IonUtils {
         HashMap<String, String> props = new HashMap<String, String>();
         for (Iterator<Entry<Object, Object>> iter = propsIn.entrySet().iterator(); iter.hasNext();) {
             Entry<Object, Object> entry = iter.next();
-            props.put((String) entry.getKey(), (String) entry.getValue());
+            props.put((String) entry.getKey(), ((String) entry.getValue()).trim());
             // Add to System properties
-            System.setProperty((String) entry.getKey(), (String) entry.getValue());
+            System.setProperty((String) entry.getKey(), ((String) entry.getValue()).trim());
         }
         return props;
     }
