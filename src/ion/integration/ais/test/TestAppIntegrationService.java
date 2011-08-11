@@ -29,49 +29,49 @@ public class TestAppIntegrationService extends TestCase {
 
 
 	private String certificate = "-----BEGIN CERTIFICATE-----\\n" +
-	"MIIEVDCCAzygAwIBAgICCQ4wDQYJKoZIhvcNAQELBQAwazETMBEGCgmSJomT8ixkARkWA29yZzEX\\n" +
+	"MIIEVDCCAzygAwIBAgICBZ0wDQYJKoZIhvcNAQELBQAwazETMBEGCgmSJomT8ixkARkWA29yZzEX\\n" +
 	"MBUGCgmSJomT8ixkARkWB2NpbG9nb24xCzAJBgNVBAYTAlVTMRAwDgYDVQQKEwdDSUxvZ29uMRww\\n" +
-	"GgYDVQQDExNDSUxvZ29uIE9wZW5JRCBDQSAxMB4XDTExMDYwMzIxMDIxOFoXDTExMDYwNDA5MDcx\\n" +
+	"GgYDVQQDExNDSUxvZ29uIE9wZW5JRCBDQSAxMB4XDTExMDgxMDIzMzQxOFoXDTExMDgxMTExMzkx\\n" +
 	"OFowZjETMBEGCgmSJomT8ixkARkTA29yZzEXMBUGCgmSJomT8ixkARkTB2NpbG9nb24xCzAJBgNV\\n" +
-	"BAYTAlVTMQ8wDQYDVQQKEwZHb29nbGUxGDAWBgNVBAMTD09PSS1DSSBPT0kgQTU1MjCCASIwDQYJ\\n" +
-	"KoZIhvcNAQEBBQADggEPADCCAQoCggEBAMIbdvzufLyoedYoWaKW8OISLcC8GfvpvhnUmrM9prEI\\n" +
-	"NHYwSfXuVlqVGHXtRUfPJj0Its+TQf7myOH5gsApqwX2MqP5QcJyO2aNWRNkTmK3XPC7gWI0Hcd5\\n" +
-	"qgwzzK3Sn6UKRjmoEcjL2vm9NaNIg8TMkj04lAG3Re59+v5uLq+cltced2QKKpxdU8EWtGMQozAu\\n" +
-	"AYaJM1avcX51ea122z49LrNCJ+2dFcpklYF61C6/A9guKkXGhk0KM+n8JU1pyKlpvmI/p8wVbgs5\\n" +
-	"GnmCaUdsyUnblXAKP3pioC1LJMRzm15YP6GLGyo8lRQviIR9efKLXoVS3PisC7eoCcyUOTcCAwEA\\n" +
+	"BAYTAlVTMQ8wDQYDVQQKEwZHb29nbGUxGDAWBgNVBAMTD09PSS1DSSBPT0kgQTUwMTCCASIwDQYJ\\n" +
+	"KoZIhvcNAQEBBQADggEPADCCAQoCggEBAIDLZVG6oyn3sHlb9Xg/s0+09guSQRiIngNJh8Fxd02G\\n" +
+	"DKye0et/sfjO358Evq8NSeRx9lgbWFeBYtRqg4enxz913FySUXh7WxYjgm72No9aeMtY3DhwihrI\\n" +
+	"hvvpIrnZH5upAr+v8N/NgrSXmSZfEsO/VhW8WzjtnbCPhrgeP+3s8u6k/jZrJly03T76Lh7OfY+D\\n" +
+	"oiio1aEJ7zp077JN3FRcKXH/9WbM5dnT0sWj8gtsRfA0oUpTLr9Pi7ukwN/3bb1aGby6m5FzJzZZ\\n" +
+	"TD/Bql7BZs1dnIoKK3C0rXWQ/1w7XUxKMfUEAcAdLemMc+fJlmLlkj7ceu3qIiqacxD8gskCAwEA\\n" +
 	"AaOCAQUwggEBMAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/BAQDAgSwMBMGA1UdJQQMMAoGCCsGAQUF\\n" +
 	"BwMCMBgGA1UdIAQRMA8wDQYLKwYBBAGCkTYBAwMwbAYDVR0fBGUwYzAvoC2gK4YpaHR0cDovL2Ny\\n" +
 	"bC5jaWxvZ29uLm9yZy9jaWxvZ29uLW9wZW5pZC5jcmwwMKAuoCyGKmh0dHA6Ly9jcmwuZG9lZ3Jp\\n" +
 	"ZHMub3JnL2NpbG9nb24tb3BlbmlkLmNybDBEBgNVHREEPTA7gRFteW9vaWNpQGdtYWlsLmNvbYYm\\n" +
-	"dXJuOnB1YmxpY2lkOklETitjaWxvZ29uLm9yZyt1c2VyK0E1NTIwDQYJKoZIhvcNAQELBQADggEB\\n" +
-	"AAW2n6oHSRBK3hoO/7628SLh0WCesmISKzqZRm1K6EuYiLpLsgfLOZWqu27UmuxlrBNDYNs3lgL/\\n" +
-	"8VaDVo9sJMowrdWhBawALuEHrIYkX6S1HsgvcRW9n23zb1AyjwbCZlKK8QH4Moh6uByO+pOSZdbV\\n" +
-	"Lz2dw6nIoKz702VMiElLXeE1pDJIeCr5W1FJAZpi9SEWIzdjtHGojSpUx7CNupCOOTIH8R1cHbO0\\n" +
-	"mBDnP20LUI+JjtN1Va0bAHc2W8UZSsW8g4QvTBJ7XvsOGV+7XhFmxZmEhGaFDtPyCMW6E34EuRJS\\n" +
-	"9l8al9sP+u2brS6fQ5qoc5xyZVVcffYPdBFT8gY=\\n" +
+	"dXJuOnB1YmxpY2lkOklETitjaWxvZ29uLm9yZyt1c2VyK0E1MDEwDQYJKoZIhvcNAQELBQADggEB\\n" +
+	"AJVbyOSd5TI/ZJFTWjKzyzoRWCsVsa0Kc+8mZb48fqIh+aWIeQb232uzcb6E3d6c7EHy3sYx/mGX\\n" +
+	"p1yNw0tYl4bMmj3DCZNvOpl3fiI29a351nmMOmbCgWETSTOUr+Peoc90fwa77MJ+u4P/8m95vJpf\\n" +
+	"IkUze92bJ78k8ztmVCw69R7DTooNMLc2GH3zcdp3ul+4We/uIV0VvQPQnqKAibUb2spHjU1/u6Kw\\n" +
+	"aIJVedgVu050DzA/gyv019p1tzJAHsaz4fwpd5iSelmOHU2ZCIIRPz9uRHQLQfVq1C4lzVdhogby\\n" +
+	"wyHT0uL94u2u3IELKAcY8Zz78hdHv2AWwpwenMk=\\n" +
 	"-----END CERTIFICATE-----";
 	private String privateKey = "-----BEGIN RSA PRIVATE KEY-----\\n" +
-	"MIIEowIBAAKCAQEAwht2/O58vKh51ihZopbw4hItwLwZ++m+GdSasz2msQg0djBJ9e5WWpUYde1F\\n" +
-	"R88mPQi2z5NB/ubI4fmCwCmrBfYyo/lBwnI7Zo1ZE2ROYrdc8LuBYjQdx3mqDDPMrdKfpQpGOagR\\n" +
-	"yMva+b01o0iDxMySPTiUAbdF7n36/m4ur5yW1x53ZAoqnF1TwRa0YxCjMC4BhokzVq9xfnV5rXbb\\n" +
-	"Pj0us0In7Z0VymSVgXrULr8D2C4qRcaGTQoz6fwlTWnIqWm+Yj+nzBVuCzkaeYJpR2zJSduVcAo/\\n" +
-	"emKgLUskxHObXlg/oYsbKjyVFC+IhH158otehVLc+KwLt6gJzJQ5NwIDAQABAoIBAQCoDild4YmD\\n" +
-	"uYYK4dKBT5fs03pjZThF/+DD8muiBh2dJpJtRW+zio+fS3jrGOujuXjM3Q+R9lfsPpnr9B+9ChZ1\\n" +
-	"SewcRcEmfcpqBrT5ch3foAvKrTze7mpd+zs751ktoa7wsE2Ou7HyHHVRRfz7itvy9n8inCqgtbHJ\\n" +
-	"Q6+cu36WMUXhDlfa9hq73DN2nmKZjqaRg0rIIfyLa4fvMFWz5AtHR8FOwk79YvzOAE70MXuca0en\\n" +
-	"NmqXD/OaZ4MNXTMdPt0f2hlYOO+/rPv8DZpfi+joB9NQ+ZZqcb7nQ56yOcJx+yPjQ+8yRmheil4g\\n" +
-	"BVRr83Z41ZsCpuHpnP6FdwZNqobpAoGBAONEBtYpyktY6bbc1Z9pAy00kiGyoNFCzvtvhL3JvPZo\\n" +
-	"nC+N0aRMnlWXxxPtvyqyJIJvqK1KbWcd4yD200xhLpC5r/y3HpXJ19V+mAQ0cEsuZamw9K1fB+EY\\n" +
-	"aSlp9Foz/5cZCiX31F8yi0js+IuP1xzAv7oqup9CFry/6wp7jBm7AoGBANqmMH+0OpFVIiSjBjre\\n" +
-	"/E+sSxcqrajv4JvDns96fJjGOJ/LBY0eUUhwPY4wim0rfNcu3Hmotp/X8w0+OX0svXhu0MP0WCCJ\\n" +
-	"y/S8wNIQuXN25mqVRmU+hLFii4t7SgdxM8r1/oQKH0lAqE123zAYR417cdBurCBQA5aKKyEyTZi1\\n" +
-	"AoGAWesucUnzmkBBqHJTq1DXSumD8AVHD8TJND55XMYXF79oHICWM9WEyATXZZEpk/EL9PfM21OZ\\n" +
-	"WbU/imleTNgennB5qxmg5k8IMJZ3+yHsVDK1UqCLDpWM/oi0AwjC/3WXaOclVsRpqIjNBzuLU1zE\\n" +
-	"FcJFmZkSYbS6Xk/o5Srg0cUCgYBVRLZpNwoYH1E/ZGxLjSZsk8587GHpHhND65gFZcktczAl8PDr\\n" +
-	"RcWBMHRw/TEevfTjnhzRPSBrWbYplfipfkctrlmv8ZxkpBhsCyhPQ8Ju6xGUwz4+wZDR9JJjBOOr\\n" +
-	"31PJdQGa0K++y35XJ2KGyREuddO+60opF8subBfBzHJCeQKBgA0SkCgGHFILi80EG4FHZCdb3+CR\\n" +
-	"w/0z56l5aPSP52xpWjzPyywv+4ku+LXEyWF3qj4xJww8SVBP5nmTsYEJwu26g97ZWprehJzOOhWu\\n" +
-	"11HQQLNLNPYu68sggMAjjdguSl7W2cEJskqTWs8Gsjug0HQw/I3I9MTJKa71rsYBNdhL\\n" +
+	"MIIEowIBAAKCAQEAgMtlUbqjKfeweVv1eD+zT7T2C5JBGIieA0mHwXF3TYYMrJ7R63+x+M7fnwS+\\n" +
+	"rw1J5HH2WBtYV4Fi1GqDh6fHP3XcXJJReHtbFiOCbvY2j1p4y1jcOHCKGsiG++kiudkfm6kCv6/w\\n" +
+	"382CtJeZJl8Sw79WFbxbOO2dsI+GuB4/7ezy7qT+NmsmXLTdPvouHs59j4OiKKjVoQnvOnTvsk3c\\n" +
+	"VFwpcf/1Zszl2dPSxaPyC2xF8DShSlMuv0+Lu6TA3/dtvVoZvLqbkXMnNllMP8GqXsFmzV2cigor\\n" +
+	"cLStdZD/XDtdTEox9QQBwB0t6Yxz58mWYuWSPtx67eoiKppzEPyCyQIDAQABAoIBABdlW01iavtX\\n" +
+	"rC4Pf2LNp4QGKl/lvH95acLNG6UPOI3TmP/OhfGSq8C3y7V2RjFEZ7Tg4tAUf5K9xTcy9huxZado\\n" +
+	"gJQsXDJXri8yWiJQBY867xB5Xt+9ycidvq+KJS2/fFdpdz9c9ZOiIGkv1Lk8sgru+fNO2P9ZYrjN\\n" +
+	"Cbrue8x7aZERyxuewU7opU6BihX2Ckw+YLGQwTYmqp6nNDKXV3dZY9tKE4a9uuhOelPggbi1Zy98\\n" +
+	"/HrN6qMqH6ICQq3Zm82NZQlb8PL0u6v18Ojf+4BUDKyD9QHWtuB7IsUnDU3Wr1Y0Rpi0hx5gXM4/\\n" +
+	"2QwzOqVS3n6BSCJCOimwqkKOh4UCgYEAu2i4+Q1VGazIW98/KKEEL87gPDxXIhq1IcbzfzMAqsNp\\n" +
+	"bxGdypMmD7fnHN8FEFqTw8UND9DOsmh90fSPmprrXoLlf4Ymr3DNKhrZVKzrOM/LB0L6Yry3NXWN\\n" +
+	"2cZE5bj+0bxLqqQ2rFxoEfWjilO0lLUOW7XFr/PLTNCd9xmK4LMCgYEAr+7JgMwQi9LTO+oF+F0J\\n" +
+	"oExwoSqre8SbtGoGvke0Bb+ir/RD1Ghoa01PgX0xM1XRhaeMjLoVj4/EDcSMKC5gS+Lug9VRUbZt\\n" +
+	"drz6f0lcvy39rzL7yEoB/Ap2QXRLmILUs14zR/duOiAA/cqm49uCzp4hypRcmepvw4beL9FSlJMC\\n" +
+	"gYEAshb0IAehZQKia1ucozlPxzaqM9OLYadLlUuAPNH0wlFsMdXlwolO1AUIpJDyOPY6EQGCRhNB\\n" +
+	"OJy/Y/MpO9wX6vosqKCMxo9FB8v31tVzucsMvlvRoF6BI1YQdHBLLJo93IU4ynG+WtB9PQPWYy7k\\n" +
+	"HaRofpIfx/K+sMJWOmiVZq0CgYBqoKav0P4WQGiV33hO1tSGus1oYJweH0LfTYNYv8xzz3miesDB\\n" +
+	"c6YVon2VVXMEUfbysmGUyRNYNyHz1jO8Bp+GXruAW0E17QLa/B42FxiHJjCihpvjADfDsfOKKBnJ\\n" +
+	"DUIsk+Mwst2zjMIND02mu9vDrkN8q/6TqmqibpMrGAqc0QKBgAt4sl2UD6ZthrElIe6+R7zGvJtq\\n" +
+	"dygQsBAF2wb2sluIRu6zdm9EDp6XzlzouN3PhCr6Vh/CO/zf43+dKC6yrRDAFiEttoOgeMTBIj2B\\n" +
+	"xN/XW/CKTL9f05RpuHULaoNHcOqi56m+Cs6jUaOuVwPxn5T0YoN/Tp24hbRfxFvMG34V\\n" +
 	"-----END RSA PRIVATE KEY-----";
 
 	public TestAppIntegrationService(String name) throws FileNotFoundException {
@@ -168,6 +168,18 @@ public class TestAppIntegrationService extends TestCase {
 		}
 		assertTrue(ais.getStatus() == 200);
 		assertTrue(replyJsonString.startsWith("{\"name\": \"MyOOICI\",\"institution\": \"OOICI\",\"email_address\": \"myooici@gmail.com\",\"authenticating_organization\": \"Google\",\"profile\": [{\"name\": \"mobile\",\"value\": \"555-555-5555\"}"));
+
+		// Set user role
+//		requestJsonString = "{\"user_ooi_id\": \"" + ooi_id + "\",\"role\": \"ADMIN\"}";
+//		replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.SET_USER_ROLE, ooi_id, "0");
+//		printStream.println("SET_USER_ROLE");
+//		printStream.println("  request: " + requestJsonString);
+//		printStream.println("  reply: " + replyJsonString);
+//		if (ais.getStatus() != 200) {
+//			printStream.println("  error string: " + ais.getErrorMessage());
+//		}
+//		assertTrue(ais.getStatus() == 200);
+//		assertTrue(replyJsonString == null);
 	}
 
 	public void testShowDataResourcesAnonymous() {
@@ -249,8 +261,8 @@ public class TestAppIntegrationService extends TestCase {
 			assertTrue(ais.getErrorMessage().startsWith("{\"error_num\": 500,\"error_str\":"));
 		}
 
-		// Create data resource
-		requestJsonString = "{\"user_id\": \"" + ooi_id + "\",\"source_type\": 1,\"request_type\": 1, \"ion_title\": \"ion_title\",\"ion_description\": \"ion_description\", \"ion_institution_id\": \"ion_institution_id\",\"base_url\": \"http://foo\",\"is_public\":true}";
+		// Create data resource 1
+		requestJsonString = "{\"user_id\": \"" + ooi_id + "\",\"source_type\": 4,\"request_type\": 4, \"ion_title\": \"ion_title\",\"ion_description\": \"ion_description\", \"ion_institution_id\": \"ion_institution_id\",\"dataset_url\": \"http://geoport.whoi.edu/thredds/dodsC/oceansites/OS_NTAS_2010_R_M-1.nc\",\"is_public\":true}";
 		replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.CREATE_DATA_RESOURCE, ooi_id, "0");
 		printStream.println("CREATE_DATA_RESOURCE");
 		printStream.println("  request: " + requestJsonString);
@@ -262,8 +274,24 @@ public class TestAppIntegrationService extends TestCase {
 		assertTrue(replyJsonString.startsWith("{\"data_source_id\": "));
 
 		// Grab stuff for use in later calls
-		JSONObject createDataResourceMsg = (JSONObject)JSONValue.parse(replyJsonString);
-		String dataSetID = (String)createDataResourceMsg.get("data_set_id");
+		JSONObject createDataResourceMsg1 = (JSONObject)JSONValue.parse(replyJsonString);
+		String dataSetID1 = (String)createDataResourceMsg1.get("data_set_id");
+
+		// Create data resource 2
+		requestJsonString = "{\"user_id\": \"" + ooi_id + "\",\"source_type\": 4,\"request_type\": 4, \"ion_title\": \"ion_title\",\"ion_description\": \"ion_description\", \"ion_institution_id\": \"ion_institution_id\",\"dataset_url\": \"http://geoport.whoi.edu/thredds/dodsC/oceansites/OS_NTAS_2010_R_M-1.nc\",\"is_public\":true}";
+		replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.CREATE_DATA_RESOURCE, ooi_id, "0");
+		printStream.println("CREATE_DATA_RESOURCE");
+		printStream.println("  request: " + requestJsonString);
+		printStream.println("  reply: " + replyJsonString);
+		if (ais.getStatus() != 200) {
+			printStream.println("  error string: " + ais.getErrorMessage());
+		}
+		assertTrue(ais.getStatus() == 200);
+		assertTrue(replyJsonString.startsWith("{\"data_source_id\": "));
+
+		// Grab stuff for use in later calls
+		JSONObject createDataResourceMsg2 = (JSONObject)JSONValue.parse(replyJsonString);
+		String dataSetID2 = (String)createDataResourceMsg2.get("data_set_id");
 
 		requestJsonString = "{\"user_ooi_id\": \"" + ooi_id + "\"}";
 		replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.FIND_DATA_RESOURCES_BY_USER, ooi_id, "0");
@@ -298,7 +326,7 @@ public class TestAppIntegrationService extends TestCase {
 		assertTrue(replyJsonString.startsWith("{\"data_resource_id\": "));
 
 		// Update data resource
-		requestJsonString = "{\"user_id\": \"" + ooi_id + "\",\"data_set_resource_id\":\"" + dataSetID + "\",\"isPublic\":true,\"max_ingest_millis\": 1,\"update_start_datetime_millis\": 1,\"update_interval_seconds\": 1,\"ion_title\": \"ion_title\",\"ion_description\": \"ion_description\", \"visualization_url\":\"http://foo.org/bar\"}";
+		requestJsonString = "{\"user_id\": \"" + ooi_id + "\",\"data_set_resource_id\":\"" + dataSetID1 + "\",\"isPublic\":true,\"max_ingest_millis\": 1,\"update_start_datetime_millis\": 1,\"update_interval_seconds\": 1,\"ion_title\": \"ion_title\",\"ion_description\": \"ion_description\", \"visualization_url\":\"http://foo.org/bar\"}";
 		replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.UPDATE_DATA_RESOURCE, ooi_id, "0");
 		printStream.println("UPDATE_DATA_RESOURCE");
 		printStream.println("  request: " + requestJsonString);
@@ -357,8 +385,8 @@ public class TestAppIntegrationService extends TestCase {
 		assertTrue(ais.getStatus() == 200);
 		assertTrue(replyJsonString.equals("{\"success\": true}"));
 
-		// Delete data resource
-		requestJsonString = "{\"data_set_resource_id\": [\"" + dataSetID + "\"]}";
+		// Delete data resources
+		requestJsonString = "{\"data_set_resource_id\": [\"" + dataSetID1 + "\",\"" + dataSetID2 + "\"]}";
 		replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.DELETE_DATA_RESOURCE, ooi_id, "0");
 		printStream.println("DELETE_DATA_RESOURCE");
 		printStream.println("  request: " + requestJsonString);
@@ -482,6 +510,9 @@ public class TestAppIntegrationService extends TestCase {
 		requestJsonString = "{\"ooi_id\": \"" + ooi_id + "\"}";
 		replyJsonString = ais.sendReceiveUIRequest(requestJsonString, RequestType.GET_RESOURCE, ooi_id, "0");
 		assertTrue(replyJsonString.startsWith("{\"resource\": ["));
+		if (ais.getStatus() != 200) {
+			printStream.println("  error string: " + ais.getErrorMessage());
+		}
 		assertTrue(ais.getStatus() == 200);
 		printStream.println("GET_RESOURCE: epucontrollers");
 		printStream.println("  request: " + requestJsonString);
