@@ -6,7 +6,7 @@
     </configurations>
     <dependencies>
         <!-- Public dependencies -->
-        <dependency org="net.ooici" name="ioncore-java" rev="0.2.17" conf="*->*,!sources,!javadoc" transitive="true"/>
+        <dependency org="net.ooici" name="ioncore-java" rev="0.2.18" conf="*->*,!sources,!javadoc" transitive="true"/>
         
     </dependencies>
 </ivy-module>
