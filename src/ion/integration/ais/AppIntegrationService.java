@@ -19,6 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import net.ooici.core.container.Container;
 import net.ooici.core.container.Container.Structure;
@@ -43,7 +44,10 @@ public class AppIntegrationService {
     private MessagingName instrumentIntegrationSvc;
 
     private MsgBrokerClient msgBrokerClient;
-    private BaseProcess baseProcess;
+
+    private ArrayList<BaseProcess> freeBaseProcesses = new ArrayList<BaseProcess>();
+    private ArrayList<BaseProcess> inUseBaseProcesses = new ArrayList<BaseProcess>();
+    private static final int MAX_FREE_BASE_PROCESS_POOL_SIZE = 10;
     
     private String errorMessage;
     private int status;
@@ -258,8 +262,12 @@ public class AppIntegrationService {
 
 		msgBrokerClient = new MsgBrokerClient();
 		msgBrokerClient.attach();
-		baseProcess = new BaseProcess(msgBrokerClient);
+		
+		// Spawn and add one base process to the pool
+		BaseProcess baseProcess = new BaseProcess(msgBrokerClient);
 		baseProcess.spawn();
+		freeBaseProcesses.add(baseProcess);
+
 		createMessagingNames(sysName);
 	}
 
@@ -275,10 +283,11 @@ public class AppIntegrationService {
 		msgBrokerClient = new MsgBrokerClient();
 		msgBrokerClient.attach();
 		
-		System.out.println("Connected to host: " + msgBrokerClient.toString());
-
-		baseProcess = new BaseProcess(msgBrokerClient);
+		// Spawn and add one base process to the pool
+		BaseProcess baseProcess = new BaseProcess(msgBrokerClient);
 		baseProcess.spawn();
+		freeBaseProcesses.add(baseProcess);
+
 		createMessagingNames(sysName);
 	}
 
@@ -296,8 +305,12 @@ public class AppIntegrationService {
 	public AppIntegrationService(String sysName, String hostName, int portNumber, String exchange) {
 		msgBrokerClient = new MsgBrokerClient(hostName, portNumber, exchange);
 		msgBrokerClient.attach();
-		baseProcess = new BaseProcess(msgBrokerClient);
+		
+		// Spawn and add one base process to the pool
+		BaseProcess baseProcess = new BaseProcess(msgBrokerClient);
 		baseProcess.spawn();
+		freeBaseProcesses.add(baseProcess);
+
 		createMessagingNames(sysName);
 	}
 
@@ -317,33 +330,65 @@ public class AppIntegrationService {
 	public AppIntegrationService(String sysName, String hostName, int portNumber, String username, String password, String exchange) {
 		msgBrokerClient = new MsgBrokerClient(hostName, portNumber, username, password, exchange);
 		msgBrokerClient.attach();
-		baseProcess = new BaseProcess(msgBrokerClient);
+		
+		// Spawn and add one base process to the pool
+		BaseProcess baseProcess = new BaseProcess(msgBrokerClient);
 		baseProcess.spawn();
-		createMessagingNames(sysName);
-	}
+		freeBaseProcesses.add(baseProcess);
 
-	public AppIntegrationService(String sysName, MsgBrokerClient brokerClient) {
-		baseProcess = new BaseProcess(brokerClient);
-		baseProcess.spawn();
-		createMessagingNames(sysName);
-	}
-
-	public AppIntegrationService(String sysName, BaseProcess baseProcess) {
-		this.baseProcess = baseProcess;
 		createMessagingNames(sysName);
 	}
 
 	public void dispose() {
-		baseProcess.dispose();
-	}
-
-	public BaseProcess getBaseProcess() {
-		return baseProcess;
+		// Delete free and in-use pools
+		freeBaseProcesses = null;
+		inUseBaseProcesses = null;
+		msgBrokerClient.detach();
 	}
 
 	private void createMessagingNames(String sysName) {
 		applicationIntegrationSvc = new MessagingName(sysName, AIS_SERVICE_NAME);
 		instrumentIntegrationSvc = new MessagingName(sysName, INSTRUMENT_INTEGRATION_SERVICE_NAME);
+	}
+
+	/**
+	 * BaseProcess pool handling routines
+	 */
+	private BaseProcess getBaseProcessFromPool() {
+		synchronized (freeBaseProcesses) {
+			BaseProcess baseProcess = null;
+			if (freeBaseProcesses.size() == 0) {
+				// Spawn a new Base Process
+				baseProcess = new BaseProcess(msgBrokerClient);
+				baseProcess.spawn();
+			}
+			else {
+				// Reuse a pooled Base Process
+				baseProcess = freeBaseProcesses.remove(0);
+			}
+			inUseBaseProcesses.add(baseProcess);
+			return baseProcess;
+		}
+	}
+
+	private void returnBasebaseProcessToPool(BaseProcess baseProcess, boolean timedout) {
+		synchronized (freeBaseProcesses) {
+			// If timeout, throw away Base Process
+			inUseBaseProcesses.remove(baseProcess);
+			if (timedout) {
+				// Do nothing
+			}
+			// If at or above high water mark, dispose
+			// Else, return to the free pool
+			else {
+				if (freeBaseProcesses.size() >= MAX_FREE_BASE_PROCESS_POOL_SIZE) {
+					// Do nothing
+				}
+				else {
+					freeBaseProcesses.add(baseProcess);
+				}
+			}
+		}
 	}
 
 	/**
@@ -390,7 +435,15 @@ public class AppIntegrationService {
 			messagingName = instrumentIntegrationSvc;
 		}
 
-		IonMessage replyMessage = baseProcess.rpcSendContainerContent(messagingName, serviceOperation, requestMessage, userId, expiry);
+		// Get base process from free pool
+		BaseProcess baseProcess = getBaseProcessFromPool();
+
+		IonMessage replyMessage = null;
+		try {
+			replyMessage = baseProcess.rpcSendContainerContent(messagingName, serviceOperation, requestMessage, userId, expiry);
+		} finally {
+			returnBasebaseProcessToPool(baseProcess, replyMessage == null);
+		}
 		
 		if (replyMessage == null) {
     		errorMessage = "Request timeout";
