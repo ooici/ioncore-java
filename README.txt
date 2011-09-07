@@ -62,6 +62,27 @@ Compile the project by running:
 ::
 	ant compile
 
+Unit Test
+=========
+The TestApplicationIntegrationService junit test requires that a capability container be up and running
+with pre-loaded data sets.  You can point the junit class to the capability container by defining
+an ooici-conn.properties file in your home directory.  Example content is shown below:
+
+ion.sysname=<sys name used when starting the CC>
+ion.host=<host running RabbitMQ>
+ion.username=guest
+ion.password=guest
+
+Once the CC is up and running and the ooici-conn.properties file has been defined, you can runn the junit
+test cases with:
+::
+    ant test
+
+To investigate junit failures, first look in the "report/*.xml file(s) for lines like the following:
+    <failure message...>
+    
+The TestAppIntegrationService junit test attempts to dump out helpful failure messages received from the CC
+into the JSONFormatExamples.txt file.  This file can be found at the root level in the ioncore-java repository.
 
 
 Build.xml
